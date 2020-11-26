@@ -7,6 +7,9 @@
     <groupId>by.leonovich.hibernatecrm</groupId>
     <artifactId>hibernate-crm</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>hibernate-crm-xml</module>
+    </modules>
     <name>hibernate-crm</name>
     <packaging>pom</packaging>
 
