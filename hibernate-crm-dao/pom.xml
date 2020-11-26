@@ -3,20 +3,27 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>by.leonovich.hibernatecrm</groupId>
         <artifactId>hibernate-crm</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>hibernate-crm-xml</artifactId>
+    <artifactId>hibernate-crm-dao</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>hibernate-crm-xml</name>
+    <name>hibernate-crm-dao</name>
     <url>http://maven.apache.org</url>
 
     <dependencies>
+        <dependency>
+            <groupId>by.leonovich.hibernatecrm</groupId>
+            <artifactId>hibernate-crm-xml</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -48,7 +55,7 @@
     </dependencies>
 
     <build>
-        <finalName>hibernate-crm-xml</finalName>
+        <finalName>hibernate-crm-dao</finalName>
         <plugins>
 
         </plugins>

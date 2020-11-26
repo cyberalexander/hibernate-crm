@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!--
+SINGLE TABLE or TABLE PER CLASS HIERARCHY
+Single table will be created for all hierarchy of classes with all set of fields from every class
+-->
+<hibernate-mapping package="by.leonovich.hibernatecrm.mappings.singletable">
+    <class name="Person" table="T_PERSON" discriminator-value="P">
+        <id name="id" type="long" column="PERSON_ID">
+            <generator class="increment"/>
+        </id>
+        <discriminator column="TYPE"/>
+        <property name="name" column="F_NAME" type="string"/>
+        <property name="surname" column="F_SURNAME" type="string"/>
+        <property name="age" column="F_AGE" type="int"/>
+        <subclass name="Employee" discriminator-value="E">
+            <property name="company" column="F_COMPANY"/>
+            <property name="salary" column="F_SALARY"/>
+        </subclass>
+        <subclass name="Student" discriminator-value="S">
+            <property name="faculty" column="F_FACULTY"/>
+            <property name="mark" column="F_MARK"/>
+        </subclass>
+    </class>
+</hibernate-mapping>
