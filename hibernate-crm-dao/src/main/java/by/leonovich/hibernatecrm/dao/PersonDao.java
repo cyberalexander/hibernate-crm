@@ -4,8 +4,7 @@ import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import by.leonovich.hibernatecrm.mappings.singletable.Person;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.hibernate.Transaction;
 
 /**
  * Created : 26/11/2020 22:07
@@ -16,35 +15,46 @@ import org.slf4j.LoggerFactory;
  * @version 1.0
  */
 public class PersonDao extends BaseDao<Person> {
-    private static final Logger LOG = LoggerFactory.getLogger(BaseDao.class);
 
-    public void sessionFlushDemo(Integer id, String newName) throws DaoException {
+    /**
+     * Explicitly flushing information from context to database. If entity was changed in context,
+     * changes will be stored in database.
+     */
+    public void sessionFlushDemo(Long id, String newName) throws DaoException {
         try {
             Session session = HibernateUtil.getHibernateUtil().getSession();
+            transaction = session.beginTransaction();
             Person p = session.get(Person.class, id);
-            System.out.println("Received from Session : " + p);
+            LOG.info("Dirty={}. Received from Session name = {}", session.isDirty(), p.getName());
             p.setName(newName);
-            System.out.println("After modification in application : " + p);
+            LOG.info("Dirty={}. After modification in application name = {}", session.isDirty(), p.getName());
             session.flush();
-            System.out.println("After FLUSH : " + p);
+            LOG.info("Dirty={}. After FLUSH : {}", session.isDirty(), p);
+            transaction.commit();
         } catch (HibernateException e) {
+            transaction.rollback();
             throw new DaoException(e);
         }
-
     }
 
-    public void sessionRefreshDemo(Integer id, String newName) throws DaoException {
+    /**
+     * Refresh information about entity(ies) in context with actual data from database. If entity was changed
+     * in context, refresh will erase those changes.
+     */
+    public void sessionRefreshDemo(Long id, String newName) throws DaoException {
         try {
             Session session = HibernateUtil.getHibernateUtil().getSession();
-            Person p = (Person)session.get(Person.class, id);
-            System.out.println("Received from Session : " + p);
+            transaction = session.beginTransaction();
+            Person p = session.get(Person.class, id);
+            LOG.info("Dirty={}. Received from Session name = {}", session.isDirty(), p.getName());
             p.setName(newName);
-            System.out.println("After modification in application : " + p);
+            LOG.info("Dirty={}. After modification in application name = {}", session.isDirty(), p.getName());
             session.refresh(p);
-            System.out.println("After REFRESH : " + p);
+            LOG.info("Dirty={}. After REFRESH : {}", session.isDirty(), p);
+            transaction.commit();
         } catch (HibernateException e) {
+            transaction.rollback();
             throw new DaoException(e);
         }
-
     }
 }

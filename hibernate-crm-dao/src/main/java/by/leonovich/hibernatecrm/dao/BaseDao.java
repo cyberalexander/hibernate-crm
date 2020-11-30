@@ -25,18 +25,20 @@ import java.util.Optional;
  * @version 1.0
  */
 public abstract class BaseDao<T> implements Dao<T> {
-    private static final Logger LOG = LoggerFactory.getLogger(BaseDao.class);
-    private Transaction transaction = null;
+    protected static final Logger LOG = LoggerFactory.getLogger(BaseDao.class);
+    protected Transaction transaction = null;
+    protected HibernateUtil hibernate;
 
     public void saveOrUpdate(T t) throws DaoException {
         try {
             Session session = HibernateUtil.getHibernateUtil().getSession();
             transaction = session.beginTransaction();
+            LOG.debug("Before {}", t);
             session.saveOrUpdate(t);
-            LOG.info("saveOrUpdate(t): {}", t);
+            LOG.debug("After {}", t);
             transaction.commit();
             session.evict(t);
-            LOG.info("Save or update (commit): {}", t);
+            LOG.debug("After commit {}", t);
         } catch (HibernateException e) {
             transaction.rollback();
             throw new DaoException(e);
@@ -44,39 +46,34 @@ public abstract class BaseDao<T> implements Dao<T> {
     }
 
     public T get(Serializable id) throws DaoException {
-        LOG.info("Get class by id:" + id);
-        T t = null;
         try {
+            LOG.debug("{}", id);
             Session session = HibernateUtil.getHibernateUtil().getSession();
             transaction = session.beginTransaction();
-            t = (T) session.get(getPersistentClass(), id);
+            T t = session.get(getPersistentClass(), id);
             transaction.commit();
             Optional.ofNullable(t).ifPresent(session::evict);
-            LOG.info("get clazz:" + t);
+            LOG.info("Result : {}", t);
+            return t;
         } catch (HibernateException e) {
             transaction.rollback();
-            LOG.error("Error get " + getPersistentClass() + " in Dao" + e);
             throw new DaoException(e);
         }
-        return t;
     }
 
     public T load(Serializable id) throws DaoException {
-        LOG.info("Load class by id:" + id);
-        T t = null;
         try {
+            LOG.debug("{}", id);
             Session session = HibernateUtil.getHibernateUtil().getSession();
             transaction = session.beginTransaction();
-            t = (T) session.load(getPersistentClass(), id);
-            LOG.info("load() clazz:" + t);
-            session.isDirty();
+            T t = session.load(getPersistentClass(), id);
+            LOG.debug("Session#isDirty={}; Result : {}", session.isDirty(), t);
             transaction.commit();
+            return t;
         } catch (HibernateException e) {
-            LOG.error("Error load() " + getPersistentClass() + " in Dao" + e);
             transaction.rollback();
             throw new DaoException(e);
         }
-        return t;
     }
 
     public void delete(T t) throws DaoException {
@@ -85,9 +82,8 @@ public abstract class BaseDao<T> implements Dao<T> {
             transaction = session.beginTransaction();
             session.delete(t);
             transaction.commit();
-            LOG.info("Delete:" + t);
+            LOG.debug("Deleted : {}", t);
         } catch (HibernateException e) {
-            LOG.error("Error during " + t + " removing.", e);
             transaction.rollback();
             throw new DaoException(e);
         }
@@ -136,11 +132,11 @@ public abstract class BaseDao<T> implements Dao<T> {
 
     @Override
     public Serializable getLastIndex() throws DaoException {
-        return null;
+        throw new UnsupportedOperationException("Operation is not implemented yet!");
     }
 
     @SuppressWarnings("unchecked")
-    private Class getPersistentClass() {
+    private Class<T> getPersistentClass() {
         return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
@@ -150,5 +146,9 @@ public abstract class BaseDao<T> implements Dao<T> {
 
     public void setTransaction(Transaction transaction) {
         this.transaction = transaction;
+    }
+
+    public void setHibernate(HibernateUtil hibernate) {
+        this.hibernate = hibernate;
     }
 }
