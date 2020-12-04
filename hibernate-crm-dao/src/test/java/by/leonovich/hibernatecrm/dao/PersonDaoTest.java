@@ -1,6 +1,5 @@
 package by.leonovich.hibernatecrm.dao;
 
-import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import by.leonovich.hibernatecrm.mappings.singletable.Person;
 import by.leonovich.hibernatecrm.tools.RandomStrings;
 import lombok.SneakyThrows;
@@ -34,14 +33,12 @@ import static by.leonovich.hibernatecrm.tools.RandomStrings.SURNAME;
 class PersonDaoTest {
     private static final Logger LOG = LoggerFactory.getLogger(PersonDaoTest.class);
 
-    private static final HibernateUtil hibernate = HibernateUtil.getHibernateUtil();
     private static final PersonDao personDao = new PersonDao();
     private static List<Person> all;
     private static Random r;
 
     @BeforeAll
     static void beforeAll() {
-        personDao.setHibernate(hibernate);
         r = new Random();
 
         all = Stream.generate(Person::new)
@@ -58,7 +55,6 @@ class PersonDaoTest {
                 return person;
             })
             .collect(Collectors.toList());
-        LOG.info("beforeAll : {}. Is hibernate set up? {}", all.size(), hibernate.getSession().isConnected());
     }
 
     @Test

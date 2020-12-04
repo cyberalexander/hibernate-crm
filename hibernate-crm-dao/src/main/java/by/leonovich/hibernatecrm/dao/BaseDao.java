@@ -26,8 +26,12 @@ import java.util.Optional;
  */
 public abstract class BaseDao<T> implements Dao<T> {
     protected static final Logger LOG = LoggerFactory.getLogger(BaseDao.class);
-    protected Transaction transaction = null;
+    protected Transaction transaction;
     protected HibernateUtil hibernate;
+
+    public BaseDao() {
+        hibernate = HibernateUtil.getHibernateUtil();
+    }
 
     public void saveOrUpdate(T t) throws DaoException {
         try {
@@ -138,17 +142,5 @@ public abstract class BaseDao<T> implements Dao<T> {
     @SuppressWarnings("unchecked")
     private Class<T> getPersistentClass() {
         return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-    }
-
-    public Transaction getTransaction() {
-        return transaction;
-    }
-
-    public void setTransaction(Transaction transaction) {
-        this.transaction = transaction;
-    }
-
-    public void setHibernate(HibernateUtil hibernate) {
-        this.hibernate = hibernate;
     }
 }

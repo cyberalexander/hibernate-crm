@@ -1,7 +1,5 @@
 package by.leonovich.hibernatecrm.dao;
 
-import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -28,6 +26,4 @@ public interface Dao<T> {
     List<Serializable> getIds() throws DaoException;
 
     Serializable getLastIndex() throws DaoException;
-
-    void setHibernate(HibernateUtil hibernate);
 }

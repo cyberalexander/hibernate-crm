@@ -19,7 +19,7 @@
     <properties>
         <!-- ========= Project properties ========= -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jdk.version>1.8</jdk.version>
+        <jdk.version>15</jdk.version>
 
         <!-- ========= Plugins versions ========= -->
         <compiler-plugin.version>3.8.0</compiler-plugin.version>
