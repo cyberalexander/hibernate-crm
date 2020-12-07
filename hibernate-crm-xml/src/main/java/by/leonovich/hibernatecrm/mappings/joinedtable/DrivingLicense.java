@@ -1,11 +1,11 @@
-package by.leonovich.hibernatecrm.mappings.singletable;
+package by.leonovich.hibernatecrm.mappings.joinedtable;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * Created : 26/11/2020 21:36
+ * Created : 06/12/2020 18:22
  * Project : hibernate-crm
  * IDE : IntelliJ IDEA
  *
@@ -15,8 +15,7 @@ import lombok.ToString;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class Employee extends Person {
-
-    private String company;
-    private Double salary;
+public class DrivingLicense extends Document {
+    private DrivingCategory drivingCategory;
+    private Boolean international;
 }

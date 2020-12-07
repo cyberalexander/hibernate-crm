@@ -13,13 +13,20 @@ import java.util.List;
  */
 public interface Dao<T> {
 
-    void saveOrUpdate(T t) throws DaoException;
+    /**
+     * Persist entity in database
+     * @param entity Object to be persisted in database
+     * @return Generated unique ID
+     */
+    Serializable save(T entity) throws DaoException;
+
+    void saveOrUpdate(T entity) throws DaoException;
 
     T get(Serializable id) throws DaoException;
 
     T load(Serializable id) throws DaoException;
 
-    void delete(T t) throws DaoException;
+    void delete(T entity) throws DaoException;
 
     List<T> getAll(Class<T> type) throws DaoException;
 

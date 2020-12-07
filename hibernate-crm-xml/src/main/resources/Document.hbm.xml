@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!--
+JOINED TABLE - TABLE PER SUBCLASS
+For every class will be created separate table with ONLY set of fields related to this class and
+with a foreign key to a parent class
+-->
+<hibernate-mapping package="by.leonovich.hibernatecrm.mappings.joinedtable">
+    <class name="Document" table="T_DOCUMENT">
+        <id name="id" type="java.lang.Long" column="F_ID">
+            <generator class="identity"/>
+        </id>
+        <property name="documentNumber" type="java.lang.String" column="F_DOC_NUMBER"/>
+        <property name="issueDate" type="date" column="F_ISSUE_DATE"/>
+        <property name="expirationDate" type="date" column="F_EXPIRE_DATE"/>
+        <joined-subclass name="Passport" table="T_PASSPORT">
+            <key><column name="F_ID"/></key>
+            <property name="passportNumber" type="java.lang.String" column="F_PASSPORT_NUMBER"/>
+            <property name="nationality" type="java.lang.String" column="F_NATIONALITY"/>
+            <property name="issuedBy" type="java.lang.String" column="F_ISSUED_BY"/>
+        </joined-subclass>
+        <joined-subclass name="DrivingLicense" table="T_DRIVING_LICENSE">
+            <key><column name="F_ID"/></key>
+            <property name="drivingCategory" column="F_CATEGORY">
+                <type name="org.hibernate.type.EnumType">
+                    <param name="enumClass">by.leonovich.hibernatecrm.mappings.joinedtable.DrivingCategory</param>
+                    <param name="type">12</param> <!-- 12 = java.sql.Types.VARCHAR -->
+                </type>
+            </property>
+            <property name="international" type="java.lang.Boolean" column="F_INTERNATIONAL"/>
+        </joined-subclass>
+    </class>
+</hibernate-mapping>

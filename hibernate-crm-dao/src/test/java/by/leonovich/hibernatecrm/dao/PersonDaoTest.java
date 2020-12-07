@@ -33,7 +33,7 @@ import static by.leonovich.hibernatecrm.tools.RandomStrings.SURNAME;
 class PersonDaoTest {
     private static final Logger LOG = LoggerFactory.getLogger(PersonDaoTest.class);
 
-    private static final PersonDao personDao = new PersonDao();
+    private static final Dao<Person> personDao = new BaseDao<>();
     private static List<Person> all;
     private static Random r;
 
@@ -55,21 +55,52 @@ class PersonDaoTest {
                 return person;
             })
             .collect(Collectors.toList());
+        LOG.debug("Test data generated : {}", all);
     }
 
     @Test
     @SneakyThrows
-    void testSaveOrUpdate() {
+    void testSave() {
         Person p = new Person();
         p.setName(new RandomStrings(NAME).get());
         p.setSurname(new RandomStrings(SURNAME).get());
         p.setAge(new Random().nextInt(99 - 1) + 1);
 
-        personDao.saveOrUpdate(p);
+        MatcherAssert.assertThat("It was expected generated Id to be not null",
+            personDao.save(p),
+            Matchers.notNullValue()
+        );
+    }
 
-        MatcherAssert.assertThat(String.format("It was expected loaded from db object to be equal to %s", p),
-            personDao.get(p.getId()),
-            Matchers.equalTo(p)
+    @Test
+    @SneakyThrows
+    void testSaveOrUpdateSave() {
+        Person toSave = new Person();
+        toSave.setName(new RandomStrings(NAME).get());
+        toSave.setSurname(new RandomStrings(SURNAME).get());
+        toSave.setAge(new Random().nextInt(99 - 1) + 1);
+
+        personDao.saveOrUpdate(toSave);
+
+        MatcherAssert.assertThat(String.format("It was expected loaded from db object to be equal to %s", toSave),
+            personDao.get(toSave.getId()),
+            Matchers.equalTo(toSave)
+        );
+    }
+
+    @Test
+    @SneakyThrows
+    void testSaveOrUpdateUpdate() {
+        Person toUpdate = all.get(r.nextInt(all.size() - 1));
+        toUpdate.setName(new RandomStrings(NAME).get());
+        toUpdate.setSurname(new RandomStrings(SURNAME).get());
+        toUpdate.setAge(new Random().nextInt(99 - 1) + 1);
+
+        personDao.saveOrUpdate(toUpdate);
+
+        MatcherAssert.assertThat(String.format("It was expected loaded from db object to be equal to %s", toUpdate),
+            personDao.get(toUpdate.getId()),
+            Matchers.equalTo(toUpdate)
         );
     }
 
@@ -86,7 +117,7 @@ class PersonDaoTest {
     @Test
     @SneakyThrows
     void testGetPersonNotExists() {
-        Serializable index = all.size() + 1L;
+        Serializable index = all.size() + 20L;
         MatcherAssert.assertThat(String.format("It was expected not to GET any Object by ID=%s", index),
             personDao.get(index),
             Matchers.nullValue()
@@ -105,6 +136,7 @@ class PersonDaoTest {
 
     @Test
     @SneakyThrows
+    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testLoadPersonNotExists() {
         Serializable index = all.size() + 10L;
         Assertions.assertThrows(
@@ -133,6 +165,7 @@ class PersonDaoTest {
 
     @Test
     @SneakyThrows
+    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testGetAll() {
         List<Person> queried = new ArrayList<>(personDao.getAll(Person.class));
         all.forEach(p ->
@@ -144,6 +177,7 @@ class PersonDaoTest {
 
     @Test
     @SneakyThrows
+    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testGetIds() {
         List<Long> collectedIds = all.stream().map(Person::getId).collect(Collectors.toList());
         List<Serializable> queried = new ArrayList<>(personDao.getIds());
@@ -153,22 +187,5 @@ class PersonDaoTest {
                 Matchers.is(Boolean.TRUE)
             );
         });
-    }
-
-    @Test
-    @SneakyThrows
-    void testSessionFlush() {
-        Person toTestFlush = new Person();
-        toTestFlush.setName("TEST_FLUSH_NAME");
-        toTestFlush.setSurname("TEST_FLUSH_SURNAME");
-        toTestFlush.setAge(30);
-        personDao.saveOrUpdate(toTestFlush);
-        personDao.sessionFlushDemo(toTestFlush.getId(), new RandomStrings(NAME).get());
-    }
-
-    @Test
-    @SneakyThrows
-    void testSessionRefresh() {
-        personDao.sessionRefreshDemo(all.iterator().next().getId(), new RandomStrings(NAME).get());
     }
 }

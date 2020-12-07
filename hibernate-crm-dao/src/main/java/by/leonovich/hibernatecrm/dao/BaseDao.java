@@ -24,25 +24,43 @@ import java.util.Optional;
  * @author alexanderleonovich
  * @version 1.0
  */
-public abstract class BaseDao<T> implements Dao<T> {
+public class BaseDao<T> implements Dao<T> {
     protected static final Logger LOG = LoggerFactory.getLogger(BaseDao.class);
     protected Transaction transaction;
     protected HibernateUtil hibernate;
 
     public BaseDao() {
-        hibernate = HibernateUtil.getHibernateUtil();
+        hibernate = HibernateUtil.getInstance();
     }
 
-    public void saveOrUpdate(T t) throws DaoException {
+    @Override
+    public Serializable save(T entity) throws DaoException {
         try {
-            Session session = HibernateUtil.getHibernateUtil().getSession();
+            Session session = HibernateUtil.getInstance().getSession();
             transaction = session.beginTransaction();
-            LOG.debug("Before {}", t);
-            session.saveOrUpdate(t);
-            LOG.debug("After {}", t);
+            LOG.debug("Before {}", entity);
+            Serializable id = session.save(entity);
+            LOG.debug("After {}", entity);
             transaction.commit();
-            session.evict(t);
-            LOG.debug("After commit {}", t);
+            session.evict(entity);
+            LOG.debug("After commit {}", entity);
+            return id;
+        } catch (HibernateException e) {
+            transaction.rollback();
+            throw new DaoException(e);
+        }
+    }
+
+    public void saveOrUpdate(T entity) throws DaoException {
+        try {
+            Session session = HibernateUtil.getInstance().getSession();
+            transaction = session.beginTransaction();
+            LOG.debug("Before {}", entity);
+            session.saveOrUpdate(entity);
+            LOG.debug("After {}", entity);
+            transaction.commit();
+            session.evict(entity);
+            LOG.debug("After commit {}", entity);
         } catch (HibernateException e) {
             transaction.rollback();
             throw new DaoException(e);
@@ -52,7 +70,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     public T get(Serializable id) throws DaoException {
         try {
             LOG.debug("{}", id);
-            Session session = HibernateUtil.getHibernateUtil().getSession();
+            Session session = HibernateUtil.getInstance().getSession();
             transaction = session.beginTransaction();
             T t = session.get(getPersistentClass(), id);
             transaction.commit();
@@ -68,7 +86,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     public T load(Serializable id) throws DaoException {
         try {
             LOG.debug("{}", id);
-            Session session = HibernateUtil.getHibernateUtil().getSession();
+            Session session = HibernateUtil.getInstance().getSession();
             transaction = session.beginTransaction();
             T t = session.load(getPersistentClass(), id);
             LOG.debug("Session#isDirty={}; Result : {}", session.isDirty(), t);
@@ -80,13 +98,13 @@ public abstract class BaseDao<T> implements Dao<T> {
         }
     }
 
-    public void delete(T t) throws DaoException {
+    public void delete(T entity) throws DaoException {
         try {
-            Session session = HibernateUtil.getHibernateUtil().getSession();
+            Session session = HibernateUtil.getInstance().getSession();
             transaction = session.beginTransaction();
-            session.delete(t);
+            session.delete(entity);
             transaction.commit();
-            LOG.debug("Deleted : {}", t);
+            LOG.debug("Deleted : {}", entity);
         } catch (HibernateException e) {
             transaction.rollback();
             throw new DaoException(e);
@@ -96,7 +114,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     @Override
     public List<T> getAll(Class<T> type) throws DaoException {
         try {
-            Session session = HibernateUtil.getHibernateUtil().getSession();
+            Session session = HibernateUtil.getInstance().getSession();
             transaction = session.beginTransaction();
 
             CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -116,7 +134,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     @Override
     public List<Serializable> getIds() throws DaoException {
         try {
-            Session session = HibernateUtil.getHibernateUtil().getSession();
+            Session session = HibernateUtil.getInstance().getSession();
             transaction = session.beginTransaction();
 
             Class clazz = getPersistentClass();

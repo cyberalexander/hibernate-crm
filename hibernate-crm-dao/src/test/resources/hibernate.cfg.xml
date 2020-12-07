@@ -15,6 +15,7 @@
         <property name="show_sql">true</property>
         <property name="hibernate.hbm2ddl.auto">create</property>
         <mapping resource="Person.hbm.xml"/>
+        <mapping resource="Document.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>
 

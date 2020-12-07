@@ -17,35 +17,34 @@ import org.slf4j.LoggerFactory;
  * @version 1.0
  */
 public class HibernateUtil {
-    private static HibernateUtil util = null;
     private static final Logger LOG = LoggerFactory.getLogger(HibernateUtil.class);
-    private final SessionFactory sessionFactory;
+    private static final HibernateUtil instance = new HibernateUtil();
+    private final SessionFactory factory;
     private final ThreadLocal<Session> sessions = new ThreadLocal<>();
 
     private HibernateUtil() {
         try {
-            sessionFactory = new Configuration().configure().buildSessionFactory();
-            LOG.debug("SessionFactory initialized : {}", sessionFactory);
+            Configuration config = new Configuration().configure();
+            config.setPhysicalNamingStrategy(new CustomPhysicalNamingStrategy());
+            factory = config.buildSessionFactory();
+            LOG.trace("SessionFactory initialized : {}", factory);
         } catch (Exception e) {
-            throw new HibernateException("Initial SessionFactory creation failed.", e);
+            throw new HibernateException("Hibernate Session Factory creation failed.", e);
             /*System.exit(0);*/
         }
     }
 
-    public Session getSession () {
+    public Session getSession() {
         Session session = sessions.get();
         if (session == null) {
-            session = sessionFactory.openSession();
+            session = factory.openSession();
             sessions.set(session);
         }
         session.setHibernateFlushMode(FlushMode.AUTO);
         return session;
     }
 
-    public static synchronized HibernateUtil getHibernateUtil(){
-        if (util == null){
-            util = new HibernateUtil();
-        }
-        return util;
+    public static synchronized HibernateUtil getInstance(){
+        return instance;
     }
 }
