@@ -2,6 +2,7 @@ package by.leonovich.hibernatecrm.mappings.joinedtable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created : 06/12/2020 18:23
@@ -17,6 +18,6 @@ public enum DrivingCategory {
     private static final List<DrivingCategory> ALL = Arrays.asList(DrivingCategory.values());
 
     public static DrivingCategory random() {
-        return ALL.get(ALL.size() - 1);
+        return ALL.get(new Random().nextInt(ALL.size() - 1));
     }
 }

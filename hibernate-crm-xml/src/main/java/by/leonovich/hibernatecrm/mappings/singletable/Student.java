@@ -1,5 +1,7 @@
 package by.leonovich.hibernatecrm.mappings.singletable;
 
+import by.leonovich.hibernatecrm.tools.RandomNumber;
+import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -19,4 +21,17 @@ public class Student extends Person {
 
     private String faculty;
     private Double mark;
+
+    @Override
+    public <T extends Person> T populate() {
+        super.populate();
+        this.setFaculty(RandomString.FACULTY.get());
+        this.setMark(RandomNumber.MARK.get());
+        return (T) this;
+    }
+
+    public static Student init() {
+        Student st = new Student();
+        return st.populate();
+    }
 }

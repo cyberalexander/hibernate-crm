@@ -1,26 +1,19 @@
 package by.leonovich.hibernatecrm.dao;
 
+import by.leonovich.hibernatecrm.TestConstants;
 import by.leonovich.hibernatecrm.mappings.singletable.Person;
-import by.leonovich.hibernatecrm.tools.RandomStrings;
+import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.hibernate.ObjectNotFoundException;
+import org.hibernate.Session;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static by.leonovich.hibernatecrm.tools.RandomStrings.NAME;
-import static by.leonovich.hibernatecrm.tools.RandomStrings.SURNAME;
 
 /**
  * Created : 27/11/2020 09:54
@@ -30,44 +23,26 @@ import static by.leonovich.hibernatecrm.tools.RandomStrings.SURNAME;
  * @author alexanderleonovich
  * @version 1.0
  */
-class PersonDaoTest {
-    private static final Logger LOG = LoggerFactory.getLogger(PersonDaoTest.class);
+class PersonDaoTest extends AbstractPersonDaoTest {
 
-    private static final Dao<Person> personDao = new BaseDao<>();
-    private static List<Person> all;
-    private static Random r;
-
-    @BeforeAll
-    static void beforeAll() {
-        r = new Random();
-
-        all = Stream.generate(Person::new)
-            .limit(10)
-            .map(person -> {
-                person.setName(new RandomStrings(NAME).get());
-                person.setSurname(new RandomStrings(SURNAME).get());
-                person.setAge(new Random().nextInt(99 - 1) + 1);
-                try {
-                    personDao.saveOrUpdate(person);
-                } catch (DaoException e) {
-                    throw new RuntimeException(e);
-                }
-                return person;
-            })
-            .collect(Collectors.toList());
-        LOG.debug("Test data generated : {}", all);
+    @Test
+    @SneakyThrows
+    void testPersist() {
+        Person person = Person.init();
+        dao.persist(person);
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_PERSIST, person),
+            dao.get(person.getId()),
+            Matchers.notNullValue()
+        );
     }
 
     @Test
     @SneakyThrows
     void testSave() {
-        Person p = new Person();
-        p.setName(new RandomStrings(NAME).get());
-        p.setSurname(new RandomStrings(SURNAME).get());
-        p.setAge(new Random().nextInt(99 - 1) + 1);
-
-        MatcherAssert.assertThat("It was expected generated Id to be not null",
-            personDao.save(p),
+        MatcherAssert.assertThat(
+            TestConstants.M_SAVE,
+            dao.save(Person.init()),
             Matchers.notNullValue()
         );
     }
@@ -75,15 +50,11 @@ class PersonDaoTest {
     @Test
     @SneakyThrows
     void testSaveOrUpdateSave() {
-        Person toSave = new Person();
-        toSave.setName(new RandomStrings(NAME).get());
-        toSave.setSurname(new RandomStrings(SURNAME).get());
-        toSave.setAge(new Random().nextInt(99 - 1) + 1);
-
-        personDao.saveOrUpdate(toSave);
-
-        MatcherAssert.assertThat(String.format("It was expected loaded from db object to be equal to %s", toSave),
-            personDao.get(toSave.getId()),
+        Person toSave = Person.init();
+        dao.saveOrUpdate(toSave);
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_SAVE_OR_UPDATE_SAVE, toSave),
+            dao.get(toSave.getId()),
             Matchers.equalTo(toSave)
         );
     }
@@ -91,15 +62,12 @@ class PersonDaoTest {
     @Test
     @SneakyThrows
     void testSaveOrUpdateUpdate() {
-        Person toUpdate = all.get(r.nextInt(all.size() - 1));
-        toUpdate.setName(new RandomStrings(NAME).get());
-        toUpdate.setSurname(new RandomStrings(SURNAME).get());
-        toUpdate.setAge(new Random().nextInt(99 - 1) + 1);
-
-        personDao.saveOrUpdate(toUpdate);
-
-        MatcherAssert.assertThat(String.format("It was expected loaded from db object to be equal to %s", toUpdate),
-            personDao.get(toUpdate.getId()),
+        Person toUpdate = allPersons.get(randIndex()).populate();
+        toUpdate.setName("UPDATE_" + RandomString.NAME.get() + "_" + toUpdate.getId());
+        dao.saveOrUpdate(toUpdate);
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, toUpdate),
+            dao.get(toUpdate.getId()),
             Matchers.equalTo(toUpdate)
         );
     }
@@ -107,9 +75,10 @@ class PersonDaoTest {
     @Test
     @SneakyThrows
     void testGetPerson() {
-        Serializable randomIndex = all.get(r.nextInt(all.size())).getId();
-        MatcherAssert.assertThat(String.format("Cannot GET Person by ID=%s", randomIndex),
-            personDao.get(randomIndex),
+        Serializable randomIndex = allPersons.get(randIndex()).getId();
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_GET, Person.class.getSimpleName(), randomIndex),
+            dao.get(randomIndex),
             Matchers.notNullValue()
         );
     }
@@ -117,9 +86,10 @@ class PersonDaoTest {
     @Test
     @SneakyThrows
     void testGetPersonNotExists() {
-        Serializable index = all.size() + 20L;
-        MatcherAssert.assertThat(String.format("It was expected not to GET any Object by ID=%s", index),
-            personDao.get(index),
+        Serializable index = allPersons.get(allPersons.size() - 1).getId() + 300L;
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_GET_NOT_EXISTS, index),
+            dao.get(index),
             Matchers.nullValue()
         );
     }
@@ -127,49 +97,61 @@ class PersonDaoTest {
     @Test
     @SneakyThrows
     void testLoadPerson() {
-        Serializable randomIndex = all.get(r.nextInt(all.size())).getId();
-        MatcherAssert.assertThat(String.format("Cannot LOAD Person by ID=%s", randomIndex),
-            personDao.load(randomIndex),
+        Serializable randomIndex = allPersons.get(randIndex()).getId();
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_LOAD, Person.class.getSimpleName(), randomIndex),
+            dao.load(randomIndex),
             Matchers.notNullValue()
         );
     }
 
+    /**
+     * Method {@link Session#load} is different from {@link Session#get}
+     * In case of "get", when object not exists in database, hibernate returns null. When in case of "load"
+     * hibernate will not query object immediately but will just return proxy. And when we try to access any property
+     * of that proxy, hibernate will immediately execute select to database and throw {@link ObjectNotFoundException}
+     * if object won't be found there.
+     */
     @Test
     @SneakyThrows
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testLoadPersonNotExists() {
-        Serializable index = all.size() + 10L;
+        Serializable index = allPersons.get(allPersons.size() - 1).getId() + 300L;
         Assertions.assertThrows(
             ObjectNotFoundException.class,
-            () -> personDao.load(index).toString(),
-            "Expected org.hibernate.ObjectNotFoundException!");
+            () -> dao.load(index).getName(),
+            TestConstants.M_LOAD_EXCEPTION);
     }
 
     @Test
     @SneakyThrows
     void testDelete() {
-        Person toDelete = new Person();
-        toDelete.setName(new RandomStrings(NAME).get());
-        toDelete.setSurname(new RandomStrings(SURNAME).get());
-        toDelete.setAge(new Random().nextInt(99 - 1) + 1);
+        Person toDelete = Person.init();
 
-        personDao.saveOrUpdate(toDelete); /* 1. Save object in DB */
-        Assertions.assertNotNull(toDelete.getId(), String.format("%s was not saved in data base", toDelete));
-        personDao.delete(toDelete); /* 2. Delete object from DB */
+        dao.saveOrUpdate(toDelete); /* 1. Save object in DB */
+        Assertions.assertNotNull(toDelete.getId(), TestConstants.M_SAVE);
+        dao.delete(toDelete); /* 2. Delete object from DB */
 
-        MatcherAssert.assertThat(String.format("Expected %s to be deleted from db", toDelete),
-            personDao.get(toDelete.getId()), /* 3. Try to get deleted object from DB */
+        MatcherAssert.assertThat(String.format(TestConstants.M_DELETE, toDelete),
+            dao.get(toDelete.getId()), /* 3. Try to get deleted object from DB */
             Matchers.nullValue()
         );
     }
 
+    /**
+     * Comparing IDs here, because other information might be changed at the time other tests are running,
+     * like {@link PersonDaoTest#testSaveOrUpdateUpdate()}
+     */
     @Test
     @SneakyThrows
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testGetAll() {
-        List<Person> queried = new ArrayList<>(personDao.getAll(Person.class));
-        all.forEach(p ->
-            MatcherAssert.assertThat(String.format("%s does not exists in database.", p),
+        List<Serializable> queried = dao.getAll(Person.class).stream()
+            .map(Person::getId)
+            .collect(Collectors.toList());
+        allPersons.stream().map(Person::getId).forEach(p ->
+            MatcherAssert.assertThat(
+                String.format(TestConstants.M_GET_ALL, Person.class.getSimpleName(), p),
                 queried.contains(p),
                 Matchers.is(Boolean.TRUE)
             ));
@@ -179,10 +161,10 @@ class PersonDaoTest {
     @SneakyThrows
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testGetIds() {
-        List<Long> collectedIds = all.stream().map(Person::getId).collect(Collectors.toList());
-        List<Serializable> queried = new ArrayList<>(personDao.getIds());
-        collectedIds.forEach(id -> {
-            MatcherAssert.assertThat(String.format("%s does not exists in database.", id),
+        List<Serializable> queried = dao.getIds();
+        allPersons.stream().map(Person::getId).forEach(id -> {
+            MatcherAssert.assertThat(
+                String.format(TestConstants.M_GET_IDS, id),
                 queried.contains(id),
                 Matchers.is(Boolean.TRUE)
             );

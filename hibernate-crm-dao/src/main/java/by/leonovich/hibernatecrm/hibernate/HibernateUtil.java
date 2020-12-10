@@ -1,12 +1,11 @@
 package by.leonovich.hibernatecrm.hibernate;
 
-import org.hibernate.FlushMode;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
 
 /**
  * Created : 26/11/2020 22:03
@@ -35,11 +34,10 @@ public class HibernateUtil {
     }
 
     public Session getSession() {
-        Session session = sessions.get();
-        if (session == null) {
-            session = factory.openSession();
-            sessions.set(session);
-        }
+        Session session = Optional.ofNullable(sessions.get())
+            .filter(SharedSessionContract::isOpen)
+            .orElseGet(factory::openSession);
+        sessions.set(session);
         session.setHibernateFlushMode(FlushMode.AUTO);
         return session;
     }

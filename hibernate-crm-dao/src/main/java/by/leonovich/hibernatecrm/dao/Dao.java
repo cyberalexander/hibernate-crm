@@ -13,8 +13,10 @@ import java.util.List;
  */
 public interface Dao<T> {
 
+    void persist(T entity) throws DaoException;
+
     /**
-     * Persist entity in database
+     * Save entity in database
      * @param entity Object to be persisted in database
      * @return Generated unique ID
      */

@@ -1,5 +1,7 @@
 package by.leonovich.hibernatecrm.mappings.singletable;
 
+import by.leonovich.hibernatecrm.tools.RandomNumber;
+import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -19,4 +21,16 @@ public class Person implements Serializable {
     private String name;
     private String surname;
     private Integer age;
+
+    public <T extends Person> T populate() {
+        this.setName(RandomString.NAME.get());
+        this.setSurname(RandomString.SURNAME.get());
+        this.setAge(RandomNumber.AGE.get());
+        return (T) this;
+    }
+
+    public static Person init() {
+        Person p = new Person();
+        return p.populate();
+    }
 }

@@ -24,7 +24,7 @@ import java.util.Optional;
  * @author alexanderleonovich
  * @version 1.0
  */
-public class BaseDao<T> implements Dao<T> {
+public abstract class BaseDao<T> implements Dao<T> {
     protected static final Logger LOG = LoggerFactory.getLogger(BaseDao.class);
     protected Transaction transaction;
     protected HibernateUtil hibernate;
@@ -34,13 +34,30 @@ public class BaseDao<T> implements Dao<T> {
     }
 
     @Override
+    public void persist(T entity) throws DaoException {
+        try {
+            Session session = HibernateUtil.getInstance().getSession();
+            transaction = session.beginTransaction();
+            LOG.debug("Before persist {}", entity);
+            session.persist(entity);
+            LOG.debug("After persist {}", entity);
+            transaction.commit();
+            session.evict(entity);
+            LOG.debug("After commit {}", entity);
+        } catch (HibernateException e) {
+            transaction.rollback();
+            throw new DaoException(e);
+        }
+    }
+
+    @Override
     public Serializable save(T entity) throws DaoException {
         try {
             Session session = HibernateUtil.getInstance().getSession();
             transaction = session.beginTransaction();
-            LOG.debug("Before {}", entity);
+            LOG.debug("Before save {}", entity);
             Serializable id = session.save(entity);
-            LOG.debug("After {}", entity);
+            LOG.debug("After save {}", entity);
             transaction.commit();
             session.evict(entity);
             LOG.debug("After commit {}", entity);
@@ -51,6 +68,7 @@ public class BaseDao<T> implements Dao<T> {
         }
     }
 
+    @Override
     public void saveOrUpdate(T entity) throws DaoException {
         try {
             Session session = HibernateUtil.getInstance().getSession();
@@ -67,6 +85,7 @@ public class BaseDao<T> implements Dao<T> {
         }
     }
 
+    @Override
     public T get(Serializable id) throws DaoException {
         try {
             LOG.debug("{}", id);
@@ -83,13 +102,14 @@ public class BaseDao<T> implements Dao<T> {
         }
     }
 
+    @Override
     public T load(Serializable id) throws DaoException {
         try {
-            LOG.debug("{}", id);
+            LOG.debug("Loading by id={}", id);
             Session session = HibernateUtil.getInstance().getSession();
             transaction = session.beginTransaction();
             T t = session.load(getPersistentClass(), id);
-            LOG.debug("Session#isDirty={}; Result : {}", session.isDirty(), t);
+            LOG.debug("Session#isDirty={}; result : {}", session.isDirty(), t);
             transaction.commit();
             return t;
         } catch (HibernateException e) {
@@ -98,6 +118,7 @@ public class BaseDao<T> implements Dao<T> {
         }
     }
 
+    @Override
     public void delete(T entity) throws DaoException {
         try {
             Session session = HibernateUtil.getInstance().getSession();

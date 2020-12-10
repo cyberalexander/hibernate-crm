@@ -1,8 +1,10 @@
 package by.leonovich.hibernatecrm.mappings.joinedtable;
 
+import by.leonovich.hibernatecrm.tools.RandomNumber;
+import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 /**
  * Created : 06/12/2020 18:13
@@ -16,6 +18,18 @@ import java.time.LocalDateTime;
 public class Document {
     private Long id;
     private String documentNumber;
-    private LocalDateTime issueDate;
-    private LocalDateTime expirationDate;
+    private LocalDate issueDate;
+    private LocalDate expirationDate;
+
+    public <T extends Document> T populate() {
+        this.setDocumentNumber(RandomString.DOCUMENT_NUMBER.get());
+        this.setIssueDate(LocalDate.now().minusDays(RandomNumber.DAYS.get()));
+        this.setExpirationDate(LocalDate.now().plusDays(RandomNumber.DAYS.get()));
+        return (T) this;
+    }
+
+    public static Document init() {
+        Document p = new Document();
+        return p.populate();
+    }
 }

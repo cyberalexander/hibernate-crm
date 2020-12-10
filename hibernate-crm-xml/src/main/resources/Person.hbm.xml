@@ -16,7 +16,7 @@ Single table will be created for all hierarchy of classes with all set of fields
         <property name="age" column="F_AGE" type="int"/>
         <subclass name="Employee" discriminator-value="E">
             <property name="company" column="F_COMPANY"/>
-            <property name="salary" column="F_SALARY"/>
+            <property name="salary" column="F_SALARY" type="big_decimal" precision="19" scale="4"/>
         </subclass>
         <subclass name="Student" discriminator-value="S">
             <property name="faculty" column="F_FACULTY"/>

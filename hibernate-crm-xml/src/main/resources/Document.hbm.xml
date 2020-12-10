@@ -12,12 +12,17 @@ with a foreign key to a parent class
             <generator class="identity"/>
         </id>
         <property name="documentNumber" type="java.lang.String" column="F_DOC_NUMBER"/>
-        <property name="issueDate" type="date" column="F_ISSUE_DATE"/>
-        <property name="expirationDate" type="date" column="F_EXPIRE_DATE"/>
+        <property name="issueDate" column="F_ISSUE_DATE"/>
+        <property name="expirationDate" column="F_EXPIRE_DATE"/>
         <joined-subclass name="Passport" table="T_PASSPORT">
             <key><column name="F_ID"/></key>
             <property name="passportNumber" type="java.lang.String" column="F_PASSPORT_NUMBER"/>
-            <property name="nationality" type="java.lang.String" column="F_NATIONALITY"/>
+            <property name="nationality" column="F_NATIONALITY">
+                <type name="org.hibernate.type.EnumType">
+                    <param name="enumClass">by.leonovich.hibernatecrm.mappings.joinedtable.Nationality</param>
+                    <param name="type">12</param>
+                </type>
+            </property>
             <property name="issuedBy" type="java.lang.String" column="F_ISSUED_BY"/>
         </joined-subclass>
         <joined-subclass name="DrivingLicense" table="T_DRIVING_LICENSE">
