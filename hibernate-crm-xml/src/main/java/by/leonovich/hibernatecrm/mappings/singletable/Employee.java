@@ -33,7 +33,6 @@ public class Employee extends Person {
     }
 
     public static Employee init() {
-        Employee emp = new Employee();
-        return emp.populate();
+        return new Employee().populate();
     }
 }

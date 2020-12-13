@@ -1,4 +1,4 @@
-package by.leonovich.hibernatecrm.mappings.joinedtable;
+package by.leonovich.hibernatecrm.mappings.common;
 
 import java.util.Arrays;
 import java.util.List;

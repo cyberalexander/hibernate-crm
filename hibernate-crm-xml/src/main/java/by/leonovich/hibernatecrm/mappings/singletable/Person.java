@@ -30,7 +30,6 @@ public class Person implements Serializable {
     }
 
     public static Person init() {
-        Person p = new Person();
-        return p.populate();
+        return new Person().populate();
     }
 }

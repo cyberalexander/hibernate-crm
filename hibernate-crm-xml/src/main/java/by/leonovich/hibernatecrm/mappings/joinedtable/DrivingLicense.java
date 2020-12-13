@@ -1,5 +1,6 @@
 package by.leonovich.hibernatecrm.mappings.joinedtable;
 
+import by.leonovich.hibernatecrm.mappings.common.DrivingCategory;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -30,7 +31,6 @@ public class DrivingLicense extends Document {
     }
 
     public static DrivingLicense init() {
-        DrivingLicense dl = new DrivingLicense();
-        return dl.populate();
+        return new DrivingLicense().populate();
     }
 }

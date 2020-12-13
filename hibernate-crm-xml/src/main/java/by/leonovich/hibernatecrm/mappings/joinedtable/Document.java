@@ -29,7 +29,6 @@ public class Document {
     }
 
     public static Document init() {
-        Document p = new Document();
-        return p.populate();
+        return new Document().populate();
     }
 }

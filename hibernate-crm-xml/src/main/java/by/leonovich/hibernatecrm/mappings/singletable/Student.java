@@ -31,7 +31,6 @@ public class Student extends Person {
     }
 
     public static Student init() {
-        Student st = new Student();
-        return st.populate();
+        return new Student().populate();
     }
 }

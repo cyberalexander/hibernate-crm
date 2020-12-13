@@ -1,5 +1,6 @@
 package by.leonovich.hibernatecrm.mappings.joinedtable;
 
+import by.leonovich.hibernatecrm.mappings.common.Nationality;
 import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,7 +32,6 @@ public class Passport extends Document {
     }
 
     public static Passport init() {
-        Passport p = new Passport();
-        return p.populate();
+        return new Passport().populate();
     }
 }

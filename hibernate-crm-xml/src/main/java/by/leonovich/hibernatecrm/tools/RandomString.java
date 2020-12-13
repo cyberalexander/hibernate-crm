@@ -31,8 +31,12 @@ public enum RandomString {
     DOCUMENT_NUMBER(() -> generateDocNumber(10)),
     PASSPORT_NUMBER(() -> generateDocNumber(6)),
     ISSUED_BY(() -> {
-        int issuedByLength = new Random().nextInt(15-4) + 3;
+        int issuedByLength = new Random().nextInt(15-4) + 4;
         return generate(issuedByLength);
+    }),
+    MANUFACTURER(() -> {
+        int manufacturerLength = new Random().nextInt(10-2) + 2;
+        return generate(manufacturerLength);
     });
 
     private final Supplier<String> supplier;

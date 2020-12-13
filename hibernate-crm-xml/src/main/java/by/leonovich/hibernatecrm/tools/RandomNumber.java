@@ -21,8 +21,9 @@ public enum RandomNumber {
     MARK(() -> Double.valueOf(String.format("%.1f", 1 + (101 - 1) * new Random().nextDouble()))),
     SALARY(() ->
         BigDecimal.valueOf(100 + (100000 - 100) * new Random().nextDouble()).setScale(4, RoundingMode.CEILING)
-    )
-    ;
+    ),
+    ENGINE_VOLUME(() -> ThreadLocalRandom.current().nextDouble(10) * 5),
+    PASSENGERS_COUNT(() -> new Random().nextInt(8 - 2) + 2);
 
     private final Supplier<? extends Serializable> supplier;
 

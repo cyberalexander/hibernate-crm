@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="by.leonovich.hibernatecrm.mappings.tableperclass">
+    <class name="Vehicle" table="T_VEHICLE">
+        <comment>
+            TABLE PER CONCRETE SUBCLASS.
+            Separate table with full set of columns will be created for every class in hierarchy.
+            It's similar to @MappedSuperClass. But it's  creating a table for a Parent class as well.
+        </comment>
+        <id name="id" type="long" column="F_ID">
+            <generator class="uuid"/>
+        </id>
+        <property name="engineVolume" column="F_ENGINE_VOLUME"/>
+        <property name="manufacturer" column="F_MANUFACTURER"/>
+        <union-subclass name="ElectricCar" table="T_ELECTRIC_CAR">
+            <property name="batteryCapacity" column="F_BATTERY_CAPACITY"/>
+            <property name="passengersCount" column="F_PASSENGERS"/>
+            <property name="bodyType" column="F_BODY_TYPE"/>
+        </union-subclass>
+        <union-subclass name="MotorCycle" table="T_MOTORCYCLE">
+            <property name="type" column="F_TYPE"/>
+            <property name="tankCapacity" column="F_TANK_CAPACITY"/>
+        </union-subclass>
+    </class>
+</hibernate-mapping>

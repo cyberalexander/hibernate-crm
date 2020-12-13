@@ -13,6 +13,7 @@
         <property name="hibernate.hbm2ddl.auto">update</property>
         <mapping resource="Person.hbm.xml"/> <!-- Table per class hierarchy (single table) -->
         <mapping resource="Document.hbm.xml"/> <!-- Joined subclass (separate table with unique fields for every class) -->
+        <mapping resource="Vehicle.hbm.xml"/> <!-- Union subclass (every table has all set of fields from parent) -->
     </session-factory>
 </hibernate-configuration>
 
