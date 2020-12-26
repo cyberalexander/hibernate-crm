@@ -1,7 +1,7 @@
-package by.leonovich.hibernatecrm.dao;
+package by.leonovich.hibernatecrm.dao.person;
 
 import by.leonovich.hibernatecrm.TestConstants;
-import by.leonovich.hibernatecrm.mappings.singletable.Employee;
+import by.leonovich.hibernatecrm.mappings.singletable.Student;
 import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
@@ -9,32 +9,36 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 /**
- * Created : 07/12/2020 20:39
+ * Created : 08/12/2020 21:55
  * Project : hibernate-crm
  * IDE : IntelliJ IDEA
  *
  * @author alexanderleonovich
  * @version 1.0
  */
-class EmployeeDaoTest extends AbstractPersonDaoTest {
+class StudentDaoTest extends AbstractPersonDaoTest {
 
     @Test
     @SneakyThrows
     void testPersist() {
-        Employee emp = Employee.init();
-        dao.persist(emp);
+        Student student = Student.init();
+        student.setUniversity(universities.randomEntity());
+        dao.persist(student);
         MatcherAssert.assertThat(
-            String.format(TestConstants.M_PERSIST, emp),
-            dao.get(emp.getId()),
-            Matchers.equalTo(emp)
+            String.format(TestConstants.M_PERSIST, student),
+            dao.get(student.getId()),
+            Matchers.equalTo(student)
         );
     }
 
     @Test
     @SneakyThrows
     void testSave() {
-        MatcherAssert.assertThat(TestConstants.M_SAVE,
-            dao.save(Employee.init()),
+        Student student = Student.init();
+        student.setUniversity(universities.randomEntity());
+        MatcherAssert.assertThat(
+            TestConstants.M_SAVE,
+            dao.save(student),
             Matchers.notNullValue()
         );
     }
@@ -42,7 +46,8 @@ class EmployeeDaoTest extends AbstractPersonDaoTest {
     @Test
     @SneakyThrows
     void testSaveOrUpdateSave() {
-        Employee toSave = Employee.init();
+        Student toSave = Student.init();
+        toSave.setUniversity(universities.randomEntity());
         dao.saveOrUpdate(toSave);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_SAVE_OR_UPDATE_SAVE, toSave),
@@ -54,8 +59,8 @@ class EmployeeDaoTest extends AbstractPersonDaoTest {
     @Test
     @SneakyThrows
     void testSaveOrUpdateUpdate() {
-        Employee toUpdate = randomEmployee();
-        toUpdate.setCompany("UPDATE_" + RandomString.COMPANY.get() + "_" + toUpdate.getId());
+        Student toUpdate = students.randomEntity();
+        toUpdate.setFaculty("UPDATE_" + RandomString.FACULTY.get() + "_" + toUpdate.getId());
         dao.saveOrUpdate(toUpdate);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, toUpdate),
@@ -66,17 +71,13 @@ class EmployeeDaoTest extends AbstractPersonDaoTest {
 
     @Test
     @SneakyThrows
-    void testGetEmployee() {
-        Employee randomEmployee = randomEmployee();
-        LOG.info("{}", randomEmployee);
+    void testGet() {
+        Student randStudent = students.randomEntity();
+        LOG.info("{}", randStudent);
         MatcherAssert.assertThat(
-            String.format(TestConstants.M_GET, randomEmployee.getClass().getSimpleName(), randomEmployee.getId()),
-            dao.get(randomEmployee.getId()),
-            Matchers.instanceOf(Employee.class)
+            String.format(TestConstants.M_GET, randStudent.getClass().getSimpleName(), randStudent.getId()),
+            dao.get(randStudent.getId()),
+            Matchers.instanceOf(Student.class)
         );
-    }
-
-    public Employee randomEmployee() {
-        return (Employee) allPersons.stream().filter(p -> p instanceof Employee).findFirst().get();
     }
 }

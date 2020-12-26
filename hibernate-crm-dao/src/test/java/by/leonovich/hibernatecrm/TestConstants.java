@@ -11,8 +11,8 @@ package by.leonovich.hibernatecrm;
 public class TestConstants {
         public static final String M_PERSIST = "Persisted entity should to be equal to : %s";
         public static final String M_SAVE = "Generated Id must not be null";
-        public static final String M_SAVE_OR_UPDATE_SAVE = "Saved entity should to be equal to : %s";
-        public static final String M_SAVE_OR_UPDATE_UPDATE = "Updated entity should to be equal to : %s";
+        public static final String M_SAVE_OR_UPDATE_SAVE = "Saved entity should be equal to : %s";
+        public static final String M_SAVE_OR_UPDATE_UPDATE = "Updated entity should be equal to : %s";
         public static final String M_GET = "Cannot GET %s by Id : %s";
         public static final String M_GET_NOT_EXISTS = "There should not be any record in database for Id : %s";
         public static final String M_LOAD = "Cannot LOAD %s by Id : %s";
@@ -20,4 +20,5 @@ public class TestConstants {
         public static final String M_DELETE ="%s should be deleted from database";
         public static final String M_GET_ALL = "%s with Id : %s was not found in database.";
         public static final String M_GET_IDS = "%s does not exists in database.";
+        public static final String M_GET_PARTICULAR_TYPE_IDS = "Found %s but only entities of %s type expected to be queried.";
 }

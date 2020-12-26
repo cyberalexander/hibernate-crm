@@ -1,7 +1,8 @@
-package by.leonovich.hibernatecrm.dao;
+package by.leonovich.hibernatecrm.dao.person;
 
 import by.leonovich.hibernatecrm.TestConstants;
 import by.leonovich.hibernatecrm.mappings.singletable.Person;
+import by.leonovich.hibernatecrm.tools.RandomNumber;
 import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
@@ -62,8 +63,10 @@ class PersonDaoTest extends AbstractPersonDaoTest {
     @Test
     @SneakyThrows
     void testSaveOrUpdateUpdate() {
-        Person toUpdate = allPersons.get(randIndex()).populate();
+        Person toUpdate = allPersons.randomEntity();
+        LOG.info("{}", toUpdate);
         toUpdate.setName("UPDATE_" + RandomString.NAME.get() + "_" + toUpdate.getId());
+        toUpdate.getPhoneNumber().setNumber(RandomNumber.DEFAULT_L.get());
         dao.saveOrUpdate(toUpdate);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, toUpdate),
@@ -74,19 +77,19 @@ class PersonDaoTest extends AbstractPersonDaoTest {
 
     @Test
     @SneakyThrows
-    void testGetPerson() {
-        Serializable randomIndex = allPersons.get(randIndex()).getId();
+    void testGet() {
+        Person person = allPersons.randomEntity();
         MatcherAssert.assertThat(
-            String.format(TestConstants.M_GET, Person.class.getSimpleName(), randomIndex),
-            dao.get(randomIndex),
+            String.format(TestConstants.M_GET, person.getClass().getSimpleName(), person.getId()),
+            dao.get(person.getId()),
             Matchers.notNullValue()
         );
     }
 
     @Test
     @SneakyThrows
-    void testGetPersonNotExists() {
-        Serializable index = allPersons.get(allPersons.size() - 1).getId() + 300L;
+    void testGetWhenNotExists() {
+        Serializable index = allPersons.lastElement().getId() + 300L;
         MatcherAssert.assertThat(
             String.format(TestConstants.M_GET_NOT_EXISTS, index),
             dao.get(index),
@@ -96,8 +99,8 @@ class PersonDaoTest extends AbstractPersonDaoTest {
 
     @Test
     @SneakyThrows
-    void testLoadPerson() {
-        Serializable randomIndex = allPersons.get(randIndex()).getId();
+    void testLoad() {
+        Serializable randomIndex = allPersons.randomEntity().getId();
         MatcherAssert.assertThat(
             String.format(TestConstants.M_LOAD, Person.class.getSimpleName(), randomIndex),
             dao.load(randomIndex),
@@ -115,8 +118,8 @@ class PersonDaoTest extends AbstractPersonDaoTest {
     @Test
     @SneakyThrows
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-    void testLoadPersonNotExists() {
-        Serializable index = allPersons.get(allPersons.size() - 1).getId() + 300L;
+    void testLoadWhenNotExists() {
+        Serializable index = allPersons.lastElement().getId() + 300L;
         Assertions.assertThrows(
             ObjectNotFoundException.class,
             () -> dao.load(index).getName(),

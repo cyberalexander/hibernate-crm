@@ -1,16 +1,18 @@
-package by.leonovich.hibernatecrm.dao;
+package by.leonovich.hibernatecrm.dao.document;
 
+import by.leonovich.hibernatecrm.dao.Dao;
+import by.leonovich.hibernatecrm.dao.DocumentDao;
 import by.leonovich.hibernatecrm.mappings.joinedtable.Document;
 import by.leonovich.hibernatecrm.mappings.joinedtable.DrivingLicense;
 import by.leonovich.hibernatecrm.mappings.joinedtable.Passport;
+import by.leonovich.hibernatecrm.tools.MagicList;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.Collections;
-import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,17 +27,18 @@ import java.util.stream.Stream;
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class AbstractDocumentDaoTest {
     protected static final Logger LOG = LoggerFactory.getLogger(AbstractDocumentDaoTest.class);
-    protected static final Random r = new Random();
     protected static final Dao<Document> dao = new DocumentDao();
-    protected static List<Document> allDocuments;
+    protected static final MagicList<Document> allDocuments = new MagicList<>();
+    protected static final MagicList<DrivingLicense> drivingLicenses = new MagicList<>();
+    protected static final MagicList<Passport> passports = new MagicList<>();
 
     @BeforeAll
     static void beforeAll() {
-        Stream<Document> documentStream = Stream.generate(Document::init).limit(25);
-        Stream<DrivingLicense> licenseStream = Stream.generate(DrivingLicense::init).limit(30);
-        Stream<Passport> passportStream = Stream.generate(Passport::init).limit(35);
+        drivingLicenses.addAll(Stream.generate(DrivingLicense::init).limit(10).collect(Collectors.toList()));
+        passports.addAll(Stream.generate(Passport::init).limit(10).collect(Collectors.toList()));
 
-        allDocuments = Stream.concat(Stream.concat(documentStream, licenseStream), passportStream).collect(Collectors.toList());
+        allDocuments.addAll(drivingLicenses);
+        allDocuments.addAll(passports);
         Collections.shuffle(allDocuments);
         allDocuments.forEach(AbstractDocumentDaoTest::persistEach);
     }
@@ -47,7 +50,11 @@ public abstract class AbstractDocumentDaoTest {
         return doc;
     }
 
-    protected int randIndex() {
-        return r.nextInt(allDocuments.size() - 1);
+    /**
+     * Method implemented in order to just "hide" {@link by.leonovich.hibernatecrm.dao.DaoException}
+     */
+    @SneakyThrows
+    public Document daoGet(Serializable id) {
+        return dao.get(id);
     }
 }

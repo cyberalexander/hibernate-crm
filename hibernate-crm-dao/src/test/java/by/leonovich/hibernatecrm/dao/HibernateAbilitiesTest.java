@@ -2,6 +2,7 @@ package by.leonovich.hibernatecrm.dao;
 
 import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import by.leonovich.hibernatecrm.mappings.singletable.Person;
+import by.leonovich.hibernatecrm.tools.MagicList;
 import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
@@ -15,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
-import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,21 +32,21 @@ class HibernateAbilitiesTest {
     private static final Logger LOG = LoggerFactory.getLogger(HibernateAbilitiesTest.class);
     private static final Dao<Person> dao = new PersonDao();
     private static HibernateUtil hibernate;
-    private static List<Person> all;
-    private static Random r;
+    private static final MagicList<Person> all = new MagicList<>();
 
     @BeforeAll
     static void beforeAll() {
         hibernate = HibernateUtil.getInstance();
-        r = new Random();
-        all = Stream.generate(Person::init).limit(10).map(HibernateAbilitiesTest::persistEach).collect(Collectors.toList());
+        all.addAll(
+            Stream.generate(Person::init).limit(10).map(HibernateAbilitiesTest::persistEach).collect(Collectors.toList())
+        );
     }
 
     @Test
     @SneakyThrows
     void testContains() {
         Session session = hibernate.getSession();
-        Person notInContext = randomEntry();
+        Person notInContext = all.randomEntity();
 
         MatcherAssert.assertThat("Object should not be associated with session",
             session.contains(notInContext),
@@ -58,7 +58,7 @@ class HibernateAbilitiesTest {
     @SneakyThrows
     void testEvict() {
         Session session = hibernate.getSession();
-        Long id = randomEntry().getId();
+        Long id = all.randomEntity().getId();
         Transaction t = session.beginTransaction();
         Person test = session.get(Person.class, id); //attached to context
         session.evict(test); //removed from context
@@ -77,7 +77,7 @@ class HibernateAbilitiesTest {
     @Test
     @SneakyThrows
     void testFlush() {
-        Person detached = randomEntry();
+        Person detached = all.randomEntity();
         Session session = hibernate.getSession();
         LOG.info("isDirty={}, in memory : {}", session.isDirty(), detached);
 
@@ -110,7 +110,7 @@ class HibernateAbilitiesTest {
     @Test
     @SneakyThrows
     void testRefresh() {
-        Person detached = randomEntry();
+        Person detached = all.randomEntity();
         Session session = hibernate.getSession();
         LOG.info("isDirty={}, in memory : {}", session.isDirty(), detached);
 
@@ -137,7 +137,7 @@ class HibernateAbilitiesTest {
     @Test
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testPersist() {
-        Person random = randomEntry();
+        Person random = all.randomEntity();
         Session session = hibernate.getSession();
         Transaction t = session.beginTransaction();
         LOG.info("isDirty={}, before modify : {}", session.isDirty(), random);
@@ -167,7 +167,7 @@ class HibernateAbilitiesTest {
     @Test
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testPersistThrowException() {
-        Person random = randomEntry();
+        Person random = all.randomEntity();
         Session session = hibernate.getSession();
 
         Transaction t = session.beginTransaction();
@@ -188,7 +188,7 @@ class HibernateAbilitiesTest {
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testPersistThrowException2() {
         Person newPerson = new Person();
-        newPerson.setId(r.nextLong());
+        newPerson.setId(new Random().nextLong());
 
         Session session = hibernate.getSession();
         Transaction t = session.beginTransaction();
@@ -201,14 +201,6 @@ class HibernateAbilitiesTest {
                 "detached entity passed to persist]!");
 
         t.commit();
-    }
-
-    private Person randomEntry() {
-        int randomIndex = r.nextInt(all.size() - 1);
-        if (LOG.isInfoEnabled()) {
-            LOG.info("randomIndex = " + randomIndex);
-        }
-        return all.get(randomIndex);
     }
 
     @SneakyThrows

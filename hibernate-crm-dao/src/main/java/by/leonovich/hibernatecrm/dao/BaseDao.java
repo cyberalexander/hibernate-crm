@@ -43,6 +43,7 @@ public abstract class BaseDao<T> implements Dao<T> {
             LOG.debug("After persist {}", entity);
             transaction.commit();
             session.evict(entity);
+            session.clear();
             LOG.debug("After commit {}", entity);
         } catch (HibernateException e) {
             transaction.rollback();
@@ -60,6 +61,7 @@ public abstract class BaseDao<T> implements Dao<T> {
             LOG.debug("After save {}", entity);
             transaction.commit();
             session.evict(entity);
+            session.clear();
             LOG.debug("After commit {}", entity);
             return id;
         } catch (HibernateException e) {
@@ -78,6 +80,7 @@ public abstract class BaseDao<T> implements Dao<T> {
             LOG.debug("After {}", entity);
             transaction.commit();
             session.evict(entity);
+            session.clear();
             LOG.debug("After commit {}", entity);
         } catch (HibernateException e) {
             transaction.rollback();

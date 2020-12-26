@@ -19,10 +19,12 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class Student extends Person {
 
+    private University university;
     private String faculty;
     private Double mark;
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends Person> T populate() {
         super.populate();
         this.setFaculty(RandomString.FACULTY.get());

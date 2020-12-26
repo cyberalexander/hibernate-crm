@@ -25,6 +25,7 @@ public class Employee extends Person {
     private BigDecimal salary;
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends Person> T populate() {
         super.populate();
         this.setCompany(RandomString.COMPANY.get());

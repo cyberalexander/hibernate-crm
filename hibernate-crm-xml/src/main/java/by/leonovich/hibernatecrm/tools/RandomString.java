@@ -12,12 +12,13 @@ import java.util.function.Supplier;
  * @version 1.0
  */
 public enum RandomString {
+    DEFAULT(() -> generate(new Random().nextInt(8 - 2) + 2)),
     NAME(() -> {
-        int nameLength = new Random().nextInt(8-2) + 2;
+        int nameLength = new Random().nextInt(6 - 2) + 2;
         return generate(nameLength);
     }),
     SURNAME(() -> {
-        int nameLength = new Random().nextInt(10-3) + 3;
+        int nameLength = new Random().nextInt(8 - 3) + 3;
         return generate(nameLength);
     }),
     COMPANY(() -> {

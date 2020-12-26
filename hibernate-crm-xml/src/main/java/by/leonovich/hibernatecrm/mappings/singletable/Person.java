@@ -16,16 +16,22 @@ import java.io.Serializable;
  */
 @Data
 public class Person implements Serializable {
-
     private Long id;
     private String name;
     private String surname;
     private Integer age;
+    private Address homeAddress; /* COMPONENT relation */
+    private PhoneNumber phoneNumber; /* ONE-TO-ONE relation */
 
+    @SuppressWarnings("unchecked")
     public <T extends Person> T populate() {
         this.setName(RandomString.NAME.get());
         this.setSurname(RandomString.SURNAME.get());
-        this.setAge(RandomNumber.AGE.get());
+        this.setAge(RandomNumber.DEFAULT_I.get());
+        this.setHomeAddress(Address.init());
+
+        this.setPhoneNumber(PhoneNumber.init(this));
+
         return (T) this;
     }
 

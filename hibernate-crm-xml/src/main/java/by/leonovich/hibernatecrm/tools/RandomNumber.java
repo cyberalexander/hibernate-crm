@@ -16,13 +16,15 @@ import java.util.function.Supplier;
  * @version 1.0
  */
 public enum RandomNumber {
-    AGE(() -> new Random().nextInt(99 - 1) + 1),
+    DEFAULT_I(() -> new Random().nextInt(100- 1) + 1),
+    DEFAULT_L(() -> ThreadLocalRandom.current().nextLong(10000000L, 1000000000L)),
     DAYS(() -> ThreadLocalRandom.current().nextLong(10, 1000)),
     MARK(() -> Double.valueOf(String.format("%.1f", 1 + (101 - 1) * new Random().nextDouble()))),
     SALARY(() ->
         BigDecimal.valueOf(100 + (100000 - 100) * new Random().nextDouble()).setScale(4, RoundingMode.CEILING)
     ),
     ENGINE_VOLUME(() -> ThreadLocalRandom.current().nextDouble(10) * 5),
+    BATTERY_CAPACITY(() -> ThreadLocalRandom.current().nextInt(10) * 5),
     PASSENGERS_COUNT(() -> new Random().nextInt(8 - 2) + 2);
 
     private final Supplier<? extends Serializable> supplier;
