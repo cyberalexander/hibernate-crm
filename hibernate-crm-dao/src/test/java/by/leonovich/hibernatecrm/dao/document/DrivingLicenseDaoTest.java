@@ -1,7 +1,6 @@
 package by.leonovich.hibernatecrm.dao.document;
 
 import by.leonovich.hibernatecrm.TestConstants;
-import by.leonovich.hibernatecrm.dao.Dao;
 import by.leonovich.hibernatecrm.dao.DrivingLicenseDao;
 import by.leonovich.hibernatecrm.mappings.joinedtable.Document;
 import by.leonovich.hibernatecrm.mappings.joinedtable.DrivingLicense;
@@ -18,6 +17,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import static by.leonovich.hibernatecrm.TestConstants.UPDATE_PREFIX;
+
 /**
  * Created : 10/12/2020 10:12
  * Project : hibernate-crm
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
  * @author alexanderleonovich
  * @version 1.0
  */
-class DrivingLicenseDaoTest extends AbstractDocumentDaoTest {
+class DrivingLicenseDaoTest extends CommonDocumentDaoTest {
 
     @Test
     @SneakyThrows
@@ -66,7 +67,7 @@ class DrivingLicenseDaoTest extends AbstractDocumentDaoTest {
     @SneakyThrows
     void testSaveOrUpdateUpdate() {
         DrivingLicense toUpdate = drivingLicenses.randomEntity();
-        toUpdate.setDocumentNumber("UPDATE_" + RandomString.DOCUMENT_NUMBER.get() + "_" + toUpdate.getId());
+        toUpdate.setDocumentNumber(UPDATE_PREFIX + RandomString.DOCUMENT_NUMBER.get() + "_" + toUpdate.getId());
         toUpdate.setInternational(new Random().nextBoolean());
         dao.saveOrUpdate(toUpdate);
         MatcherAssert.assertThat(
@@ -117,8 +118,7 @@ class DrivingLicenseDaoTest extends AbstractDocumentDaoTest {
     @SneakyThrows
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testGetAll() {
-        Dao<DrivingLicense> drivingLicenseDao = new DrivingLicenseDao();
-        List<Serializable> queried = drivingLicenseDao.getAll(DrivingLicense.class).stream()
+        List<Serializable> queried = new DrivingLicenseDao().getAll(DrivingLicense.class).stream()
             .map(DrivingLicense::getId)
             .collect(Collectors.toList());
         drivingLicenses.stream().map(DrivingLicense::getId).forEach(p ->
@@ -132,9 +132,7 @@ class DrivingLicenseDaoTest extends AbstractDocumentDaoTest {
     @Test
     @SneakyThrows
     void testGetIds() {
-        Dao<DrivingLicense> drivingLicenseDao = new DrivingLicenseDao();
-        List<Serializable> passportIdsOnly = drivingLicenseDao.getIds();
-        Optional<Document> notDrivingLicense = passportIdsOnly.stream()
+        Optional<Document> notDrivingLicense = new DrivingLicenseDao().getIds().stream()
             .map(this::daoGet)
             .filter(dLicense -> !(dLicense instanceof DrivingLicense))
             .findFirst();

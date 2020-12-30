@@ -17,6 +17,9 @@
         <mapping resource="Person.hbm.xml"/>
         <mapping resource="Document.hbm.xml"/>
         <mapping resource="Vehicle.hbm.xml"/>
+        <mapping resource="PhoneNumber.hbm.xml"/>
+        <mapping resource="University.hbm.xml"/>
+        <mapping resource="Meeting.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>
 

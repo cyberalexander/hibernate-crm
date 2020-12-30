@@ -1,7 +1,7 @@
 package by.leonovich.hibernatecrm.dao.vehicle;
 
 import by.leonovich.hibernatecrm.TestConstants;
-import by.leonovich.hibernatecrm.mappings.tableperclass.ElectricCar;
+import by.leonovich.hibernatecrm.mappings.tableperclass.MotorCycle;
 import by.leonovich.hibernatecrm.tools.RandomNumber;
 import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.SneakyThrows;
@@ -14,23 +14,23 @@ import java.io.Serializable;
 import static by.leonovich.hibernatecrm.TestConstants.UPDATE_PREFIX;
 
 /**
- * Created : 13/12/2020 15:22
+ * Created : 26/12/2020 21:02
  * Project : hibernate-crm
  * IDE : IntelliJ IDEA
  *
  * @author alexanderleonovich
  * @version 1.0
  */
-class ElectricCarDaoTest extends CommonVehicleDaoTest {
+class MotorCycleDaoTest extends CommonVehicleDaoTest {
 
     @Test
     @SneakyThrows
     void testPersist() {
-        ElectricCar car = ElectricCar.init();
-        dao.persist(car);
+        MotorCycle motorCycle = MotorCycle.init();
+        dao.persist(motorCycle);
         MatcherAssert.assertThat(
-            String.format(TestConstants.M_PERSIST, car),
-            dao.get(car.getId()),
+            String.format(TestConstants.M_PERSIST, motorCycle),
+            dao.get(motorCycle.getId()),
             Matchers.notNullValue()
         );
     }
@@ -40,7 +40,7 @@ class ElectricCarDaoTest extends CommonVehicleDaoTest {
     void testSave() {
         MatcherAssert.assertThat(
             TestConstants.M_SAVE,
-            dao.save(ElectricCar.init()),
+            dao.save(MotorCycle.init()),
             Matchers.notNullValue()
         );
     }
@@ -48,21 +48,21 @@ class ElectricCarDaoTest extends CommonVehicleDaoTest {
     @Test
     @SneakyThrows
     void testSaveOrUpdateSave() {
-        ElectricCar toSave = ElectricCar.init();
-        dao.saveOrUpdate(toSave);
+        MotorCycle motorCycle = MotorCycle.init();
+        dao.saveOrUpdate(motorCycle);
         MatcherAssert.assertThat(
-            String.format(TestConstants.M_SAVE_OR_UPDATE_SAVE, toSave),
-            dao.get(toSave.getId()),
-            Matchers.equalTo(toSave)
+            String.format(TestConstants.M_SAVE_OR_UPDATE_SAVE, motorCycle),
+            dao.get(motorCycle.getId()),
+            Matchers.equalTo(motorCycle)
         );
     }
 
     @Test
     @SneakyThrows
     void testSaveOrUpdateUpdate() {
-        ElectricCar toUpdate = electricCars.randomEntity();
+        MotorCycle toUpdate = motorCycles.randomEntity();
         toUpdate.setManufacturer(UPDATE_PREFIX + RandomString.MANUFACTURER.get() + "_" + toUpdate.getId());
-        toUpdate.setBatteryCapacity(RandomNumber.BATTERY_CAPACITY.get());
+        toUpdate.setTankCapacity(RandomNumber.ENGINE_VOLUME.get());
         dao.saveOrUpdate(toUpdate);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, toUpdate),
@@ -74,9 +74,9 @@ class ElectricCarDaoTest extends CommonVehicleDaoTest {
     @Test
     @SneakyThrows
     void testGet() {
-        Serializable randomId = electricCars.randomEntity().getId();
+        Serializable randomId = motorCycles.randomEntity().getId();
         MatcherAssert.assertThat(
-            String.format(TestConstants.M_GET, ElectricCar.class.getSimpleName(), randomId),
+            String.format(TestConstants.M_GET, MotorCycle.class.getSimpleName(), randomId),
             dao.get(randomId),
             Matchers.notNullValue()
         );
@@ -85,7 +85,7 @@ class ElectricCarDaoTest extends CommonVehicleDaoTest {
     @Test
     @SneakyThrows
     void testGetWhenNotExists() {
-        Serializable index = electricCars.lastElement().getId() + 300L;
+        Serializable index = motorCycles.lastElement().getId() + 300L;
         MatcherAssert.assertThat(
             String.format(TestConstants.M_GET_NOT_EXISTS, index),
             dao.get(index),
@@ -96,9 +96,9 @@ class ElectricCarDaoTest extends CommonVehicleDaoTest {
     @Test
     @SneakyThrows
     void testLoad() {
-        Serializable randomId = electricCars.randomEntity().getId();
+        Serializable randomId = motorCycles.randomEntity().getId();
         MatcherAssert.assertThat(
-            String.format(TestConstants.M_LOAD, ElectricCar.class.getSimpleName(), randomId),
+            String.format(TestConstants.M_LOAD, MotorCycle.class.getSimpleName(), randomId),
             dao.load(randomId),
             Matchers.notNullValue()
         );

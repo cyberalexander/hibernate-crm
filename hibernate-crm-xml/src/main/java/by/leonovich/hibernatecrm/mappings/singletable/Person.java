@@ -1,5 +1,6 @@
 package by.leonovich.hibernatecrm.mappings.singletable;
 
+import by.leonovich.hibernatecrm.mappings.Automated;
 import by.leonovich.hibernatecrm.tools.RandomNumber;
 import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.Data;
@@ -15,7 +16,7 @@ import java.io.Serializable;
  * @version 1.0
  */
 @Data
-public class Person implements Serializable {
+public class Person implements Serializable, Automated<Person>  {
     private Long id;
     private String name;
     private String surname;
@@ -23,16 +24,31 @@ public class Person implements Serializable {
     private Address homeAddress; /* COMPONENT relation */
     private PhoneNumber phoneNumber; /* ONE-TO-ONE relation */
 
-    @SuppressWarnings("unchecked")
-    public <T extends Person> T populate() {
+    @Override
+    public Person populate() {
         this.setName(RandomString.NAME.get());
         this.setSurname(RandomString.SURNAME.get());
         this.setAge(RandomNumber.DEFAULT_I.get());
         this.setHomeAddress(Address.init());
-
         this.setPhoneNumber(PhoneNumber.init(this));
+        return this;
+    }
 
-        return (T) this;
+    @Override
+    public Person populateCascade() {
+        return this.populate();
+    }
+
+    @Override
+    public Person modify() {
+        this.setName(newValue(this.getId(), RandomString.NAME));
+        this.getPhoneNumber().setNumber(RandomNumber.DEFAULT_L.get());
+        return this;
+    }
+
+    @Override
+    public Person modifyCascade() {
+        return this.modify();
     }
 
     public static Person init() {

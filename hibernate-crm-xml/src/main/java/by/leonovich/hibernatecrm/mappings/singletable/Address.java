@@ -6,6 +6,7 @@ import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 /**
@@ -17,7 +18,7 @@ import java.util.Locale;
  * @version 1.0
  */
 @Data
-public class Address {
+public class Address implements Serializable {
     private String country;
     private String countryCode;
     private String city;

@@ -4,6 +4,8 @@ import by.leonovich.hibernatecrm.tools.RandomNumber;
 import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * Created : 10/12/2020 22:52
  * Project : hibernate-crm
@@ -13,7 +15,7 @@ import lombok.Data;
  * @version 1.0
  */
 @Data
-public class Vehicle {
+public class Vehicle implements Serializable {
     private Long id;
     private Double engineVolume;
     private String manufacturer;

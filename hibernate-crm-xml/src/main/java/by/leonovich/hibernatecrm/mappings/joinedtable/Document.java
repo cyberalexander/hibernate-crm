@@ -4,6 +4,7 @@ import by.leonovich.hibernatecrm.tools.RandomNumber;
 import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
@@ -15,7 +16,7 @@ import java.time.LocalDate;
  * @version 1.0
  */
 @Data
-public class Document {
+public class Document implements Serializable {
     private Long id;
     private String documentNumber;
     private LocalDate issueDate;

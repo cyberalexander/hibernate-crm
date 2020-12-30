@@ -1,7 +1,6 @@
 package by.leonovich.hibernatecrm.dao.document;
 
 import by.leonovich.hibernatecrm.TestConstants;
-import by.leonovich.hibernatecrm.dao.Dao;
 import by.leonovich.hibernatecrm.dao.PassportDao;
 import by.leonovich.hibernatecrm.mappings.joinedtable.Document;
 import by.leonovich.hibernatecrm.mappings.joinedtable.Passport;
@@ -9,6 +8,8 @@ import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import org.hibernate.ObjectNotFoundException;
+import org.hibernate.Session;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static by.leonovich.hibernatecrm.TestConstants.UPDATE_PREFIX;
 /**
  * Created : 10/12/2020 20:28
  * Project : hibernate-crm
@@ -25,7 +27,7 @@ import java.util.stream.Collectors;
  * @author alexanderleonovich
  * @version 1.0
  */
-class PassportDaoTest extends AbstractDocumentDaoTest {
+class PassportDaoTest extends CommonDocumentDaoTest {
 
     @Test
     @SneakyThrows
@@ -65,7 +67,7 @@ class PassportDaoTest extends AbstractDocumentDaoTest {
     @SneakyThrows
     void testSaveOrUpdateUpdate() {
         Passport toUpdate = passports.randomEntity();
-        toUpdate.setPassportNumber("UPDATE_" + RandomString.PASSPORT_NUMBER.get() + "_" + toUpdate.getId());
+        toUpdate.setPassportNumber(UPDATE_PREFIX + RandomString.PASSPORT_NUMBER.get() + "_" + toUpdate.getId());
         dao.saveOrUpdate(toUpdate);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, toUpdate),
@@ -88,6 +90,17 @@ class PassportDaoTest extends AbstractDocumentDaoTest {
 
     @Test
     @SneakyThrows
+    void testGetWhenNotExists() {
+        Serializable index = passports.lastElement().getId() + 300L;
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_GET_NOT_EXISTS, index),
+            dao.get(index),
+            Matchers.nullValue()
+        );
+    }
+
+    @Test
+    @SneakyThrows
     void testLoad() {
         Serializable randomIndex = passports.randomEntity().getId();
         MatcherAssert.assertThat(
@@ -97,17 +110,41 @@ class PassportDaoTest extends AbstractDocumentDaoTest {
         );
     }
 
+    /**
+     * Method {@link Session#load} is different from {@link Session#get}
+     * In case of "get", when object not exists in database, hibernate returns null. When in case of "load"
+     * hibernate will not query object immediately but will just return proxy. And when we try to access any property
+     * of that proxy, hibernate will immediately execute select to database and throw {@link ObjectNotFoundException}
+     * if object won't be found there.
+     */
+    @Test
+    @SneakyThrows
+    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
+    void testLoadWhenNotExists() {
+        Serializable index = passports.lastElement().getId() + 300L;
+        Document loaded = dao.load(index);
+        Assertions.assertThrows(
+            ObjectNotFoundException.class,
+            loaded::getDocumentNumber,
+            TestConstants.M_LOAD_EXCEPTION);
+    }
+
+    /**
+     * 1. Save Passport in DB
+     * 2. Passport Meeting from DB
+     * 3. Assert that Passport does not exists in DB any more
+     */
     @Test
     @SneakyThrows
     void testDelete() {
         Passport toDelete = Passport.init();
 
-        dao.saveOrUpdate(toDelete); /* 1. Save object in DB */
+        dao.saveOrUpdate(toDelete); //[1]
         Assertions.assertNotNull(toDelete.getId(), TestConstants.M_SAVE);
-        dao.delete(toDelete); /* 2. Delete object from DB */
+        dao.delete(toDelete); //[2]
 
         MatcherAssert.assertThat(String.format(TestConstants.M_DELETE, toDelete),
-            dao.get(toDelete.getId()), /* 3. Try to get deleted object from DB */
+            dao.get(toDelete.getId()), //[3]
             Matchers.nullValue()
         );
     }
@@ -116,8 +153,7 @@ class PassportDaoTest extends AbstractDocumentDaoTest {
     @SneakyThrows
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testGetAll() {
-        Dao<Passport> passportDao = new PassportDao();
-        List<Serializable> queried = passportDao.getAll(Passport.class).stream()
+        List<Serializable> queried = new PassportDao().getAll(Passport.class).stream()
             .map(Passport::getId)
             .collect(Collectors.toList());
         passports.stream().map(Passport::getId).forEach(p ->
@@ -128,13 +164,10 @@ class PassportDaoTest extends AbstractDocumentDaoTest {
             ));
     }
 
-
     @Test
     @SneakyThrows
     void testGetIds() {
-        Dao<Passport> passportDao = new PassportDao();
-        List<Serializable> passportIdsOnly = passportDao.getIds();
-        Optional<Document> notPassport = passportIdsOnly.stream()
+        Optional<Document> notPassport = new PassportDao().getIds().stream()
             .map(this::daoGet)
             .filter(passport -> !(passport instanceof Passport))
             .findFirst();

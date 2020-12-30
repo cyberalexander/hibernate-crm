@@ -7,14 +7,16 @@ import by.leonovich.hibernatecrm.mappings.tableperclass.MotorCycle;
 import by.leonovich.hibernatecrm.mappings.tableperclass.Vehicle;
 import by.leonovich.hibernatecrm.tools.MagicList;
 import lombok.SneakyThrows;
+import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
-import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static by.leonovich.hibernatecrm.TestConstants.MAIN_LIMIT;
 
 /**
  * Created : 13/12/2020 15:18
@@ -25,9 +27,8 @@ import java.util.stream.Stream;
  * @version 1.0
  */
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
-public abstract class AbstractVehicleDaoTest {
-    protected static final Logger LOG = LoggerFactory.getLogger(AbstractVehicleDaoTest.class);
-    protected static final Random r = new Random();
+public abstract class CommonVehicleDaoTest {
+    protected static final Logger LOG = LoggerFactory.getLogger(CommonVehicleDaoTest.class);
     protected static final Dao<Vehicle> dao = new VehicleDao();
     protected static final MagicList<Vehicle> allVehicles = new MagicList<>();
     protected static final MagicList<ElectricCar> electricCars = new MagicList<>();
@@ -35,13 +36,17 @@ public abstract class AbstractVehicleDaoTest {
 
     @BeforeAll
     static void beforeAll() {
-        electricCars.addAll(Stream.generate(ElectricCar::init).limit(25).collect(Collectors.toList()));
-        motorCycles.addAll(Stream.generate(MotorCycle::init).limit(25).collect(Collectors.toList()));
+        /* hint to do not invoke this method more than once */
+        if (CollectionUtils.isNotEmpty(allVehicles)) {
+            return;
+        }
+        electricCars.addAll(Stream.generate(ElectricCar::init).limit(MAIN_LIMIT).collect(Collectors.toList()));
+        motorCycles.addAll(Stream.generate(MotorCycle::init).limit(MAIN_LIMIT).collect(Collectors.toList()));
 
         allVehicles.addAll(electricCars);
         allVehicles.addAll(motorCycles);
         Collections.shuffle(allVehicles);
-        allVehicles.forEach(AbstractVehicleDaoTest::persistEach);
+        allVehicles.forEach(CommonVehicleDaoTest::persistEach);
     }
 
     @SneakyThrows

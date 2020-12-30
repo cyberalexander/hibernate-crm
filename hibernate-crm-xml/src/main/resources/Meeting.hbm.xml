@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="by.leonovich.hibernatecrm.mappings.singletable">
+    <class name="Meeting" table="T_MEETING">
+        <id name="id" column="F_ID">
+            <generator class="native">
+                <param name="sequence">T_MEETING_SEQ</param>
+            </generator>
+        </id>
+        <property name="subject" column="F_SUBJECT"/>
+        <property name="meetingDate" column="F_DATE"/>
+        <property name="expired" formula="{sysdate() > F_DATE}" type="java.lang.Boolean" access="field">
+            <meta attribute="description>">Not a column in database, but calculated by hibernate value</meta>
+        </property>
+
+        <!--
+        TODO turn lazy="false" to lazy="true" after DAO layer will be rewritten. Cause currently, session is opened-closed
+        TODO in DAO, and if try to access employees collection after session is closed, LazyInitializationException will be thrown
+        -->
+        <set name="employees" table="T_EMPLOYEE_MEETING" cascade="save-update" inverse="true" lazy="false" fetch="select">
+            <key column="F_MEETING_ID"/>
+            <many-to-many column="F_EMPLOYEE_ID" class="Employee"/>
+        </set>
+    </class>
+</hibernate-mapping>

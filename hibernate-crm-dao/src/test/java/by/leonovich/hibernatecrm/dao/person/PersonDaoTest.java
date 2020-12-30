@@ -1,9 +1,9 @@
 package by.leonovich.hibernatecrm.dao.person;
 
 import by.leonovich.hibernatecrm.TestConstants;
+import by.leonovich.hibernatecrm.mappings.singletable.Address;
 import by.leonovich.hibernatecrm.mappings.singletable.Person;
-import by.leonovich.hibernatecrm.tools.RandomNumber;
-import by.leonovich.hibernatecrm.tools.RandomString;
+import by.leonovich.hibernatecrm.mappings.singletable.PhoneNumber;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -11,6 +11,8 @@ import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.List;
@@ -24,7 +26,8 @@ import java.util.stream.Collectors;
  * @author alexanderleonovich
  * @version 1.0
  */
-class PersonDaoTest extends AbstractPersonDaoTest {
+class PersonDaoTest extends CommonPersonDaoTest {
+    protected static final Logger LOG = LoggerFactory.getLogger(PersonDaoTest.class);
 
     @Test
     @SneakyThrows
@@ -50,7 +53,7 @@ class PersonDaoTest extends AbstractPersonDaoTest {
 
     @Test
     @SneakyThrows
-    void testSaveOrUpdateSave() {
+    void testSaveOrUpdate_Save() {
         Person toSave = Person.init();
         dao.saveOrUpdate(toSave);
         MatcherAssert.assertThat(
@@ -62,16 +65,27 @@ class PersonDaoTest extends AbstractPersonDaoTest {
 
     @Test
     @SneakyThrows
-    void testSaveOrUpdateUpdate() {
+    void testSaveOrUpdate_Update() {
         Person toUpdate = allPersons.randomEntity();
-        LOG.info("{}", toUpdate);
-        toUpdate.setName("UPDATE_" + RandomString.NAME.get() + "_" + toUpdate.getId());
-        toUpdate.getPhoneNumber().setNumber(RandomNumber.DEFAULT_L.get());
-        dao.saveOrUpdate(toUpdate);
+        dao.saveOrUpdate(toUpdate.modify());
         MatcherAssert.assertThat(
             String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, toUpdate),
             dao.get(toUpdate.getId()),
             Matchers.equalTo(toUpdate)
+        );
+    }
+
+    @Test
+    @SneakyThrows
+    void testSaveOrUpdate_UpdateCascade() {
+        Person newPerson = Person.init();
+        dao.save(newPerson);
+        PhoneNumber modifiedCascade = newPerson.modifyCascade().getPhoneNumber();
+        dao.saveOrUpdate(newPerson);
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, modifiedCascade),
+            dao.get(newPerson.getId()).getPhoneNumber(),
+            Matchers.equalTo(modifiedCascade)
         );
     }
 
@@ -143,7 +157,7 @@ class PersonDaoTest extends AbstractPersonDaoTest {
 
     /**
      * Comparing IDs here, because other information might be changed at the time other tests are running,
-     * like {@link PersonDaoTest#testSaveOrUpdateUpdate()}
+     * like {@link PersonDaoTest#testSaveOrUpdate_Update()}
      */
     @Test
     @SneakyThrows
@@ -172,5 +186,20 @@ class PersonDaoTest extends AbstractPersonDaoTest {
                 Matchers.is(Boolean.TRUE)
             );
         });
+    }
+
+    /**
+     * Test {@link Address#getIndex()} "hibernate-calculable" field
+     */
+    @Test
+    @SneakyThrows
+    void testPersonAddressColumnIndex() {
+        Address address = dao.get(allPersons.randomEntity().getId()).getHomeAddress();
+        String expected = address.getCountryCode() + "_" + address.getCountry();
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_TEST_INDEX, expected),
+            address.getIndex(),
+            Matchers.equalTo(expected)
+        );
     }
 }

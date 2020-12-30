@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="by.leonovich.hibernatecrm.mappings.singletable">
+    <class name="PhoneNumber" table="T_PHONE_NUMBER" lazy="false">
+        <comment>
+            ONE-TO-ONE RELATION
+        </comment>
+        <id name="personId" column="F_PERSON_ID">
+            <generator class="foreign">
+                <param name="property">person</param>
+            </generator>
+        </id>
+        <one-to-one name="person" class="Person" constrained="true" cascade="save-update"/>
+        <property name="type" column="F_TYPE">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">by.leonovich.hibernatecrm.mappings.common.PhoneNumberType</param>
+                <param name="useNamed">true</param>
+            </type>
+        </property>
+        <property name="number" column="F_NUMBER"/>
+    </class>
+</hibernate-mapping>

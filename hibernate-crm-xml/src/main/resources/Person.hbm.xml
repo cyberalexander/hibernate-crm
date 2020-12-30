@@ -11,69 +11,43 @@
         <id name="id" type="java.lang.Long" column="F_ID">
             <generator class="increment"/>
         </id>
-        <discriminator column="TYPE" not-null="true"/>
+        <discriminator column="TYPE"/>
         <property name="name" column="F_NAME" type="string"/>
         <property name="surname" column="F_SURNAME" type="string"/>
         <property name="age" column="F_AGE" type="int"/>
+        <one-to-one name="phoneNumber" cascade="all" class="PhoneNumber"/>
 
-        <one-to-one name="phoneNumber" cascade="all" class="by.leonovich.hibernatecrm.mappings.singletable.PhoneNumber"/>
-
-        <!--
-        Component - contained object, which persisted in database as a parameter, not as a separate entity
-        -->
         <component name="homeAddress" class="Address">
+            <meta attribute="description">
+                Component - contained object, which persisted in database as a parameter, not as a separate entity
+            </meta>
             <property name="country" column="F_COUNTRY"/>
             <property name="countryCode" column="F_CODE"/>
             <property name="city" column="F_CITY"/>
             <property name="street" column="F_STREET"/>
             <property name="buildingNumber" column="F_BUILDING"/>
-            <!-- Not a column in database, but calculated by hibernate value -->
-            <property name="index" formula="{concat(F_CODE, '_', F_COUNTRY)}" type="java.lang.String" access="field"/>
+            <property name="index" formula="{concat(F_CODE, '_', F_COUNTRY)}" type="java.lang.String" access="field">
+                <meta attribute="description">Not a column in database, but calculated by hibernate value</meta>
+            </property>
         </component>
 
         <subclass name="Employee" discriminator-value="E">
             <property name="company" column="F_COMPANY"/>
             <property name="salary" column="F_SALARY" type="big_decimal" precision="19" scale="4"/>
+            <!--
+            TODO turn lazy="false" to lazy="true" after DAO layer will be rewritten. Cause currently, session is opened-closed
+            TODO in DAO, and if try to access meetings collection after session is closed, LazyInitializationException will be thrown
+            -->
+            <set name="meetings" table="T_EMPLOYEE_MEETING" inverse="false" lazy="false" fetch="select" cascade="save-update">
+                <key column="F_EMPLOYEE_ID"/>
+                <many-to-many column="F_MEETING_ID" class="Meeting"/>
+            </set>
         </subclass>
+
         <subclass name="Student" discriminator-value="S">
             <property name="faculty" column="F_FACULTY"/>
             <property name="mark" column="F_MARK"/>
             <many-to-one name="university" class="University" fetch="select" column="F_UNIVERSITY_ID" cascade="save-update"/>
         </subclass>
-    </class>
-
-    <!-- ONE-TO-ONE -->
-    <class name="PhoneNumber" table="T_PHONE_NUMBER" lazy="false">
-        <id name="personId" column="F_PERSON_ID">
-            <generator class="foreign">
-                <param name="property">person</param>
-            </generator>
-        </id>
-        <one-to-one name="person" class="Person" constrained="true"/>
-        <property name="type" column="F_TYPE">
-            <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">by.leonovich.hibernatecrm.mappings.common.PhoneNumberType</param>
-                <param name="useNamed">true</param>
-            </type>
-        </property>
-        <property name="number" column="F_NUMBER"/>
-    </class>
-
-    <!-- ONE-TO-MANY -->
-    <class name="University" table="T_UNIVERSITY">
-        <id name="id" column="F_UNIVERSITY_ID">
-            <generator class="native">
-                <param name="sequence">T_UNIVERSITY_SEQ</param>
-            </generator>
-        </id>
-        <property name="universityName" column="F_NAME"/>
-        <!--
-        TODO turn lazy="false" to lazy="true" after DAO layer will be rewritten. Cause currently, session is opened-closed
-        TODO in DAO, and if try to access students set after session is closed, LazyInitializationException will be thrown
-        -->
-        <set name="students" table="T_PERSON" cascade="all" inverse="true" lazy="false" fetch="select">
-            <key column="F_UNIVERSITY_ID" not-null="true"/>
-            <one-to-many class="Student"/>
-        </set>
     </class>
 </hibernate-mapping>

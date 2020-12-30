@@ -19,20 +19,45 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class Student extends Person {
 
-    private University university;
+    private University university; /* MANY-TO-ONE relation */
     private String faculty;
     private Double mark;
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Person> T populate() {
+    public Student populate() {
         super.populate();
         this.setFaculty(RandomString.FACULTY.get());
         this.setMark(RandomNumber.MARK.get());
-        return (T) this;
+        return this;
+    }
+
+    @Override
+    public Student populateCascade() {
+        this.populate();
+        this.setUniversity(University.init());
+        this.getUniversity().getStudents().add(this);
+        return this;
+    }
+
+    @Override
+    public Student modify() {
+        super.modify();
+        this.setFaculty(newValue(this.getId(), RandomString.FACULTY));
+        return this;
+    }
+
+    @Override
+    public Student modifyCascade() {
+        this.modify();
+        this.getUniversity().setName(newCascadeValue(this.getId(), RandomString.DEFAULT));
+        return this;
     }
 
     public static Student init() {
         return new Student().populate();
+    }
+
+    public static Student initWithManyToOne() {
+        return new Student().populateCascade();
     }
 }

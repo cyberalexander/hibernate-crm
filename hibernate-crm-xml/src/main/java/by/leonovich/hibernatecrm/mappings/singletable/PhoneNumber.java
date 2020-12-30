@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 /**
  * Created : 13/12/2020 16:54
  * Project : hibernate-crm`
@@ -15,9 +17,8 @@ import lombok.ToString;
  * @version 1.0
  */
 @Data
-public class PhoneNumber {
-
-    private Long personId;
+public class PhoneNumber implements Serializable {
+    private Long personId; /* ONE-TO-ONE relation */
     private PhoneNumberType type;
     private Long number;
 

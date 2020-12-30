@@ -7,6 +7,7 @@ import by.leonovich.hibernatecrm.mappings.joinedtable.DrivingLicense;
 import by.leonovich.hibernatecrm.mappings.joinedtable.Passport;
 import by.leonovich.hibernatecrm.tools.MagicList;
 import lombok.SneakyThrows;
+import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,8 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static by.leonovich.hibernatecrm.TestConstants.MAIN_LIMIT;
+
 /**
  * Created : 10/12/2020 10:13
  * Project : hibernate-crm
@@ -24,9 +27,8 @@ import java.util.stream.Stream;
  * @author alexanderleonovich
  * @version 1.0
  */
-@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
-public abstract class AbstractDocumentDaoTest {
-    protected static final Logger LOG = LoggerFactory.getLogger(AbstractDocumentDaoTest.class);
+public class CommonDocumentDaoTest {
+    protected static final Logger LOG = LoggerFactory.getLogger(CommonDocumentDaoTest.class);
     protected static final Dao<Document> dao = new DocumentDao();
     protected static final MagicList<Document> allDocuments = new MagicList<>();
     protected static final MagicList<DrivingLicense> drivingLicenses = new MagicList<>();
@@ -34,17 +36,21 @@ public abstract class AbstractDocumentDaoTest {
 
     @BeforeAll
     static void beforeAll() {
-        drivingLicenses.addAll(Stream.generate(DrivingLicense::init).limit(10).collect(Collectors.toList()));
-        passports.addAll(Stream.generate(Passport::init).limit(10).collect(Collectors.toList()));
+        /* hint to do not invoke this method more than once */
+        if (CollectionUtils.isNotEmpty(allDocuments)) {
+            return;
+        }
+        drivingLicenses.addAll(Stream.generate(DrivingLicense::init).limit(MAIN_LIMIT).collect(Collectors.toList()));
+        passports.addAll(Stream.generate(Passport::init).limit(MAIN_LIMIT).collect(Collectors.toList()));
 
         allDocuments.addAll(drivingLicenses);
         allDocuments.addAll(passports);
         Collections.shuffle(allDocuments);
-        allDocuments.forEach(AbstractDocumentDaoTest::persistEach);
+        allDocuments.forEach(CommonDocumentDaoTest::persist);
     }
 
     @SneakyThrows
-    private static Document persistEach(Document doc) {
+    private static Document persist(Document doc) {
         dao.saveOrUpdate(doc);
         LOG.info("{}", doc);
         return doc;

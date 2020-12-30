@@ -1,5 +1,6 @@
 package by.leonovich.hibernatecrm.mappings.singletable;
 
+import by.leonovich.hibernatecrm.mappings.Automated;
 import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,6 +9,8 @@ import lombok.ToString;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created : 13/12/2020 19:38
@@ -18,20 +21,46 @@ import java.util.Set;
  * @version 1.0
  */
 @Data
-public class University implements Serializable {
+public class University implements Serializable, Automated<University> {
     private Long id;
-    private String universityName;
+    private String name;
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private Set<Student> students = new HashSet<>();
+    private Set<Student> students = new HashSet<>(); /* ONE-TO-MANY relation */
 
+    @Override
     public University populate() {
-        this.setUniversityName(RandomString.DEFAULT.get());
+        this.setName(RandomString.DEFAULT.get());
+        return this;
+    }
+
+    @Override
+    public University populateCascade() {
+        this.populate();
+        this.setStudents(Stream.generate(Student::init).limit(3).collect(Collectors.toSet()));
+        this.getStudents().forEach(st -> st.setUniversity(this));
+        return this;
+    }
+
+    @Override
+    public University modify() {
+        this.setName(newValue(this.getId(), RandomString.DEFAULT));
+        return this;
+    }
+
+    @Override
+    public University modifyCascade() {
+        this.modify();
+        this.getStudents().forEach(st -> st.setName(newCascadeValue(this.getId(), RandomString.NAME)));
         return this;
     }
 
     public static University init() {
         return new University().populate();
+    }
+
+    public static University initWithOneToMany() {
+        return new University().populateCascade();
     }
 }
