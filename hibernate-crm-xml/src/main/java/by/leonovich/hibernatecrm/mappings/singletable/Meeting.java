@@ -71,6 +71,11 @@ public class Meeting implements Serializable, Automated<Meeting> {
         return this;
     }
 
+    @Override
+    public Serializable incrementIdAndGet() {
+        return this.getId() + 500L;
+    }
+
     public static Meeting init() {
         return new Meeting().populate();
     }

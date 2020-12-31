@@ -17,11 +17,27 @@ public interface Automated<T extends Serializable> {
 
     T populate();
 
-    T populateCascade();
+    /**
+     * Default realization throws an exception cause not every entity might have relations (one-to-one, one-to-many etc.)
+     */
+    default T populateCascade() {
+        throw new UnsupportedOperationException();
+    }
 
     T modify();
 
-    T modifyCascade();
+    /**
+     * Default realization throws an exception cause not every entity might have relations (one-to-one, one-to-many etc.)
+     */
+    default T modifyCascade() {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Method created for unit-tests to simplify entity id increment operation, to test
+     * cases of loading/getting entity by id, which is not exists in database yet.
+     */
+    Serializable incrementIdAndGet();
 
     default String newValue(Serializable id, RandomString newValuePart) {
         return id + Constants.UPDATE_PREFIX + newValuePart.get();

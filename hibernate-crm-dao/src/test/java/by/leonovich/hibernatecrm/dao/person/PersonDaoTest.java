@@ -66,8 +66,8 @@ class PersonDaoTest extends CommonPersonDaoTest {
     @Test
     @SneakyThrows
     void testSaveOrUpdate_Update() {
-        Person toUpdate = allPersons.randomEntity();
-        dao.saveOrUpdate(toUpdate.modify());
+        Person toUpdate = allPersons.randomEntity().modify();
+        dao.saveOrUpdate(toUpdate);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, toUpdate),
             dao.get(toUpdate.getId()),
@@ -93,6 +93,7 @@ class PersonDaoTest extends CommonPersonDaoTest {
     @SneakyThrows
     void testGet() {
         Person person = allPersons.randomEntity();
+        LOG.info("Random person : {}", person);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_GET, person.getClass().getSimpleName(), person.getId()),
             dao.get(person.getId()),
@@ -103,7 +104,7 @@ class PersonDaoTest extends CommonPersonDaoTest {
     @Test
     @SneakyThrows
     void testGetWhenNotExists() {
-        Serializable index = allPersons.lastElement().getId() + 300L;
+        Serializable index = allPersons.lastElement().incrementIdAndGet();
         MatcherAssert.assertThat(
             String.format(TestConstants.M_GET_NOT_EXISTS, index),
             dao.get(index),
@@ -133,7 +134,7 @@ class PersonDaoTest extends CommonPersonDaoTest {
     @SneakyThrows
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testLoadWhenNotExists() {
-        Serializable index = allPersons.lastElement().getId() + 300L;
+        Serializable index = allPersons.lastElement().incrementIdAndGet();
         Assertions.assertThrows(
             ObjectNotFoundException.class,
             () -> dao.load(index).getName(),

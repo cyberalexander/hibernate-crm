@@ -51,6 +51,11 @@ public class Person implements Serializable, Automated<Person>  {
         return this.modify();
     }
 
+    @Override
+    public Serializable incrementIdAndGet() {
+        return this.getId() + 500L;
+    }
+
     public static Person init() {
         return new Person().populate();
     }

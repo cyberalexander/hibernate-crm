@@ -22,10 +22,18 @@ public class MotorCycle extends Vehicle {
     private Double tankCapacity;
 
     @Override
-    public <T extends Vehicle> T populate() {
+    public MotorCycle populate() {
+        super.populate();
         this.setType(MotorCycleType.random());
         this.setTankCapacity(RandomNumber.ENGINE_VOLUME.get());
-        return (T) this;
+        return this;
+    }
+
+    @Override
+    public MotorCycle modify() {
+        super.modify();
+        this.setTankCapacity(RandomNumber.ENGINE_VOLUME.get());
+        return this;
     }
 
     public static MotorCycle init() {

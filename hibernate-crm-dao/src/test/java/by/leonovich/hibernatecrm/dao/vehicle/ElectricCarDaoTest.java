@@ -2,16 +2,14 @@ package by.leonovich.hibernatecrm.dao.vehicle;
 
 import by.leonovich.hibernatecrm.TestConstants;
 import by.leonovich.hibernatecrm.mappings.tableperclass.ElectricCar;
-import by.leonovich.hibernatecrm.tools.RandomNumber;
-import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-
-import static by.leonovich.hibernatecrm.TestConstants.UPDATE_PREFIX;
 
 /**
  * Created : 13/12/2020 15:22
@@ -22,6 +20,7 @@ import static by.leonovich.hibernatecrm.TestConstants.UPDATE_PREFIX;
  * @version 1.0
  */
 class ElectricCarDaoTest extends CommonVehicleDaoTest {
+    protected static final Logger LOG = LoggerFactory.getLogger(ElectricCarDaoTest.class);
 
     @Test
     @SneakyThrows
@@ -47,7 +46,7 @@ class ElectricCarDaoTest extends CommonVehicleDaoTest {
 
     @Test
     @SneakyThrows
-    void testSaveOrUpdateSave() {
+    void testSaveOrUpdate_Save() {
         ElectricCar toSave = ElectricCar.init();
         dao.saveOrUpdate(toSave);
         MatcherAssert.assertThat(
@@ -59,15 +58,13 @@ class ElectricCarDaoTest extends CommonVehicleDaoTest {
 
     @Test
     @SneakyThrows
-    void testSaveOrUpdateUpdate() {
-        ElectricCar toUpdate = electricCars.randomEntity();
-        toUpdate.setManufacturer(UPDATE_PREFIX + RandomString.MANUFACTURER.get() + "_" + toUpdate.getId());
-        toUpdate.setBatteryCapacity(RandomNumber.BATTERY_CAPACITY.get());
-        dao.saveOrUpdate(toUpdate);
+    void testSaveOrUpdate_Update() {
+        ElectricCar car = electricCars.randomEntity().modify();
+        dao.saveOrUpdate(car);
         MatcherAssert.assertThat(
-            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, toUpdate),
-            dao.get(toUpdate.getId()),
-            Matchers.equalTo(toUpdate)
+            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, car),
+            dao.get(car.getId()),
+            Matchers.equalTo(car)
         );
     }
 
@@ -85,7 +82,7 @@ class ElectricCarDaoTest extends CommonVehicleDaoTest {
     @Test
     @SneakyThrows
     void testGetWhenNotExists() {
-        Serializable index = electricCars.lastElement().getId() + 300L;
+        Serializable index = electricCars.lastElement().incrementIdAndGet();
         MatcherAssert.assertThat(
             String.format(TestConstants.M_GET_NOT_EXISTS, index),
             dao.get(index),

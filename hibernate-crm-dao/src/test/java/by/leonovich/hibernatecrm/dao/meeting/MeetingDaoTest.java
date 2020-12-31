@@ -10,6 +10,8 @@ import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
  * @version 1.0
  */
 class MeetingDaoTest extends CommonMeetingDaoTest {
+    protected static final Logger LOG = LoggerFactory.getLogger(MeetingDaoTest.class);
 
     @Test
     @SneakyThrows
@@ -125,7 +128,7 @@ class MeetingDaoTest extends CommonMeetingDaoTest {
     @Test
     @SneakyThrows
     void testGetWhenNotExists() {
-        Serializable index = meetings.lastElement().getId() + 300L;
+        Serializable index = meetings.lastElement().incrementIdAndGet();
         MatcherAssert.assertThat(
             String.format(TestConstants.M_GET_NOT_EXISTS, index),
             meetingDao.get(index),
@@ -155,7 +158,7 @@ class MeetingDaoTest extends CommonMeetingDaoTest {
     @SneakyThrows
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testLoadWhenNotExists() {
-        Serializable index = meetings.lastElement().getId() + 300L;
+        Serializable index = meetings.lastElement().incrementIdAndGet();
         Meeting loaded = meetingDao.load(index);
         Assertions.assertThrows(
             ObjectNotFoundException.class,

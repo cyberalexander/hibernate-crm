@@ -23,11 +23,18 @@ public class DrivingLicense extends Document {
     private Boolean international;
 
     @Override
-    public <T extends Document> T populate() {
+    public DrivingLicense populate() {
         super.populate();
         this.setDrivingCategory(DrivingCategory.random());
         this.setInternational(new Random().nextBoolean());
-        return (T) this;
+        return this;
+    }
+
+    @Override
+    public DrivingLicense modify() {
+        super.modify();
+        this.setInternational(new Random().nextBoolean());
+        return this;
     }
 
     public static DrivingLicense init() {

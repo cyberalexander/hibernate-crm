@@ -56,6 +56,11 @@ public class University implements Serializable, Automated<University> {
         return this;
     }
 
+    @Override
+    public Serializable incrementIdAndGet() {
+        return this.getId() + 500L;
+    }
+
     public static University init() {
         return new University().populate();
     }

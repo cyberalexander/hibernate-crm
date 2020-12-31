@@ -2,16 +2,14 @@ package by.leonovich.hibernatecrm.dao.vehicle;
 
 import by.leonovich.hibernatecrm.TestConstants;
 import by.leonovich.hibernatecrm.mappings.tableperclass.MotorCycle;
-import by.leonovich.hibernatecrm.tools.RandomNumber;
-import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-
-import static by.leonovich.hibernatecrm.TestConstants.UPDATE_PREFIX;
 
 /**
  * Created : 26/12/2020 21:02
@@ -22,6 +20,7 @@ import static by.leonovich.hibernatecrm.TestConstants.UPDATE_PREFIX;
  * @version 1.0
  */
 class MotorCycleDaoTest extends CommonVehicleDaoTest {
+    protected static final Logger LOG = LoggerFactory.getLogger(MotorCycleDaoTest.class);
 
     @Test
     @SneakyThrows
@@ -47,7 +46,7 @@ class MotorCycleDaoTest extends CommonVehicleDaoTest {
 
     @Test
     @SneakyThrows
-    void testSaveOrUpdateSave() {
+    void testSaveOrUpdate_Save() {
         MotorCycle motorCycle = MotorCycle.init();
         dao.saveOrUpdate(motorCycle);
         MatcherAssert.assertThat(
@@ -59,15 +58,13 @@ class MotorCycleDaoTest extends CommonVehicleDaoTest {
 
     @Test
     @SneakyThrows
-    void testSaveOrUpdateUpdate() {
-        MotorCycle toUpdate = motorCycles.randomEntity();
-        toUpdate.setManufacturer(UPDATE_PREFIX + RandomString.MANUFACTURER.get() + "_" + toUpdate.getId());
-        toUpdate.setTankCapacity(RandomNumber.ENGINE_VOLUME.get());
-        dao.saveOrUpdate(toUpdate);
+    void testSaveOrUpdate_Update() {
+        MotorCycle motorCycle = motorCycles.randomEntity().modify();
+        dao.saveOrUpdate(motorCycle);
         MatcherAssert.assertThat(
-            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, toUpdate),
-            dao.get(toUpdate.getId()),
-            Matchers.equalTo(toUpdate)
+            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, motorCycle),
+            dao.get(motorCycle.getId()),
+            Matchers.equalTo(motorCycle)
         );
     }
 
@@ -85,7 +82,7 @@ class MotorCycleDaoTest extends CommonVehicleDaoTest {
     @Test
     @SneakyThrows
     void testGetWhenNotExists() {
-        Serializable index = motorCycles.lastElement().getId() + 300L;
+        Serializable index = motorCycles.lastElement().incrementIdAndGet();
         MatcherAssert.assertThat(
             String.format(TestConstants.M_GET_NOT_EXISTS, index),
             dao.get(index),

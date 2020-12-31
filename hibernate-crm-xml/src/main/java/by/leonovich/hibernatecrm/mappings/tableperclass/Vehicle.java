@@ -1,5 +1,6 @@
 package by.leonovich.hibernatecrm.mappings.tableperclass;
 
+import by.leonovich.hibernatecrm.mappings.Automated;
 import by.leonovich.hibernatecrm.tools.RandomNumber;
 import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.Data;
@@ -15,15 +16,27 @@ import java.io.Serializable;
  * @version 1.0
  */
 @Data
-public class Vehicle implements Serializable {
+public class Vehicle implements Serializable, Automated<Vehicle> {
     private Long id;
     private Double engineVolume;
     private String manufacturer;
 
-    public <T extends Vehicle> T populate() {
+    @Override
+    public Vehicle populate() {
         this.setEngineVolume(RandomNumber.ENGINE_VOLUME.get());
         this.setManufacturer(RandomString.MANUFACTURER.get());
-        return (T) this;
+        return this;
+    }
+
+    @Override
+    public Vehicle modify() {
+        this.setManufacturer(newValue(this.getId(), RandomString.MANUFACTURER));
+        return this;
+    }
+
+    @Override
+    public Serializable incrementIdAndGet() {
+        return this.getId() + 500L;
     }
 
     public static Vehicle init() {

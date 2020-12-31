@@ -119,7 +119,7 @@ class EmployeeDaoTest extends CommonPersonDaoTest {
     @SneakyThrows
     void testGet() {
         Employee randomEmployee = employees.randomEntity();
-        LOG.info("{}", randomEmployee);
+        LOG.info("Random employee : {}", randomEmployee);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_GET, randomEmployee.getClass().getSimpleName(), randomEmployee.getId()),
             dao.get(randomEmployee.getId()),

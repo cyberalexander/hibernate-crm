@@ -23,11 +23,19 @@ public class ElectricCar extends Vehicle {
     private BodyType bodyType;
 
     @Override
-    public <T extends Vehicle> T populate() {
+    public ElectricCar populate() {
+        super.populate();
         this.setBatteryCapacity(RandomNumber.BATTERY_CAPACITY.get());
         this.setPassengersCount(RandomNumber.PASSENGERS_COUNT.get());
         this.setBodyType(BodyType.random());
-        return (T) this;
+        return this;
+    }
+
+    @Override
+    public ElectricCar modify() {
+        super.modify();
+        this.setBatteryCapacity(RandomNumber.BATTERY_CAPACITY.get());
+        return this;
     }
 
     public static ElectricCar init() {

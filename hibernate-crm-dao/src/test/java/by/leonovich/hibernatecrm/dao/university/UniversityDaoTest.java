@@ -9,6 +9,8 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.io.Serializable;
@@ -23,6 +25,7 @@ import java.util.Set;
  * @version 1.0
  */
 class UniversityDaoTest extends CommonUniversityDaoTest {
+    protected static final Logger LOG = LoggerFactory.getLogger(UniversityDaoTest.class);
 
     @Test
     @SneakyThrows
@@ -134,7 +137,7 @@ class UniversityDaoTest extends CommonUniversityDaoTest {
     @Test
     @SneakyThrows
     void testGetWhenNotExists() {
-        Serializable index = universities.lastElement().getId() + 300L;
+        Serializable index = universities.lastElement().incrementIdAndGet();
         MatcherAssert.assertThat(
             String.format(TestConstants.M_GET_NOT_EXISTS, index),
             universityDao.get(index),

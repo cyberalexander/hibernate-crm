@@ -4,20 +4,19 @@ import by.leonovich.hibernatecrm.TestConstants;
 import by.leonovich.hibernatecrm.dao.DrivingLicenseDao;
 import by.leonovich.hibernatecrm.mappings.joinedtable.Document;
 import by.leonovich.hibernatecrm.mappings.joinedtable.DrivingLicense;
-import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import org.hibernate.ObjectNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.stream.Collectors;
-
-import static by.leonovich.hibernatecrm.TestConstants.UPDATE_PREFIX;
 
 /**
  * Created : 10/12/2020 10:12
@@ -28,6 +27,7 @@ import static by.leonovich.hibernatecrm.TestConstants.UPDATE_PREFIX;
  * @version 1.0
  */
 class DrivingLicenseDaoTest extends CommonDocumentDaoTest {
+    protected static final Logger LOG = LoggerFactory.getLogger(DrivingLicenseDaoTest.class);
 
     @Test
     @SneakyThrows
@@ -53,7 +53,7 @@ class DrivingLicenseDaoTest extends CommonDocumentDaoTest {
 
     @Test
     @SneakyThrows
-    void testSaveOrUpdateSave() {
+    void testSaveOrUpdate_Save() {
         DrivingLicense toSave = DrivingLicense.init();
         dao.saveOrUpdate(toSave);
         MatcherAssert.assertThat(
@@ -65,15 +65,13 @@ class DrivingLicenseDaoTest extends CommonDocumentDaoTest {
 
     @Test
     @SneakyThrows
-    void testSaveOrUpdateUpdate() {
-        DrivingLicense toUpdate = drivingLicenses.randomEntity();
-        toUpdate.setDocumentNumber(UPDATE_PREFIX + RandomString.DOCUMENT_NUMBER.get() + "_" + toUpdate.getId());
-        toUpdate.setInternational(new Random().nextBoolean());
-        dao.saveOrUpdate(toUpdate);
+    void testSaveOrUpdate_Update() {
+        DrivingLicense drivingLicense = drivingLicenses.randomEntity().modify();
+        dao.saveOrUpdate(drivingLicense);
         MatcherAssert.assertThat(
-            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, toUpdate),
-            dao.get(toUpdate.getId()),
-            Matchers.equalTo(toUpdate)
+            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, drivingLicense),
+            dao.get(drivingLicense.getId()),
+            Matchers.equalTo(drivingLicense)
         );
     }
 
@@ -101,15 +99,32 @@ class DrivingLicenseDaoTest extends CommonDocumentDaoTest {
 
     @Test
     @SneakyThrows
+    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
+    void testLoadWhenNotExists() {
+        Serializable index = drivingLicenses.lastElement().incrementIdAndGet();
+        Document loaded = dao.load(index);
+        Assertions.assertThrows(
+            ObjectNotFoundException.class,
+            loaded::getDocumentNumber,
+            TestConstants.M_LOAD_EXCEPTION);
+    }
+
+    /**
+     * 1. Save DrivingLicense in DB
+     * 2. Get DrivingLicense from DB
+     * 3. Assert that DrivingLicense does not exists in DB any more
+     */
+    @Test
+    @SneakyThrows
     void testDelete() {
         DrivingLicense toDelete = DrivingLicense.init();
 
-        dao.saveOrUpdate(toDelete); /* 1. Save object in DB */
+        dao.saveOrUpdate(toDelete); //[1]
         Assertions.assertNotNull(toDelete.getId(), TestConstants.M_SAVE);
-        dao.delete(toDelete); /* 2. Delete object from DB */
+        dao.delete(toDelete); //[2]
 
         MatcherAssert.assertThat(String.format(TestConstants.M_DELETE, toDelete),
-            dao.get(toDelete.getId()), /* 3. Try to get deleted object from DB */
+            dao.get(toDelete.getId()), //[3]
             Matchers.nullValue()
         );
     }

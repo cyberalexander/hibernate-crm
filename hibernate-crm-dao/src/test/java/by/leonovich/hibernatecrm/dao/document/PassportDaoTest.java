@@ -4,21 +4,19 @@ import by.leonovich.hibernatecrm.TestConstants;
 import by.leonovich.hibernatecrm.dao.PassportDao;
 import by.leonovich.hibernatecrm.mappings.joinedtable.Document;
 import by.leonovich.hibernatecrm.mappings.joinedtable.Passport;
-import by.leonovich.hibernatecrm.tools.RandomString;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.hibernate.ObjectNotFoundException;
-import org.hibernate.Session;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static by.leonovich.hibernatecrm.TestConstants.UPDATE_PREFIX;
 /**
  * Created : 10/12/2020 20:28
  * Project : hibernate-crm
@@ -28,6 +26,7 @@ import static by.leonovich.hibernatecrm.TestConstants.UPDATE_PREFIX;
  * @version 1.0
  */
 class PassportDaoTest extends CommonDocumentDaoTest {
+    protected static final Logger LOG = LoggerFactory.getLogger(PassportDaoTest.class);
 
     @Test
     @SneakyThrows
@@ -53,7 +52,7 @@ class PassportDaoTest extends CommonDocumentDaoTest {
 
     @Test
     @SneakyThrows
-    void testSaveOrUpdateSave() {
+    void testSaveOrUpdate_Save() {
         Passport toSave = Passport.init();
         dao.saveOrUpdate(toSave);
         MatcherAssert.assertThat(
@@ -65,14 +64,13 @@ class PassportDaoTest extends CommonDocumentDaoTest {
 
     @Test
     @SneakyThrows
-    void testSaveOrUpdateUpdate() {
-        Passport toUpdate = passports.randomEntity();
-        toUpdate.setPassportNumber(UPDATE_PREFIX + RandomString.PASSPORT_NUMBER.get() + "_" + toUpdate.getId());
-        dao.saveOrUpdate(toUpdate);
+    void testSaveOrUpdate_Update() {
+        Passport passport = passports.randomEntity().modify();
+        dao.saveOrUpdate(passport);
         MatcherAssert.assertThat(
-            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, toUpdate),
-            dao.get(toUpdate.getId()),
-            Matchers.equalTo(toUpdate)
+            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, passport),
+            dao.get(passport.getId()),
+            Matchers.equalTo(passport)
         );
     }
 
@@ -80,7 +78,6 @@ class PassportDaoTest extends CommonDocumentDaoTest {
     @SneakyThrows
     void testGet() {
         Passport randomPassport = passports.randomEntity();
-        LOG.info("{}", randomPassport);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_GET, randomPassport.getClass().getSimpleName(), randomPassport.getId()),
             dao.get(randomPassport.getId()),
@@ -91,7 +88,7 @@ class PassportDaoTest extends CommonDocumentDaoTest {
     @Test
     @SneakyThrows
     void testGetWhenNotExists() {
-        Serializable index = passports.lastElement().getId() + 300L;
+        Serializable index = passports.lastElement().incrementIdAndGet();
         MatcherAssert.assertThat(
             String.format(TestConstants.M_GET_NOT_EXISTS, index),
             dao.get(index),
@@ -110,18 +107,11 @@ class PassportDaoTest extends CommonDocumentDaoTest {
         );
     }
 
-    /**
-     * Method {@link Session#load} is different from {@link Session#get}
-     * In case of "get", when object not exists in database, hibernate returns null. When in case of "load"
-     * hibernate will not query object immediately but will just return proxy. And when we try to access any property
-     * of that proxy, hibernate will immediately execute select to database and throw {@link ObjectNotFoundException}
-     * if object won't be found there.
-     */
     @Test
     @SneakyThrows
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testLoadWhenNotExists() {
-        Serializable index = passports.lastElement().getId() + 300L;
+        Serializable index = passports.lastElement().incrementIdAndGet();
         Document loaded = dao.load(index);
         Assertions.assertThrows(
             ObjectNotFoundException.class,
@@ -131,7 +121,7 @@ class PassportDaoTest extends CommonDocumentDaoTest {
 
     /**
      * 1. Save Passport in DB
-     * 2. Passport Meeting from DB
+     * 2. Get Passport from DB
      * 3. Assert that Passport does not exists in DB any more
      */
     @Test

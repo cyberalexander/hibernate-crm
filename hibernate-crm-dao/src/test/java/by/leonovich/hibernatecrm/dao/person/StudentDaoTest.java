@@ -100,11 +100,11 @@ class StudentDaoTest extends CommonPersonDaoTest {
     @Test
     @SneakyThrows
     void testGet() {
-        Student randStudent = students.randomEntity();
-        LOG.info("{}", randStudent);
+        Student student = students.randomEntity();
+        LOG.info("Random student : {}", student);
         MatcherAssert.assertThat(
-            String.format(TestConstants.M_GET, randStudent.getClass().getSimpleName(), randStudent.getId()),
-            dao.get(randStudent.getId()),
+            String.format(TestConstants.M_GET, student.getClass().getSimpleName(), student.getId()),
+            dao.get(student.getId()),
             Matchers.instanceOf(Student.class)
         );
     }
