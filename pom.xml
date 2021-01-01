@@ -8,7 +8,8 @@
     <artifactId>hibernate-crm</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>hibernate-crm-xml</module>
+        <module>hibernate-crm-common</module>
+        <module>hibernate-crm-model</module>
         <module>hibernate-crm-dao</module>
     </modules>
     <name>hibernate-crm</name>
@@ -44,6 +45,7 @@
     </properties>
 
     <dependencyManagement>
+        <!-- 3-party dependencies -->
         <dependencies>
             <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
             <dependency>

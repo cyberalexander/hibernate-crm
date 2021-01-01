@@ -5,7 +5,7 @@ import by.leonovich.hibernatecrm.dao.PersonDao;
 import by.leonovich.hibernatecrm.mappings.singletable.Employee;
 import by.leonovich.hibernatecrm.mappings.singletable.Person;
 import by.leonovich.hibernatecrm.mappings.singletable.Student;
-import by.leonovich.hibernatecrm.tools.MagicList;
+import by.leonovich.hibernatecrm.common.collection.MagicList;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.BeforeAll;

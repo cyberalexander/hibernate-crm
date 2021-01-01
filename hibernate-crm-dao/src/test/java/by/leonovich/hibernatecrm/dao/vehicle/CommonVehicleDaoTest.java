@@ -5,7 +5,7 @@ import by.leonovich.hibernatecrm.dao.VehicleDao;
 import by.leonovich.hibernatecrm.mappings.tableperclass.ElectricCar;
 import by.leonovich.hibernatecrm.mappings.tableperclass.MotorCycle;
 import by.leonovich.hibernatecrm.mappings.tableperclass.Vehicle;
-import by.leonovich.hibernatecrm.tools.MagicList;
+import by.leonovich.hibernatecrm.common.collection.MagicList;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.BeforeAll;

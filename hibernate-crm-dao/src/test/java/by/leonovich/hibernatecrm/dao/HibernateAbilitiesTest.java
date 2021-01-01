@@ -2,8 +2,8 @@ package by.leonovich.hibernatecrm.dao;
 
 import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import by.leonovich.hibernatecrm.mappings.singletable.Person;
-import by.leonovich.hibernatecrm.tools.MagicList;
-import by.leonovich.hibernatecrm.tools.RandomString;
+import by.leonovich.hibernatecrm.common.collection.MagicList;
+import by.leonovich.hibernatecrm.common.random.RandomString;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;

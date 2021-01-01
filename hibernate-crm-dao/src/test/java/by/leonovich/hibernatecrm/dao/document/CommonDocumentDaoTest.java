@@ -5,7 +5,7 @@ import by.leonovich.hibernatecrm.dao.DocumentDao;
 import by.leonovich.hibernatecrm.mappings.joinedtable.Document;
 import by.leonovich.hibernatecrm.mappings.joinedtable.DrivingLicense;
 import by.leonovich.hibernatecrm.mappings.joinedtable.Passport;
-import by.leonovich.hibernatecrm.tools.MagicList;
+import by.leonovich.hibernatecrm.common.collection.MagicList;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.BeforeAll;

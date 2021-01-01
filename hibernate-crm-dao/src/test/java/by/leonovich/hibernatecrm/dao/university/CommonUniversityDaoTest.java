@@ -4,7 +4,7 @@ import by.leonovich.hibernatecrm.dao.Dao;
 import by.leonovich.hibernatecrm.dao.UniversityDao;
 import by.leonovich.hibernatecrm.dao.person.CommonPersonDaoTest;
 import by.leonovich.hibernatecrm.mappings.singletable.University;
-import by.leonovich.hibernatecrm.tools.MagicList;
+import by.leonovich.hibernatecrm.common.collection.MagicList;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 
