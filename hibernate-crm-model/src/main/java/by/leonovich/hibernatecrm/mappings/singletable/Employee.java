@@ -1,5 +1,6 @@
 package by.leonovich.hibernatecrm.mappings.singletable;
 
+import by.leonovich.hibernatecrm.common.model.Automated;
 import by.leonovich.hibernatecrm.common.random.RandomNumber;
 import by.leonovich.hibernatecrm.common.random.RandomString;
 import lombok.Data;
@@ -23,7 +24,7 @@ import java.util.stream.Stream;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class Employee extends Person {
+public class Employee extends Person implements Automated {
     private String company;
     private BigDecimal salary;
     @ToString.Exclude

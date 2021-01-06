@@ -25,7 +25,7 @@ import java.util.stream.Stream;
  * @version 1.0
  */
 @Data
-public class Meeting implements Serializable, Automated<Meeting> {
+public class Meeting implements Serializable, Automated {
     private Long id;
     private String subject;
     private LocalDateTime meetingDate;

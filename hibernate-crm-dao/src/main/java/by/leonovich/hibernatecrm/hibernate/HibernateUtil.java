@@ -1,6 +1,10 @@
 package by.leonovich.hibernatecrm.hibernate;
 
-import org.hibernate.*;
+import org.hibernate.FlushMode;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.SharedSessionContract;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +23,7 @@ public class HibernateUtil {
     private static final Logger LOG = LoggerFactory.getLogger(HibernateUtil.class);
     private static final HibernateUtil instance = new HibernateUtil();
     private final SessionFactory factory;
-    private final ThreadLocal<Session> sessions = new ThreadLocal<>();
+    private final ThreadLocal<Session> session = new ThreadLocal<>();
 
     private HibernateUtil() {
         try {
@@ -34,12 +38,25 @@ public class HibernateUtil {
     }
 
     public Session getSession() {
-        Session session = Optional.ofNullable(sessions.get())
+        Session s = Optional.ofNullable(this.session.get())
             .filter(SharedSessionContract::isOpen)
-            .orElseGet(factory::openSession);
-        sessions.set(session);
-        session.setHibernateFlushMode(FlushMode.AUTO);
-        return session;
+            .orElseGet(() -> {
+                Session newSession = factory.openSession();
+                LOG.info("Session {} opened!", newSession);
+                return newSession;
+            });
+        this.session.set(s);
+        s.setHibernateFlushMode(FlushMode.AUTO);
+        return s;
+    }
+
+    public void closeSession() {
+        if (this.session.get().isOpen()) {
+            this.session.get().close();
+            LOG.info("Session {} closed!", this.session.get());
+        } else {
+            LOG.info("Session {} was already closed!", this.session.get());
+        }
     }
 
     public static synchronized HibernateUtil getInstance(){

@@ -5,7 +5,8 @@
     <class name="University" table="T_UNIVERSITY">
         <comment>
             ONE-TO-MANY RELATION
-            inverse="true" - determine who is the owner of relation
+            inverse="true" - determine who is the owner of relation.
+            In this case University will be the owner of relation.
         </comment>
         <id name="id" column="F_ID">
             <generator class="native">
@@ -14,10 +15,10 @@
         </id>
         <property name="name" column="F_NAME"/>
         <!--
-        TODO turn lazy="false" to lazy="true" after DAO layer will be rewritten. Cause currently, session is opened-closed
-        TODO in DAO, and if try to access students collection after session is closed, LazyInitializationException will be thrown
+           lazy="true" - related students will not be loaded by default. But expected to be loaded when getter method
+           will be invoked (if University still will be attached to the session - no errors)
         -->
-        <set name="students" table="T_PERSON" cascade="save-update" inverse="true" lazy="false" fetch="select">
+        <set name="students" table="T_PERSON" cascade="all-delete-orphan, all" inverse="true" lazy="true" fetch="select">
             <key column="F_UNIVERSITY_ID" not-null="true"/>
             <one-to-many class="Student"/>
         </set>

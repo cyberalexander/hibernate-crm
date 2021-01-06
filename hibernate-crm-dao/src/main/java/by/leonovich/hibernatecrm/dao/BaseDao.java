@@ -14,7 +14,6 @@ import javax.persistence.criteria.Root;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created : 26/11/2020 22:01
@@ -91,13 +90,11 @@ public abstract class BaseDao<T> implements Dao<T> {
     @Override
     public T get(Serializable id) throws DaoException {
         try {
-            LOG.debug("{}", id);
             Session session = HibernateUtil.getInstance().getSession();
             transaction = session.beginTransaction();
             T t = session.get(getPersistentClass(), id);
             transaction.commit();
-            Optional.ofNullable(t).ifPresent(session::evict);
-            LOG.info("Result : {}", t);
+            LOG.debug("Request : {}; Result : {}", id, t);
             return t;
         } catch (HibernateException e) {
             transaction.rollback();
@@ -108,11 +105,10 @@ public abstract class BaseDao<T> implements Dao<T> {
     @Override
     public T load(Serializable id) throws DaoException {
         try {
-            LOG.debug("Loading by id={}", id);
             Session session = HibernateUtil.getInstance().getSession();
             transaction = session.beginTransaction();
             T t = session.load(getPersistentClass(), id);
-            LOG.debug("Session#isDirty={}; result : {}", session.isDirty(), t);
+            LOG.debug("Session#isDirty={}; Request : {}; Result : {}", session.isDirty(), id, t);
             transaction.commit();
             return t;
         } catch (HibernateException e) {

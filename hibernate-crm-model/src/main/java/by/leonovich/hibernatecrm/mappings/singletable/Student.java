@@ -18,7 +18,6 @@ import lombok.ToString;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class Student extends Person {
-
     private University university; /* MANY-TO-ONE relation */
     private String faculty;
     private Double mark;

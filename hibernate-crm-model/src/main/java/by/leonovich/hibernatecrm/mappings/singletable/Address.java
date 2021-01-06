@@ -25,7 +25,7 @@ public class Address implements Serializable {
     private String street;
     private Integer buildingNumber;
     @EqualsAndHashCode.Exclude
-    private String index;
+    private String postIndex;
 
     @SuppressWarnings("unchecked")
     public <T extends Address> T populate() {

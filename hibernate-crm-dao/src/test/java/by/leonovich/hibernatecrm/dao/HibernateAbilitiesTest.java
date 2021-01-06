@@ -9,6 +9,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,8 @@ import javax.persistence.PersistenceException;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static by.leonovich.hibernatecrm.TestConstants.MAIN_LIMIT;
 
 /**
  * Created : 06/12/2020 20:47
@@ -38,8 +41,14 @@ class HibernateAbilitiesTest {
     static void beforeAll() {
         hibernate = HibernateUtil.getInstance();
         all.addAll(
-            Stream.generate(Person::init).limit(10).map(HibernateAbilitiesTest::persistEach).collect(Collectors.toList())
+            Stream.generate(Person::init).limit(MAIN_LIMIT).map(HibernateAbilitiesTest::persist).collect(Collectors.toList())
         );
+    }
+
+    @AfterEach
+    void tearDown() {
+        //Approach: Session opened in DAO method; session closed here after each @test method execution
+        HibernateUtil.getInstance().closeSession();
     }
 
     @Test
@@ -204,7 +213,7 @@ class HibernateAbilitiesTest {
     }
 
     @SneakyThrows
-    private static Person persistEach(Person person) {
+    private static Person persist(Person person) {
         dao.save(person);
         if (LOG.isInfoEnabled()){
             LOG.info("{}", person);

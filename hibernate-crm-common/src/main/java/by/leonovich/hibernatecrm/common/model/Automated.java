@@ -13,23 +13,27 @@ import java.io.Serializable;
  * @author alexanderleonovich
  * @version 1.0
  */
-public interface Automated<T extends Serializable> {
+public interface Automated {
 
-    T populate();
+    Long getId();
+
+    void setId(Long id);
+
+    <T> T populate();
 
     /**
      * Default realization throws an exception cause not every entity might have relations (one-to-one, one-to-many etc.)
      */
-    default T populateCascade() {
+    default <T> T populateCascade() {
         throw new UnsupportedOperationException();
     }
 
-    T modify();
+    <T> T modify();
 
     /**
      * Default realization throws an exception cause not every entity might have relations (one-to-one, one-to-many etc.)
      */
-    default T modifyCascade() {
+    default <T> T modifyCascade() {
         throw new UnsupportedOperationException();
     }
 

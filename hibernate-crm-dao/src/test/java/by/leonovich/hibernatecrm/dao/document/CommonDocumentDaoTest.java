@@ -1,18 +1,20 @@
 package by.leonovich.hibernatecrm.dao.document;
 
+import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.dao.Dao;
 import by.leonovich.hibernatecrm.dao.DocumentDao;
+import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import by.leonovich.hibernatecrm.mappings.joinedtable.Document;
 import by.leonovich.hibernatecrm.mappings.joinedtable.DrivingLicense;
 import by.leonovich.hibernatecrm.mappings.joinedtable.Passport;
-import by.leonovich.hibernatecrm.common.collection.MagicList;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.Test;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,13 +30,12 @@ import static by.leonovich.hibernatecrm.TestConstants.MAIN_LIMIT;
  * @version 1.0
  */
 public class CommonDocumentDaoTest {
-    protected static final Logger LOG = LoggerFactory.getLogger(CommonDocumentDaoTest.class);
-    protected static final Dao<Document> dao = new DocumentDao();
-    protected static final MagicList<Document> allDocuments = new MagicList<>();
+    private static final MagicList<Document> allDocuments = new MagicList<>();
     protected static final MagicList<DrivingLicense> drivingLicenses = new MagicList<>();
     protected static final MagicList<Passport> passports = new MagicList<>();
 
     @BeforeAll
+    @SneakyThrows
     static void beforeAll() {
         /* hint to do not invoke this method more than once */
         if (CollectionUtils.isNotEmpty(allDocuments)) {
@@ -46,21 +47,26 @@ public class CommonDocumentDaoTest {
         allDocuments.addAll(drivingLicenses);
         allDocuments.addAll(passports);
         Collections.shuffle(allDocuments);
-        allDocuments.forEach(CommonDocumentDaoTest::persist);
+
+        Dao<Document> dao = new DocumentDao();
+        for (Document doc : allDocuments) {
+            dao.save(doc);
+        }
+        HibernateUtil.getInstance().closeSession();
     }
 
-    @SneakyThrows
-    private static Document persist(Document doc) {
-        dao.saveOrUpdate(doc);
-        LOG.info("{}", doc);
-        return doc;
+    @AfterEach
+    void tearDown() {
+        //Approach: Session opened in DAO method; session closed here after each @test method execution
+        HibernateUtil.getInstance().closeSession();
     }
 
-    /**
-     * Method implemented in order to just "hide" {@link by.leonovich.hibernatecrm.dao.DaoException}
-     */
-    @SneakyThrows
-    public Document daoGet(Serializable id) {
-        return dao.get(id);
+    @Test
+    void testDataReady() {
+        MatcherAssert.assertThat(
+            "Test data is not ready!",
+            CollectionUtils.isEmpty(allDocuments),
+            Matchers.is(Boolean.FALSE)
+        );
     }
 }

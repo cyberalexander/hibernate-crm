@@ -3,7 +3,10 @@ package by.leonovich.hibernatecrm.mappings.singletable;
 import by.leonovich.hibernatecrm.common.model.Automated;
 import by.leonovich.hibernatecrm.common.random.RandomNumber;
 import by.leonovich.hibernatecrm.common.random.RandomString;
+import by.leonovich.hibernatecrm.mappings.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -16,12 +19,16 @@ import java.io.Serializable;
  * @version 1.0
  */
 @Data
-public class Person implements Serializable, Automated<Person>  {
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class Person extends BaseEntity implements Serializable, Automated {
     private Long id;
     private String name;
     private String surname;
     private Integer age;
+    @EqualsAndHashCode.Exclude
     private Address homeAddress; /* COMPONENT relation */
+    @EqualsAndHashCode.Exclude
     private PhoneNumber phoneNumber; /* ONE-TO-ONE relation */
 
     @Override

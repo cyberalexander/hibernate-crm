@@ -6,7 +6,7 @@
         <comment>
             TABLE PER CONCRETE SUBCLASS.
             Separate table with full set of columns will be created for every class in hierarchy.
-            It's similar to @MappedSuperClass. But it's  creating a table for a Parent class as well.
+            Similar to MappedSuperClass annotation. But table created for Parent class as well.
         </comment>
         <id name="id" type="java.lang.Long" column="F_ID">
             <generator class="increment"/>

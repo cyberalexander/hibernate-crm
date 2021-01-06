@@ -26,7 +26,7 @@
             <property name="city" column="F_CITY"/>
             <property name="street" column="F_STREET"/>
             <property name="buildingNumber" column="F_BUILDING"/>
-            <property name="index" formula="{concat(F_CODE, '_', F_COUNTRY)}" type="java.lang.String" access="field">
+            <property name="postIndex" formula="concat(F_CODE, '_', F_COUNTRY)" type="java.lang.String" access="property">
                 <meta attribute="description">Not a column in database, but calculated by hibernate value</meta>
             </property>
         </component>
@@ -34,11 +34,7 @@
         <subclass name="Employee" discriminator-value="E">
             <property name="company" column="F_COMPANY"/>
             <property name="salary" column="F_SALARY" type="big_decimal" precision="19" scale="4"/>
-            <!--
-            TODO turn lazy="false" to lazy="true" after DAO layer will be rewritten. Cause currently, session is opened-closed
-            TODO in DAO, and if try to access meetings collection after session is closed, LazyInitializationException will be thrown
-            -->
-            <set name="meetings" table="T_EMPLOYEE_MEETING" inverse="false" lazy="false" fetch="select" cascade="save-update">
+            <set name="meetings" table="T_EMPLOYEE_MEETING" inverse="true" cascade="save-update" lazy="true" fetch="select">
                 <key column="F_EMPLOYEE_ID"/>
                 <many-to-many column="F_MEETING_ID" class="Meeting"/>
             </set>

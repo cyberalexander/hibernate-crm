@@ -17,7 +17,7 @@ hs_err_pid*
 
 .idea
 *.class
-.log
+*.log
 tmp
 .classpath
 .project

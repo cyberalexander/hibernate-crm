@@ -1,23 +1,31 @@
 package by.leonovich.hibernatecrm.dao.meeting;
 
 import by.leonovich.hibernatecrm.TestConstants;
+import by.leonovich.hibernatecrm.common.collection.MagicList;
+import by.leonovich.hibernatecrm.dao.BaseDaoTest;
+import by.leonovich.hibernatecrm.dao.Dao;
+import by.leonovich.hibernatecrm.dao.MeetingDao;
+import by.leonovich.hibernatecrm.dao.PersonDao;
+import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import by.leonovich.hibernatecrm.mappings.singletable.Employee;
 import by.leonovich.hibernatecrm.mappings.singletable.Meeting;
+import by.leonovich.hibernatecrm.mappings.singletable.Person;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.hibernate.ObjectNotFoundException;
-import org.hibernate.Session;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static by.leonovich.hibernatecrm.TestConstants.LIMIT;
 
 /**
  * Created : 26/12/2020 12:58
@@ -27,40 +35,38 @@ import java.util.stream.Collectors;
  * @author alexanderleonovich
  * @version 1.0
  */
-class MeetingDaoTest extends CommonMeetingDaoTest {
-    protected static final Logger LOG = LoggerFactory.getLogger(MeetingDaoTest.class);
+class MeetingDaoTest implements BaseDaoTest<Meeting> {
+    private static final Logger LOG = LoggerFactory.getLogger(MeetingDaoTest.class);
+    private static final Dao<Person> personDao = new PersonDao();
+    private static final Dao<Meeting> meetingDao = new MeetingDao();
+    private static final MagicList<Meeting> meetings = new MagicList<>();
 
-    @Test
-    @SneakyThrows
-    void testPersist() {
-        Meeting meeting = Meeting.init();
-        meetingDao.persist(meeting);
-        MatcherAssert.assertThat(
-            String.format(TestConstants.M_PERSIST, meeting),
-            meetingDao.get(meeting.getId()),
-            Matchers.notNullValue()
+    @BeforeAll
+    static void beforeAll() {
+        meetings.addAll(
+            Stream.generate(Meeting::initWithManyToMany)
+                .limit(LIMIT)
+                .map(MeetingDaoTest::persist)
+                .collect(Collectors.toList())
         );
+        HibernateUtil.getInstance().closeSession();
+    }
+
+    @AfterEach
+    void tearDown() {
+        //Approach: Session opened in DAO method; session closed here after each @test method execution
+        HibernateUtil.getInstance().closeSession();
     }
 
     @Test
     @SneakyThrows
-    void testSave() {
+    void testSaveCascade() {
+        Meeting m = Meeting.initWithManyToMany();
+        dao().saveOrUpdate(m);
         MatcherAssert.assertThat(
-            TestConstants.M_SAVE,
-            meetingDao.save(Meeting.init()),
-            Matchers.notNullValue()
-        );
-    }
-
-    @Test
-    @SneakyThrows
-    void testSaveOrUpdate_Save() {
-        Meeting meeting = Meeting.init();
-        meetingDao.saveOrUpdate(meeting);
-        MatcherAssert.assertThat(
-            String.format(TestConstants.M_SAVE_OR_UPDATE_SAVE, meeting),
-            meetingDao.get(meeting.getId()),
-            Matchers.equalTo(meeting)
+            TestConstants.M_SAVE_CASCADE,
+            dao().get(m.getId()).getEmployees(),
+            Matchers.equalTo(m.getEmployees())
         );
     }
 
@@ -68,102 +74,26 @@ class MeetingDaoTest extends CommonMeetingDaoTest {
     @SneakyThrows
     void testSaveOrUpdate_SaveCascade() {
         Meeting meeting = Meeting.initWithManyToMany();
-        meetingDao.saveOrUpdate(meeting);
+        dao().saveOrUpdate(meeting);
         MatcherAssert.assertThat(
-            String.format(TestConstants.M_SAVE_OR_UPDATE_SAVE_CASCADE, meeting.getEmployees()),
-            meetingDao.get(meeting.getId()).getEmployees().size(),
+            String.format(TestConstants.M_SAVE_OR_UPDATE_SAVE_CASCADE, meeting.getEmployees(), meeting),
+            dao().get(meeting.getId()).getEmployees().size(),
             Matchers.is(3)
         );
     }
 
     @Test
     @SneakyThrows
-    void testSaveOrUpdate_Update() {
-        Meeting modified = meetings.randomEntity().modify();
-        meetingDao.saveOrUpdate(modified);
+    void testSaveOrUpdate_UpdateCascade() {
+        Meeting meeting = Meeting.initWithManyToMany();
+        dao().save(meeting);
+        dao().saveOrUpdate(meeting.modifyCascade());
+        Set<Employee> modified = meeting.getEmployees();
         MatcherAssert.assertThat(
-            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, modified),
-            meetingDao.get(modified.getId()),
+            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATED_CASCADE, modified, meeting),
+            dao().get(meeting.getId()).getEmployees(),
             Matchers.equalTo(modified)
         );
-    }
-
-    /**
-     * 1. After persisting Meeting and new Employees to database, it's important to execute GET operation, to load
-     * populate Employees IDs. Or else [2] invocation will try to persist same employees again and following exception
-     * will be thrown:
-     * <code>
-     * Caused by: org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation:
-     * "PUBLIC.PRIMARY_KEY_87 ON PUBLIC.T_EMPLOYEE_MEETING(F_EMPLOYEE_ID, F_MEETING_ID) VALUES 1"; SQL statement:
-     * insert into T_EMPLOYEE_MEETING (F_EMPLOYEE_ID, F_MEETING_ID) values (?, ?) [23505-200]
-     * </code>
-     */
-    @Test
-    @SneakyThrows
-    void testSaveOrUpdate_UpdateCascade() {
-        Meeting toUpdate = Meeting.initWithManyToMany();
-        meetingDao.saveOrUpdate(toUpdate);
-        toUpdate = meetingDao.get(toUpdate.getId()); //[1]
-        Set<Employee> updated = toUpdate.modifyCascade().getEmployees();
-        meetingDao.saveOrUpdate(toUpdate); //[2]
-        Set<Employee> queried = meetingDao.get(toUpdate.getId()).getEmployees();
-        MatcherAssert.assertThat(
-            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, updated),
-            queried,
-            Matchers.equalTo(updated)
-        );
-    }
-
-    @Test
-    @SneakyThrows
-    void testGet() {
-        Meeting meeting = meetings.randomEntity();
-        MatcherAssert.assertThat(
-            String.format(TestConstants.M_GET, meeting.getClass().getSimpleName(), meeting.getId()),
-            meetingDao.get(meeting.getId()),
-            Matchers.instanceOf(Meeting.class)
-        );
-    }
-
-    @Test
-    @SneakyThrows
-    void testGetWhenNotExists() {
-        Serializable index = meetings.lastElement().incrementIdAndGet();
-        MatcherAssert.assertThat(
-            String.format(TestConstants.M_GET_NOT_EXISTS, index),
-            meetingDao.get(index),
-            Matchers.nullValue()
-        );
-    }
-
-    @Test
-    @SneakyThrows
-    void testLoad() {
-        Serializable index = meetings.randomEntity().getId();
-        MatcherAssert.assertThat(
-            String.format(TestConstants.M_LOAD, Meeting.class.getSimpleName(), index),
-            meetingDao.load(index),
-            Matchers.notNullValue()
-        );
-    }
-
-    /**
-     * Method {@link Session#load} is different from {@link Session#get}
-     * In case of "get", when object not exists in database, hibernate returns null. When in case of "load"
-     * hibernate will not query object immediately but will just return proxy. And when we try to access any property
-     * of that proxy, hibernate will immediately execute select to database and throw {@link ObjectNotFoundException}
-     * if object won't be found there.
-     */
-    @Test
-    @SneakyThrows
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-    void testLoadWhenNotExists() {
-        Serializable index = meetings.lastElement().incrementIdAndGet();
-        Meeting loaded = meetingDao.load(index);
-        Assertions.assertThrows(
-            ObjectNotFoundException.class,
-            loaded::getSubject,
-            TestConstants.M_LOAD_EXCEPTION);
     }
 
     /**
@@ -176,11 +106,11 @@ class MeetingDaoTest extends CommonMeetingDaoTest {
      */
     @Test
     @SneakyThrows
-    void testDelete() {
+    void testDeleteCascade() {
         Meeting meeting = Meeting.initWithManyToMany();
-        meetingDao.saveOrUpdate(meeting); //[1]
+        Employee relatedEmployee = meeting.getEmployees().iterator().next();
 
-        Assertions.assertNotNull(meeting.getId(), TestConstants.M_SAVE);
+        Assertions.assertNotNull(dao().save(meeting), TestConstants.M_SAVE); //[1]
         meeting.getEmployees().forEach(emp -> Assertions.assertNotNull(emp.getId(), TestConstants.M_SAVE)); //[2]
 
         //[3]
@@ -188,15 +118,15 @@ class MeetingDaoTest extends CommonMeetingDaoTest {
             emp.setMeetings(
                 emp.getMeetings().stream().filter(m -> !m.equals(meeting)).collect(Collectors.toSet())
             );
-            dao.saveOrUpdate(emp);
+            personDao.saveOrUpdate(emp);
         }
 
-        meetingDao.delete(meeting); //[4]
+        dao().delete(meeting); //[4]
 
         //[5]
-        MatcherAssert.assertThat(String.format(TestConstants.M_DELETE, meeting),
-            meetingDao.get(meeting.getId()),
-            Matchers.nullValue()
+        MatcherAssert.assertThat(String.format(TestConstants.M_DELETE_CASCADE_AND_KEEP_RELATION, relatedEmployee, meeting),
+            personDao.get(relatedEmployee.getId()),
+            Matchers.notNullValue()
         );
     }
 
@@ -222,33 +152,18 @@ class MeetingDaoTest extends CommonMeetingDaoTest {
             emp.setMeetings(
                 emp.getMeetings().stream().filter(m -> !m.equals(meeting)).collect(Collectors.toSet())
             );
-            dao.saveOrUpdate(emp);
+            personDao.saveOrUpdate(emp);
         }
 
         meetingDao.delete(meeting);//[4]
 
         //[5]
         for (Employee emp : meeting.getEmployees()) {
-            MatcherAssert.assertThat(String.format(TestConstants.M_DELETE_RELATION, emp, meeting),
-                dao.get(emp.getId()),
+            MatcherAssert.assertThat(String.format(TestConstants.M_DELETE_CASCADE_AND_KEEP_RELATION, emp, meeting),
+                personDao.get(emp.getId()),
                 Matchers.notNullValue()
             );
         }
-    }
-
-    @Test
-    @SneakyThrows
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-    void testGetAll() {
-        List<Serializable> queried = meetingDao.getAll(Meeting.class).stream()
-            .map(Meeting::getId)
-            .collect(Collectors.toList());
-        meetings.stream().map(Meeting::getId).forEach(meetingId ->
-            MatcherAssert.assertThat(
-                String.format(TestConstants.M_GET_ALL, Meeting.class.getSimpleName(), meetingId),
-                queried.contains(meetingId),
-                Matchers.is(Boolean.TRUE)
-            ));
     }
 
     @Test
@@ -262,5 +177,22 @@ class MeetingDaoTest extends CommonMeetingDaoTest {
                 Matchers.equalTo(queried.getExpired())
             );
         }
+    }
+
+    @Override
+    public Dao<Meeting> dao() {
+        return meetingDao;
+    }
+
+    @Override
+    public MagicList<Meeting> entities() {
+        return meetings;
+    }
+
+    @SneakyThrows
+    private static Meeting persist(Meeting meeting) {
+        meetingDao.saveOrUpdate(meeting);
+        LOG.info("{}", meeting);
+        return meeting;
     }
 }

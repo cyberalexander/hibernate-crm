@@ -1,16 +1,19 @@
 package by.leonovich.hibernatecrm.dao.vehicle;
 
+import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.dao.Dao;
 import by.leonovich.hibernatecrm.dao.VehicleDao;
+import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import by.leonovich.hibernatecrm.mappings.tableperclass.ElectricCar;
 import by.leonovich.hibernatecrm.mappings.tableperclass.MotorCycle;
 import by.leonovich.hibernatecrm.mappings.tableperclass.Vehicle;
-import by.leonovich.hibernatecrm.common.collection.MagicList;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -26,15 +29,13 @@ import static by.leonovich.hibernatecrm.TestConstants.MAIN_LIMIT;
  * @author alexanderleonovich
  * @version 1.0
  */
-@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
-public abstract class CommonVehicleDaoTest {
-    protected static final Logger LOG = LoggerFactory.getLogger(CommonVehicleDaoTest.class);
-    protected static final Dao<Vehicle> dao = new VehicleDao();
-    protected static final MagicList<Vehicle> allVehicles = new MagicList<>();
+public class CommonVehicleDaoTest {
+    private static final MagicList<Vehicle> allVehicles = new MagicList<>();
     protected static final MagicList<ElectricCar> electricCars = new MagicList<>();
     protected static final MagicList<MotorCycle> motorCycles = new MagicList<>();
 
     @BeforeAll
+    @SneakyThrows
     static void beforeAll() {
         /* hint to do not invoke this method more than once */
         if (CollectionUtils.isNotEmpty(allVehicles)) {
@@ -46,12 +47,27 @@ public abstract class CommonVehicleDaoTest {
         allVehicles.addAll(electricCars);
         allVehicles.addAll(motorCycles);
         Collections.shuffle(allVehicles);
-        allVehicles.forEach(CommonVehicleDaoTest::persistEach);
+
+        Dao<Vehicle> dao = new VehicleDao();
+        for (Vehicle v : allVehicles) {
+            dao.save(v);
+        }
+        HibernateUtil.getInstance().closeSession();
+
     }
 
-    @SneakyThrows
-    private static void persistEach(Vehicle vehicle) {
-        dao.saveOrUpdate(vehicle);
-        LOG.info("{}", vehicle);
+    @AfterEach
+    void tearDown() {
+        //Approach: Session opened in DAO method; session closed here after each @test method execution
+        HibernateUtil.getInstance().closeSession();
+    }
+
+    @Test
+    void testDataReady() {
+        MatcherAssert.assertThat(
+            "Test data is not ready!",
+            CollectionUtils.isEmpty(allVehicles),
+            Matchers.is(Boolean.FALSE)
+        );
     }
 }

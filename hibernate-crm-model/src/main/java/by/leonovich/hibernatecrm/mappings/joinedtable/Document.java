@@ -17,7 +17,7 @@ import java.time.LocalDate;
  * @version 1.0
  */
 @Data
-public class Document implements Serializable, Automated<Document> {
+public class Document implements Serializable, Automated {
     private Long id;
     private String documentNumber;
     private LocalDate issueDate;

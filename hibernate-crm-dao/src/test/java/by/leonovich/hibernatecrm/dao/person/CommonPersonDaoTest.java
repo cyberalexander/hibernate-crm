@@ -1,14 +1,19 @@
 package by.leonovich.hibernatecrm.dao.person;
 
+import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.dao.Dao;
 import by.leonovich.hibernatecrm.dao.PersonDao;
+import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import by.leonovich.hibernatecrm.mappings.singletable.Employee;
 import by.leonovich.hibernatecrm.mappings.singletable.Person;
 import by.leonovich.hibernatecrm.mappings.singletable.Student;
-import by.leonovich.hibernatecrm.common.collection.MagicList;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,29 +33,42 @@ import static by.leonovich.hibernatecrm.TestConstants.MAIN_LIMIT;
  */
 public class CommonPersonDaoTest {
     protected static final Logger LOG = LoggerFactory.getLogger(CommonPersonDaoTest.class);
-    protected static final Dao<Person> dao = new PersonDao();
+    protected static final Dao<Person> personDao = new PersonDao();
     protected static final MagicList<Person> allPersons = new MagicList<>();
     protected static final MagicList<Employee> employees = new MagicList<>();
     protected static final MagicList<Student> students = new MagicList<>();
 
     @BeforeAll
+    @SneakyThrows
     static void beforeAll() {
-        /* hint to do not invoke this method more than once */
+        /* hint to do not invoke this method more than once for every children class */
         if (CollectionUtils.isNotEmpty(allPersons)) {
             return;
         }
-        employees.addAll(Stream.generate(Employee::init).limit(MAIN_LIMIT).collect(Collectors.toList()));
-        students.addAll(Stream.generate(Student::init).limit(MAIN_LIMIT).collect(Collectors.toList()));
+        employees.addAll(Stream.generate(Employee::initWithManyToMany).limit(MAIN_LIMIT).collect(Collectors.toList()));
+        students.addAll(Stream.generate(Student::initWithManyToOne).limit(MAIN_LIMIT).collect(Collectors.toList()));
 
         allPersons.addAll(employees);
         allPersons.addAll(students);
         Collections.shuffle(allPersons);
-        allPersons.forEach(CommonPersonDaoTest::persist);
+
+        for (Person p : allPersons) {
+            personDao.save(p);
+        }
+        HibernateUtil.getInstance().closeSession();
     }
 
-    @SneakyThrows
-    protected static void persist(Person person) {
-        dao.saveOrUpdate(person);
-        LOG.info("{}", person);
+    @AfterEach
+    void tearDown() {
+        HibernateUtil.getInstance().closeSession();
+    }
+
+    @Test
+    void testDataReady() {
+        MatcherAssert.assertThat(
+            "Test data is not ready!",
+            CollectionUtils.isEmpty(allPersons),
+            Matchers.is(Boolean.FALSE)
+        );
     }
 }

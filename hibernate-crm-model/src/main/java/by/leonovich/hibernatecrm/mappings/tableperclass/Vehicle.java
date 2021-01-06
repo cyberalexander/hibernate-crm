@@ -16,7 +16,7 @@ import java.io.Serializable;
  * @version 1.0
  */
 @Data
-public class Vehicle implements Serializable, Automated<Vehicle> {
+public class Vehicle implements Serializable, Automated {
     private Long id;
     private Double engineVolume;
     private String manufacturer;

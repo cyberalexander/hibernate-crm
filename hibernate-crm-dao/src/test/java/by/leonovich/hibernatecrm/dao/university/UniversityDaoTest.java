@@ -1,20 +1,30 @@
 package by.leonovich.hibernatecrm.dao.university;
 
 import by.leonovich.hibernatecrm.TestConstants;
+import by.leonovich.hibernatecrm.common.collection.MagicList;
+import by.leonovich.hibernatecrm.dao.BaseDaoTest;
+import by.leonovich.hibernatecrm.dao.Dao;
+import by.leonovich.hibernatecrm.dao.PersonDao;
+import by.leonovich.hibernatecrm.dao.UniversityDao;
+import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
+import by.leonovich.hibernatecrm.mappings.singletable.Person;
 import by.leonovich.hibernatecrm.mappings.singletable.Student;
 import by.leonovich.hibernatecrm.mappings.singletable.University;
 import lombok.SneakyThrows;
-import org.apache.commons.collections4.CollectionUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.PersistenceException;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created : 13/12/2020 20:24
@@ -24,41 +34,36 @@ import java.util.Set;
  * @author alexanderleonovich
  * @version 1.0
  */
-class UniversityDaoTest extends CommonUniversityDaoTest {
+class UniversityDaoTest implements BaseDaoTest<University> {
     protected static final Logger LOG = LoggerFactory.getLogger(UniversityDaoTest.class);
+    protected static final Dao<Person> personDao = new PersonDao();
+    protected static final Dao<University> universityDao = new UniversityDao();
+    protected static MagicList<University> universities = new MagicList<>();
 
-    @Test
-    @SneakyThrows
-    void testPersist() {
-        University university = University.init();
-        universityDao.persist(university);
-        MatcherAssert.assertThat(
-            String.format(TestConstants.M_PERSIST, university),
-            universityDao.get(university.getId()),
-            Matchers.equalTo(university)
+    @BeforeAll
+    static void beforeAll() {
+        universities.addAll(Stream.generate(University::initWithOneToMany).limit(TestConstants.LIMIT)
+            .map(UniversityDaoTest::persist)
+            .collect(Collectors.toList())
         );
+        HibernateUtil.getInstance().closeSession();
+    }
+
+    @AfterEach
+    void tearDown() {
+        HibernateUtil.getInstance().closeSession();
     }
 
     @Test
     @SneakyThrows
-    void testSave() {
-        University university = University.init();
+    void testSaveCascade() {
+        University u = University.initWithOneToMany();
+        dao().save(u);
+        LOG.debug("Relation saved as well? {}", Objects.nonNull(u.getStudents().iterator().next().getId()));
         MatcherAssert.assertThat(
-            TestConstants.M_SAVE,
-            universityDao.save(university),
+            TestConstants.M_SAVE_CASCADE,
+            dao().get(u.getId()).getStudents().iterator().next().getId(),
             Matchers.notNullValue()
-        );
-    }
-
-    @Test
-    @SneakyThrows
-    void testSaveOrUpdate_Save() {
-        University toSave = University.init();
-        universityDao.saveOrUpdate(toSave);
-        MatcherAssert.assertThat(
-            String.format(TestConstants.M_SAVE_OR_UPDATE_SAVE, toSave),
-            universityDao.get(toSave.getId()),
-            Matchers.equalTo(toSave)
         );
     }
 
@@ -68,7 +73,7 @@ class UniversityDaoTest extends CommonUniversityDaoTest {
         University u = University.initWithOneToMany();
         universityDao.saveOrUpdate(u);
         MatcherAssert.assertThat(
-            String.format(TestConstants.M_SAVE_OR_UPDATE_SAVE_CASCADE, u.getStudents()),
+            String.format(TestConstants.M_SAVE_OR_UPDATE_SAVE_CASCADE, u.getStudents(), u),
             daoGet(u.getId()).getStudents().size(),
             Matchers.is(3)
         );
@@ -76,140 +81,75 @@ class UniversityDaoTest extends CommonUniversityDaoTest {
 
     @Test
     @SneakyThrows
-    void testSaveOrUpdate_Update() {
-        University toUpdate = universities.randomEntity();
-        universityDao.saveOrUpdate(toUpdate.modify());
-        MatcherAssert.assertThat(
-            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, toUpdate),
-            universityDao.get(toUpdate.getId()),
-            Matchers.equalTo(toUpdate)
-        );
-    }
-
-    @Test
-    @SneakyThrows
     void testSaveOrUpdate_UpdateCascade() {
-        University toUpdate = University.initWithOneToMany();
-        universityDao.saveOrUpdate(toUpdate);
-        Set<Student> updated = toUpdate.modifyCascade().getStudents();
+        University toUpdate = universities.randomEntity();
+        Set<Student> updatedStudents = toUpdate.modifyCascade().getStudents();
         universityDao.saveOrUpdate(toUpdate);
         Set<Student> queried = universityDao.get(toUpdate.getId()).getStudents();
         MatcherAssert.assertThat(
-            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, updated),
+            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATED_CASCADE, updatedStudents, toUpdate),
             queried,
-            Matchers.equalTo(updated)
-        );
-    }
-
-    @Test
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-    void testSaveOrUpdate_UpdateUniversityToNull() {
-        universities.stream()
-            .filter(u -> CollectionUtils.isNotEmpty(u.getStudents()))
-            .findFirst()
-            .ifPresentOrElse(uWithStudents -> {
-                    uWithStudents.getStudents().forEach(s -> {
-                        s.setUniversity(null);
-                        studentDaoSaveOrUpdate(s);
-                    });
-                    Set<Student> queried = daoGet(uWithStudents.getId()).getStudents();
-                    MatcherAssert.assertThat(
-                        String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATE, queried),
-                        CollectionUtils.isEmpty(queried),
-                        Matchers.is(Boolean.TRUE)
-                    );
-                }, () -> LOG.warn("Test skipped cause University containing students not found in test data!")
-            );
-    }
-
-    @Test
-    @SneakyThrows
-    void testGet() {
-        University randomUniversity = universities.randomEntity();
-        LOG.info("{}", randomUniversity);
-        MatcherAssert.assertThat(
-            String.format(TestConstants.M_GET, randomUniversity.getClass().getSimpleName(), randomUniversity.getId()),
-            universityDao.get(randomUniversity.getId()),
-            Matchers.instanceOf(University.class)
-        );
-    }
-
-    @Test
-    @SneakyThrows
-    void testGetWhenNotExists() {
-        Serializable index = universities.lastElement().incrementIdAndGet();
-        MatcherAssert.assertThat(
-            String.format(TestConstants.M_GET_NOT_EXISTS, index),
-            universityDao.get(index),
-            Matchers.nullValue()
-        );
-    }
-
-    @Test
-    @SneakyThrows
-    void testLoad() {
-        Serializable randomIndex = universities.randomEntity().getId();
-        MatcherAssert.assertThat(
-            String.format(TestConstants.M_LOAD, University.class.getSimpleName(), randomIndex),
-            universityDao.load(randomIndex),
-            Matchers.notNullValue()
+            Matchers.equalTo(updatedStudents)
         );
     }
 
     /**
-     * Important to delete reference to University to avoid 'constraint violation' exceptions at the time
-     * of delete University. I should manage deletion on my own as I set cascade="save-update", so hibernate will
-     * not delete students at the time of University deletion, but will throw exception, if any student will
-     * have reference to university to be deleted
+     * cascade="all-delete-orphan" - when deleting University, all related Student should be deleted by hibernate as well.
      */
     @Test
     @SneakyThrows
-    void testDelete() {
+    void testDeleteCascade() {
         University toDelete = University.initWithOneToMany();
-        universityDao.saveOrUpdate(toDelete);
+        universityDao.save(toDelete);
         Assertions.assertNotNull(toDelete.getId(), TestConstants.M_SAVE);
+        Student relatedStudent = toDelete.getStudents().iterator().next();
 
-        for (Student st : toDelete.getStudents()) {
-            st.setUniversity(null);
-            dao.saveOrUpdate(st);
-        }
         universityDao.delete(toDelete);
 
-        MatcherAssert.assertThat(String.format(TestConstants.M_DELETE, toDelete),
-            universityDao.get(toDelete.getId()),
+        MatcherAssert.assertThat(String.format(TestConstants.M_DELETE_CASCADE, relatedStudent, toDelete),
+            personDao.get(relatedStudent.getId()),
             Matchers.nullValue()
         );
     }
 
-    /**
-     * In case if system trying to delete University, and at the same time Student(s) has reference to it, then
-     * Exception as below will be thrown
-     * <code>
-     *     Caused by: org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Referential integrity constraint
-     *     violation: "FKIAQXXAFM5M20FPXP7HAWBDRYI: PUBLIC.T_PERSON FOREIGN KEY(F_UNIVERSITY_ID) REFERENCES PUBLIC.T_UNIVERSITY(F_ID) (9)";
-     *     SQL statement: delete from T_UNIVERSITY where F_ID=? [23503-200]
-     * </code>
-     */
     @Test
     @SneakyThrows
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
-    void testDelete_ConstraintExists() {
-        University toDelete = University.initWithOneToMany();
-        universityDao.saveOrUpdate(toDelete);
-        Assertions.assertNotNull(toDelete.getId(), TestConstants.M_SAVE);
-        Assertions.assertThrows(
-            PersistenceException.class,
-            () -> universityDao.delete(toDelete),
-            String.format(TestConstants.M_EXCEPTION_EXPECTED, toDelete.getStudents()));
+    void testDeleteOrphan() {
+        University u = University.initWithOneToMany();
+        universityDao.save(u);
+        Assertions.assertNotNull(u.getId(), TestConstants.M_SAVE);
+        u = universityDao.get(u.getId()); //Important to load entity in context to successfully delete orphan
+
+        Student orphan = u.getStudents().iterator().next();
+        boolean removed = u.expelStudent(orphan);
+        LOG.debug("Student {} expelled from University {}? {}",orphan.getId(), u.getId(),  removed);
+        universityDao.saveOrUpdate(u);
+
+        MatcherAssert.assertThat(String.format(TestConstants.M_DELETE_ORPHAN, orphan, u),
+            personDao.get(orphan.getId()),
+            Matchers.nullValue()
+        );
     }
 
-    @SneakyThrows
-    private void studentDaoSaveOrUpdate(Student s) {
-        dao.saveOrUpdate(s);
+    @Override
+    public Dao<University> dao() {
+        return universityDao;
+    }
+
+    @Override
+    public MagicList<University> entities() {
+        return universities;
     }
 
     @SneakyThrows
     private University daoGet(Serializable id) {
         return universityDao.get(id);
+    }
+
+    @SneakyThrows
+    private static University persist(University university) {
+        universityDao.saveOrUpdate(university);
+        LOG.info("{}", university);
+        return university;
     }
 }
