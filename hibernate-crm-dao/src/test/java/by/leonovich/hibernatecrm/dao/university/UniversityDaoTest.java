@@ -75,7 +75,7 @@ class UniversityDaoTest implements BaseDaoTest<University> {
         MatcherAssert.assertThat(
             String.format(TestConstants.M_SAVE_OR_UPDATE_SAVE_CASCADE, u.getStudents(), u),
             daoGet(u.getId()).getStudents().size(),
-            Matchers.is(3)
+            Matchers.is(2)
         );
     }
 

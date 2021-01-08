@@ -16,7 +16,16 @@
     <name>hibernate-crm-common</name>
     <url>http://maven.apache.org</url>
 
-    <dependencies></dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+    </dependencies>
 
     <build>
         <finalName>hibernate-crm-common</finalName>

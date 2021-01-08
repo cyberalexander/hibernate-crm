@@ -42,7 +42,7 @@ public class University implements Serializable, Automated {
     @Override
     public University populateCascade() {
         this.populate();
-        this.setStudents(Stream.generate(Student::init).limit(3).collect(Collectors.toSet()));
+        this.setStudents(Stream.generate(Student::init).limit(2).collect(Collectors.toSet()));
         this.getStudents().forEach(st -> st.setUniversity(this));
         return this;
     }

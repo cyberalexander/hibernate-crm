@@ -20,6 +20,11 @@
         <mapping resource="PhoneNumber.hbm.xml"/>
         <mapping resource="University.hbm.xml"/>
         <mapping resource="Meeting.hbm.xml"/>
+
+        <mapping class="by.leonovich.hibernatecrm.annotation.Author"/>
+        <mapping class="by.leonovich.hibernatecrm.annotation.Book"/>
+        <mapping class="by.leonovich.hibernatecrm.annotation.Library"/>
+        <mapping class="by.leonovich.hibernatecrm.annotation.Portfolio"/>
     </session-factory>
 </hibernate-configuration>
 

@@ -28,6 +28,7 @@
         <pmd.plugin.verion>3.14.0</pmd.plugin.verion>
 
         <!-- ========= Dependencies versions ========= -->
+        <javax.persistence.version>2.2</javax.persistence.version>
         <hibernate.version>5.4.23.Final</hibernate.version>
         <mysql.connector.version>8.0.17</mysql.connector.version>
         <h2.database.version>1.4.200</h2.database.version>
@@ -94,6 +95,12 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${slf4j.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/javax.persistence/javax.persistence-api -->
+            <dependency>
+                <groupId>javax.persistence</groupId>
+                <artifactId>javax.persistence-api</artifactId>
+                <version>${javax.persistence.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>

@@ -42,7 +42,7 @@ public class Employee extends Person implements Automated {
     @Override
     public Employee populateCascade() {
         this.populate();
-        this.setMeetings(Stream.generate(Meeting::init).limit(3).collect(Collectors.toSet()));
+        this.setMeetings(Stream.generate(Meeting::init).limit(2).collect(Collectors.toSet()));
         this.getMeetings().forEach(m -> m.getEmployees().add(this));
         return this;
     }

@@ -53,7 +53,7 @@ public class Meeting implements Serializable, Automated {
     @Override
     public Meeting populateCascade() {
         this.populate();
-        this.setEmployees(Stream.generate(Employee::init).limit(3).collect(Collectors.toSet()));
+        this.setEmployees(Stream.generate(Employee::init).limit(2).collect(Collectors.toSet()));
         this.getEmployees().forEach(emp -> emp.setMeetings(Collections.singleton(this)));
         return this;
     }

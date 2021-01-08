@@ -78,7 +78,7 @@ class MeetingDaoTest implements BaseDaoTest<Meeting> {
         MatcherAssert.assertThat(
             String.format(TestConstants.M_SAVE_OR_UPDATE_SAVE_CASCADE, meeting.getEmployees(), meeting),
             dao().get(meeting.getId()).getEmployees().size(),
-            Matchers.is(3)
+            Matchers.is(2)
         );
     }
 

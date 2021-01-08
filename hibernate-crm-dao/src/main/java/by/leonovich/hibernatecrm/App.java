@@ -1,13 +1,18 @@
 package by.leonovich.hibernatecrm;
 
+import by.leonovich.hibernatecrm.annotation.Author;
+import by.leonovich.hibernatecrm.annotation.Book;
+import by.leonovich.hibernatecrm.annotation.Library;
+import by.leonovich.hibernatecrm.annotation.Portfolio;
+import by.leonovich.hibernatecrm.dao.AuthorDao;
+import by.leonovich.hibernatecrm.dao.BookDao;
 import by.leonovich.hibernatecrm.dao.Dao;
-import by.leonovich.hibernatecrm.dao.PersonDao;
-import by.leonovich.hibernatecrm.dao.VehicleDao;
-import by.leonovich.hibernatecrm.mappings.singletable.Person;
-import by.leonovich.hibernatecrm.mappings.tableperclass.Vehicle;
+import by.leonovich.hibernatecrm.dao.LibraryDao;
+import by.leonovich.hibernatecrm.dao.PortfolioDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 /**
@@ -16,22 +21,28 @@ import java.util.Locale;
  */
 public class App {
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+    private static final Dao<Author> authorDao = new AuthorDao();
+    private static final Dao<Book> bookDao = new BookDao();
+    private static final Dao<Library> libraryDao = new LibraryDao();
+    private static final Dao<Portfolio> portfolioDao = new PortfolioDao();
+
 
     public static void main( String[] args ) throws Exception {
-        Dao<Vehicle> vehicleDao = new VehicleDao();
-        Vehicle newVehicle = Vehicle.init();
-        vehicleDao.save(newVehicle);
-        LOGGER.info("{}", vehicleDao.getAll(Vehicle.class));
-        Dao<Person> dao = new PersonDao();
-        Person newPerson = Person.init();
-        dao.saveOrUpdate(newPerson);
-        LOGGER.info("{}", dao.get(newPerson.getId()));
+        Serializable authorId = authorDao.save(new Author().populate());
+        LOGGER.info("AUTHOR : {}", authorDao.get(authorId));
 
-        printLocales();
+        Serializable bookId = bookDao.save(new Book().populate());
+        LOGGER.info("BOOK : {}", bookDao.get(bookId));
+
+        Serializable libraryId = libraryDao.save(new Library().populate());
+        LOGGER.info("LIBRARY : {}", libraryDao.get(libraryId));
+
+        Serializable portfolioId = portfolioDao.save(new Portfolio().populate());
+        LOGGER.info("PORTFOLIO : {}", portfolioDao.get(portfolioId));
     }
 
     @SuppressWarnings("PMD.SystemPrintln")
-    private static void printLocales() {
+    public static void printLocales() {
         String[] locales = Locale.getISOCountries();
         for (String countryCode : locales) {
             Locale obj = new Locale("", countryCode);
