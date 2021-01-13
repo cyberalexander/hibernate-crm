@@ -73,7 +73,7 @@ class PersonDaoTest extends CommonPersonDaoTest implements BaseDaoTest<Person> {
     void testDeleteCascade() {
         Person p = Person.init();
         dao().save(p);
-        PhoneNumber phoneNumber = p.modifyCascade().getPhoneNumber();
+        PhoneNumber phoneNumber = p.getPhoneNumber();
         dao().delete(p);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_DELETE_CASCADE, phoneNumber, p),

@@ -5,6 +5,8 @@ import by.leonovich.hibernatecrm.common.random.RandomNumber;
 import by.leonovich.hibernatecrm.common.random.RandomString;
 import lombok.Data;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Locale;
 
@@ -17,10 +19,18 @@ import java.util.Locale;
  * @version 1.0
  */
 @Data
+@Embeddable
 public class Location implements Serializable {
+    @Column(name = "F_COUNTRY")
     private String country;
+
+    @Column(name = "F_CITY")
     private String city;
+
+    @Column(name = "F_SREET")
     private String street;
+
+    @Column(name = "F_BUILDING")
     private Integer buildingNumber;
 
     @SuppressWarnings("unchecked")

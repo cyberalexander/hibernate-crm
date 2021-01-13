@@ -6,6 +6,8 @@ import by.leonovich.hibernatecrm.common.model.Prefix;
 import by.leonovich.hibernatecrm.common.random.RandomString;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -46,45 +48,71 @@ public class Author implements Automated {
     @Column(name = "F_SURNAME")
     private String surname;
 
+    /**
+     * F_PORTFOLIO_ID - name of the column in T_AUTHOR table
+     * F_ID - name of the Primary Key column in T_PORTFOLIO table
+     */
+    @OneToOne
+    @Cascade(CascadeType.ALL)
+    @JoinColumn(name = "F_PORTFOLIO_ID", referencedColumnName = "F_ID")
+    private Portfolio portfolio; /* ONE-TO-ONE */
+
     //TODO implement relation(s)
-    //private Portfolio portfolio; /* ONE-TO-ONE */
     //private List<Book> books; /* MANY-TO-MANY */
 
     @PostLoad
     void fillTransient() {
-        if (StringUtils.isNotEmpty(this.prefixValue)) {
-            this.prefix = Prefix.of(this.prefixValue);
+        if (StringUtils.isNotEmpty(prefixValue)) {
+            prefix = Prefix.of(prefixValue);
         }
     }
 
     @PrePersist
     void fillPersistent() {
-        if (Objects.nonNull(this.prefix)) {
-            this.prefixValue = this.prefix.getShortPrefix();
+        if (Objects.nonNull(prefix)) {
+            prefixValue = prefix.getShortPrefix();
         }
     }
 
     @Override
     public <T> T populate() {
-        this.setPrefix(Enums.random(Prefix.class));
-        this.setName(RandomString.NAME.get());
-        this.setSurname(RandomString.SURNAME.get());
+        setPrefix(Enums.random(Prefix.class));
+        setName(RandomString.NAME.get());
+        setSurname(RandomString.SURNAME.get());
+        return (T) this;
+    }
+
+    @Override
+    public <T> T populateCascade() {
+        populate();
+        setPortfolio(Portfolio.init());
         return (T) this;
     }
 
     @Override
     public <T> T modify() {
-        this.setName(newValue(this.getId(), RandomString.NAME));
-        this.setSurname(newValue(this.getId(), RandomString.SURNAME));
+        setName(newValue(getId(), RandomString.NAME));
+        setSurname(newValue(getId(), RandomString.SURNAME));
+        return (T) this;
+    }
+
+    @Override
+    public <T> T modifyCascade() {
+        setName(newValue(getId(), RandomString.NAME));
+        getPortfolio().setDescription(newCascadeValue(getId(), RandomString.DEFAULT));
         return (T) this;
     }
 
     @Override
     public Serializable incrementIdAndGet() {
-        return this.getId() + 500L;
+        return getId() + 500L;
     }
 
     public static Author init() {
         return new Author().populate();
+    }
+
+    public static Author initCascade() {
+        return new Author().populateCascade();
     }
 }

@@ -6,15 +6,12 @@ import by.leonovich.hibernatecrm.common.random.RandomNumber;
 import by.leonovich.hibernatecrm.common.random.RandomString;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Formula;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Random;
@@ -53,7 +50,11 @@ public class Portfolio implements Automated {
     @Column(name = "F_DESCRIPTION")
     private String description;
 
-    //private Author author; /* ONE-TO-ONE */
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Cascade(CascadeType.SAVE_UPDATE)
+    @OneToOne(mappedBy = "portfolio")
+    private Author author; /* ONE-TO-ONE */
 
     @Override
     public <T> T populate() {
@@ -69,9 +70,25 @@ public class Portfolio implements Automated {
     }
 
     @Override
+    public <T> T populateCascade() {
+        populate();
+        Author newAuthor = Author.init();
+        newAuthor.setPortfolio(this);
+        setAuthor(newAuthor);
+        return (T) this;
+    }
+
+    @Override
     public <T> T modify() {
         this.setNationality(Nationality.random());
         this.setDescription(newValue(this.getId(), RandomString.DEFAULT));
+        return (T) this;
+    }
+
+    @Override
+    public <T> T modifyCascade() {
+        getAuthor().setName(newCascadeValue(getId(), RandomString.NAME));
+        setDescription(newValue(getId(), RandomString.DEFAULT));
         return (T) this;
     }
 
@@ -82,5 +99,9 @@ public class Portfolio implements Automated {
 
     public static Portfolio init() {
         return new Portfolio().populate();
+    }
+
+    public static Portfolio initWithOneToOne() {
+        return new Portfolio().populateCascade();
     }
 }

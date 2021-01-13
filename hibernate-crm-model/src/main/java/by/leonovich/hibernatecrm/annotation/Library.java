@@ -5,6 +5,7 @@ import by.leonovich.hibernatecrm.common.random.RandomString;
 import lombok.Data;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -31,19 +32,23 @@ public class Library implements Automated {
     @Column(name = "F_NAME", nullable = false)
     private String name;
 
+    @Embedded
+    private Location location;
+
     //TODO implement relation(s)
-    //private Location location;
     //private List<Book> books; /* ONE-TO-MANY */
 
     @Override
     public <T> T populate() {
-        this.setName(RandomString.COMPANY.get());
+        setName(RandomString.COMPANY.get());
+        setLocation(Location.init());
         return (T) this;
     }
 
     @Override
     public <T> T modify() {
-        this.setName(newValue(this.getId(), RandomString.COMPANY));
+        setName(newValue(getId(), RandomString.COMPANY));
+        getLocation().setCity(newCascadeValue(getId(), RandomString.DEFAULT));
         return (T) this;
     }
 
