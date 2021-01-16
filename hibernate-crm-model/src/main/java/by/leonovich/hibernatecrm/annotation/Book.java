@@ -7,13 +7,10 @@ import by.leonovich.hibernatecrm.common.model.converter.CategoryConverter;
 import by.leonovich.hibernatecrm.common.random.RandomNumber;
 import by.leonovich.hibernatecrm.common.random.RandomString;
 import lombok.Data;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Random;
@@ -48,8 +45,12 @@ public class Book implements Automated {
     @Convert(converter = CategoryConverter.class)
     private Category category;
 
+    @ManyToOne
+    @Cascade(CascadeType.SAVE_UPDATE)
+    @JoinColumn(name = "F_LIBRARY_ID")
+    private Library library; /* MANY-TO-ONE */
+
     //TODO implement relation(s)
-    //private Library library; /* MANY-TO-ONE */
     //private List<Author> authors; /* MANY-TO-MANY */
 
     @Override
@@ -62,9 +63,23 @@ public class Book implements Automated {
     }
 
     @Override
+    public <T> T populateCascade() {
+        populate();
+        setLibrary(Library.init());
+        return (T) this;
+    }
+
+    @Override
     public <T> T modify() {
         this.setName(newValue(this.getId(), RandomString.NAME));
         this.setYear(LocalDate.now().minusYears(RandomNumber.DAYS.get()).getYear());
+        return (T) this;
+    }
+
+    @Override
+    public <T> T modifyCascade() {
+        modify();
+        getLibrary().setName(newCascadeValue(getId(), RandomString.COMPANY));
         return (T) this;
     }
 
@@ -75,5 +90,9 @@ public class Book implements Automated {
 
     public static Book init() {
         return new Book().populate();
+    }
+
+    public static Book initWithManyToOne() {
+        return new Book().populateCascade();
     }
 }

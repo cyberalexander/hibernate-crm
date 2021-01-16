@@ -142,7 +142,7 @@ class MeetingDaoTest implements BaseDaoTest<Meeting> {
     @SneakyThrows
     void testDeleteMeetingAndDetachRelatedEmployees() {
         Meeting meeting = Meeting.initWithManyToMany();
-        meetingDao.saveOrUpdate(meeting); //[1]
+        dao().saveOrUpdate(meeting); //[1]
 
         Assertions.assertNotNull(meeting.getId(), TestConstants.M_SAVE);
         meeting.getEmployees().forEach(emp -> Assertions.assertNotNull(emp.getId(), TestConstants.M_SAVE)); //[2]
@@ -155,7 +155,7 @@ class MeetingDaoTest implements BaseDaoTest<Meeting> {
             personDao.saveOrUpdate(emp);
         }
 
-        meetingDao.delete(meeting);//[4]
+        dao().delete(meeting);//[4]
 
         //[5]
         for (Employee emp : meeting.getEmployees()) {
@@ -169,8 +169,8 @@ class MeetingDaoTest implements BaseDaoTest<Meeting> {
     @Test
     @SneakyThrows
     void testExpiredColumn() {
-        for (Meeting m : meetings) {
-            Meeting queried = meetingDao.get(m.getId());
+        for (Meeting m : entities()) {
+            Meeting queried = dao().get(m.getId());
             MatcherAssert.assertThat(
                 String.format(TestConstants.M_MEETING_EXPIRED_TEST, queried),
                 LocalDateTime.now().isAfter(queried.getMeetingDate()),

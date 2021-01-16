@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -71,10 +70,10 @@ class UniversityDaoTest implements BaseDaoTest<University> {
     @SneakyThrows
     void testSaveOrUpdate_SaveCascade() {
         University u = University.initWithOneToMany();
-        universityDao.saveOrUpdate(u);
+        dao().saveOrUpdate(u);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_SAVE_OR_UPDATE_SAVE_CASCADE, u.getStudents(), u),
-            daoGet(u.getId()).getStudents().size(),
+            dao().get(u.getId()).getStudents().size(),
             Matchers.is(2)
         );
     }
@@ -82,10 +81,10 @@ class UniversityDaoTest implements BaseDaoTest<University> {
     @Test
     @SneakyThrows
     void testSaveOrUpdate_UpdateCascade() {
-        University toUpdate = universities.randomEntity();
+        University toUpdate = entities().randomEntity();
         Set<Student> updatedStudents = toUpdate.modifyCascade().getStudents();
-        universityDao.saveOrUpdate(toUpdate);
-        Set<Student> queried = universityDao.get(toUpdate.getId()).getStudents();
+        dao().saveOrUpdate(toUpdate);
+        Set<Student> queried = dao().get(toUpdate.getId()).getStudents();
         MatcherAssert.assertThat(
             String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATED_CASCADE, updatedStudents, toUpdate),
             queried,
@@ -100,11 +99,11 @@ class UniversityDaoTest implements BaseDaoTest<University> {
     @SneakyThrows
     void testDeleteCascade() {
         University toDelete = University.initWithOneToMany();
-        universityDao.save(toDelete);
+        dao().save(toDelete);
         Assertions.assertNotNull(toDelete.getId(), TestConstants.M_SAVE);
         Student relatedStudent = toDelete.getStudents().iterator().next();
 
-        universityDao.delete(toDelete);
+        dao().delete(toDelete);
 
         MatcherAssert.assertThat(String.format(TestConstants.M_DELETE_CASCADE, relatedStudent, toDelete),
             personDao.get(relatedStudent.getId()),
@@ -116,14 +115,14 @@ class UniversityDaoTest implements BaseDaoTest<University> {
     @SneakyThrows
     void testDeleteOrphan() {
         University u = University.initWithOneToMany();
-        universityDao.save(u);
+        dao().save(u);
         Assertions.assertNotNull(u.getId(), TestConstants.M_SAVE);
-        u = universityDao.get(u.getId()); //Important to load entity in context to successfully delete orphan
+        u = dao().get(u.getId()); //Important to load entity in context to successfully delete orphan
 
         Student orphan = u.getStudents().iterator().next();
         boolean removed = u.expelStudent(orphan);
         LOG.debug("Student {} expelled from University {}? {}",orphan.getId(), u.getId(),  removed);
-        universityDao.saveOrUpdate(u);
+        dao().saveOrUpdate(u);
 
         MatcherAssert.assertThat(String.format(TestConstants.M_DELETE_ORPHAN, orphan, u),
             personDao.get(orphan.getId()),
@@ -139,11 +138,6 @@ class UniversityDaoTest implements BaseDaoTest<University> {
     @Override
     public MagicList<University> entities() {
         return universities;
-    }
-
-    @SneakyThrows
-    private University daoGet(Serializable id) {
-        return universityDao.get(id);
     }
 
     @SneakyThrows

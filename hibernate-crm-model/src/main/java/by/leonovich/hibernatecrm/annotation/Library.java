@@ -3,14 +3,22 @@ package by.leonovich.hibernatecrm.annotation;
 import by.leonovich.hibernatecrm.common.model.Automated;
 import by.leonovich.hibernatecrm.common.random.RandomString;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created : 06/01/2021 09:47
@@ -35,13 +43,28 @@ public class Library implements Automated {
     @Embedded
     private Location location;
 
-    //TODO implement relation(s)
-    //private List<Book> books; /* ONE-TO-MANY */
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Cascade(CascadeType.ALL)
+    @OneToMany(mappedBy = "library", orphanRemoval = true)
+    private Set<Book> books; /* ONE-TO-MANY */
+
+    public boolean writeOffBook(Book book) {
+        return books.remove(book);
+    }
 
     @Override
     public <T> T populate() {
         setName(RandomString.COMPANY.get());
         setLocation(Location.init());
+        return (T) this;
+    }
+
+    @Override
+    public <T> T populateCascade() {
+        populate();
+        setBooks(Stream.generate(Book::init).limit(2).collect(Collectors.toSet()));
+        getBooks().forEach(book -> book.setLibrary(this));
         return (T) this;
     }
 
@@ -53,11 +76,22 @@ public class Library implements Automated {
     }
 
     @Override
+    public <T> T modifyCascade() {
+        modify();
+        getBooks().forEach(book -> book.setName(newCascadeValue(getId(), RandomString.NAME)));
+        return (T) this;
+    }
+
+    @Override
     public Serializable incrementIdAndGet() {
         return this.getId() + 500L;
     }
 
     public static Library init() {
         return new Library().populate();
+    }
+
+    public static Library initWitOneToMany() {
+        return new Library().populateCascade();
     }
 }
