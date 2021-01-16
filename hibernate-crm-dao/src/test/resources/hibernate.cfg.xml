@@ -25,6 +25,7 @@
         <mapping class="by.leonovich.hibernatecrm.annotation.Book"/>
         <mapping class="by.leonovich.hibernatecrm.annotation.Library"/>
         <mapping class="by.leonovich.hibernatecrm.annotation.Portfolio"/>
+        <mapping class="by.leonovich.hibernatecrm.annotation.Typewriter"/>
     </session-factory>
 </hibernate-configuration>
 

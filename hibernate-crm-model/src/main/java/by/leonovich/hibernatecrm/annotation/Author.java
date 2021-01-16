@@ -55,7 +55,16 @@ public class Author implements Automated {
     @OneToOne
     @Cascade(CascadeType.ALL)
     @JoinColumn(name = "F_PORTFOLIO_ID", referencedColumnName = "F_ID")
-    private Portfolio portfolio; /* ONE-TO-ONE */
+    private Portfolio portfolio; /* ONE-TO-ONE with foreign key */
+
+    @OneToOne
+    @Cascade(CascadeType.ALL)
+    @JoinTable(
+        name = "T_AUTHOR_TYPEWRITER",
+        joinColumns = {@JoinColumn(name = "AUTHOR_ID", referencedColumnName = "ID")},
+        inverseJoinColumns = {@JoinColumn(name = "TYPEWRITER_ID", referencedColumnName = "F_ID")}
+    )
+    private Typewriter typewriter; /* ONE-TO-ONE with a Join Table */
 
     //TODO implement relation(s)
     //private List<Book> books; /* MANY-TO-MANY */
@@ -86,6 +95,7 @@ public class Author implements Automated {
     public <T> T populateCascade() {
         populate();
         setPortfolio(Portfolio.init());
+        setTypewriter(Typewriter.init());
         return (T) this;
     }
 
@@ -100,6 +110,7 @@ public class Author implements Automated {
     public <T> T modifyCascade() {
         setName(newValue(getId(), RandomString.NAME));
         getPortfolio().setDescription(newCascadeValue(getId(), RandomString.DEFAULT));
+        getTypewriter().setModel(newCascadeValue(getId(), RandomString.DEFAULT));
         return (T) this;
     }
 

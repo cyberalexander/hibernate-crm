@@ -28,7 +28,7 @@ import static by.leonovich.hibernatecrm.TestConstants.LIMIT;
  * @author alexanderleonovich
  * @version 1.0
  */
-public class PortfolioDaoTest implements BaseDaoTest<Portfolio> {
+class PortfolioDaoTest implements BaseDaoTest<Portfolio> {
     private static final Logger LOG = LoggerFactory.getLogger(PortfolioDaoTest.class);
     private static final Dao<Portfolio> portfolioDao = new PortfolioDao();
     private static final MagicList<Portfolio> portfolios = new MagicList<>();

@@ -22,7 +22,7 @@ import static by.leonovich.hibernatecrm.TestConstants.LIMIT;
  * @author alexanderleonovich
  * @version 1.0
  */
-public class BookDaoTest implements BaseDaoTest<Book> {
+class BookDaoTest implements BaseDaoTest<Book> {
     private static final Logger LOG = LoggerFactory.getLogger(BookDaoTest.class);
     private static final Dao<Book> bookDao = new BookDao();
     private static final MagicList<Book> books = new MagicList<>();

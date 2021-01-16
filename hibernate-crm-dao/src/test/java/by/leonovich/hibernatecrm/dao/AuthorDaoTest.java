@@ -3,6 +3,7 @@ package by.leonovich.hibernatecrm.dao;
 import by.leonovich.hibernatecrm.TestConstants;
 import by.leonovich.hibernatecrm.annotation.Author;
 import by.leonovich.hibernatecrm.annotation.Portfolio;
+import by.leonovich.hibernatecrm.annotation.Typewriter;
 import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import lombok.SneakyThrows;
@@ -52,7 +53,7 @@ class AuthorDaoTest implements BaseDaoTest<Author> {
 
     @Test
     @SneakyThrows
-    void testSaveCascade() {
+    void testSaveCascade_PortFolio() {
         Author a = Author.initCascade();
         dao().save(a);
         LOG.debug("Relation saved as well? {}", Objects.nonNull(a.getPortfolio().getId()));
@@ -65,7 +66,20 @@ class AuthorDaoTest implements BaseDaoTest<Author> {
 
     @Test
     @SneakyThrows
-    void testSaveOrUpdate_SaveCascade() {
+    void testSaveCascade_TypeWriter() {
+        Author a = Author.initCascade();
+        dao().save(a);
+        LOG.debug("Relation saved as well? {}", Objects.nonNull(a.getTypewriter().getId()));
+        MatcherAssert.assertThat(
+            TestConstants.M_SAVE_CASCADE,
+            dao().get(a.getId()).getTypewriter().getId(),
+            Matchers.equalTo(a.getTypewriter().getId())
+        );
+    }
+
+    @Test
+    @SneakyThrows
+    void testSaveOrUpdate_SaveCascade_Portfolio() {
         Author a = Author.initCascade();
         Portfolio portfolio = a.getPortfolio();
         dao().saveOrUpdate(a);
@@ -78,7 +92,20 @@ class AuthorDaoTest implements BaseDaoTest<Author> {
 
     @Test
     @SneakyThrows
-    void testSaveOrUpdate_UpdateCascade() {
+    void testSaveOrUpdate_SaveCascade_Typewriter() {
+        Author a = Author.initCascade();
+        Typewriter typewriter = a.getTypewriter();
+        dao().saveOrUpdate(a);
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_SAVE_OR_UPDATE_SAVE_CASCADE, typewriter, a),
+            typewriter.getId(),
+            Matchers.notNullValue()
+        );
+    }
+
+    @Test
+    @SneakyThrows
+    void testSaveOrUpdate_UpdateCascade_Portfolio() {
         Author a = Author.initCascade();
         dao().save(a);
         Portfolio portfolio = ((Author) a.modifyCascade()).getPortfolio();
@@ -92,7 +119,21 @@ class AuthorDaoTest implements BaseDaoTest<Author> {
 
     @Test
     @SneakyThrows
-    void testDeleteCascade() {
+    void testSaveOrUpdate_UpdateCascade_Typewriter() {
+        Author a = Author.initCascade();
+        dao().save(a);
+        Typewriter typewriter = ((Author) a.modifyCascade()).getTypewriter();
+        dao().saveOrUpdate(a);
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATED_CASCADE, typewriter, a),
+            dao().get(a.getId()).getTypewriter(),
+            Matchers.equalTo(typewriter)
+        );
+    }
+
+    @Test
+    @SneakyThrows
+    void testDeleteCascade_Portfolio() {
         Author a = Author.initCascade();
         dao().save(a);
         Portfolio portfolio = a.getPortfolio();
@@ -100,6 +141,20 @@ class AuthorDaoTest implements BaseDaoTest<Author> {
         MatcherAssert.assertThat(
             String.format(TestConstants.M_DELETE_CASCADE, portfolio, a),
             new PortfolioDao().get(portfolio.getId()),
+            Matchers.nullValue()
+        );
+    }
+
+    @Test
+    @SneakyThrows
+    void testDeleteCascade_Typewriter() {
+        Author a = Author.initCascade();
+        dao().save(a);
+        Typewriter typewriter = a.getTypewriter();
+        dao().delete(a);
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_DELETE_CASCADE, typewriter, a),
+            new TypewriterDao().get(typewriter.getId()),
             Matchers.nullValue()
         );
     }
