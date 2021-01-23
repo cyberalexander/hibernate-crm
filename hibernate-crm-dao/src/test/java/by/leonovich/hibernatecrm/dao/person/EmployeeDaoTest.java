@@ -17,8 +17,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created : 07/12/2020 20:39
@@ -103,6 +106,48 @@ class EmployeeDaoTest extends CommonPersonDaoTest implements BaseDaoTest<Employe
             String.format(TestConstants.M_DELETE_CASCADE_AND_KEEP_RELATION, emp.getMeetings(), emp),
             meetingDao.get(emp.getMeetings().iterator().next().getId()),
             Matchers.notNullValue()
+        );
+    }
+
+    @Test
+    @SneakyThrows
+    void testGetHighestPaidEmployee() {
+        Employee emp = dao().getAll(Employee.class).stream()
+            .sorted(Comparator.comparing(Employee::getSalary).reversed())
+            .collect(Collectors.toList()).iterator().next();
+        Employee highestPaidEmployee = ((EmployeeDao) dao()).getHighestPaidEmployee();
+        LOG.info("{} : {}", emp.getSalary(), highestPaidEmployee.getSalary());
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_TEST_GET_HIGHEST_PAID_EMPLOYEE, emp, highestPaidEmployee),
+            highestPaidEmployee,
+            Matchers.equalTo(emp)
+        );
+    }
+
+    @Test
+    @SneakyThrows
+    void getEmployeesOrderedBySalary() {
+        List<Employee> all = dao().getAll(Employee.class).stream()
+            .sorted(Comparator.comparing(Employee::getSalary))
+            .collect(Collectors.toList());
+        Employee lowestPaidEmployee = all.iterator().next();
+        Employee highestPaidEmployee = all.get(all.size() - 1);
+
+        List<Employee> employeesOrderedBySalary = ((EmployeeDao) dao()).getEmployeesOrderedBySalary();
+        Employee lowestPaidEmployeeFromDb = employeesOrderedBySalary.iterator().next();
+        Employee highestPaidEmployeeFromDb = employeesOrderedBySalary.get(all.size() - 1);
+
+        LOG.info("{} : {}", lowestPaidEmployee.getSalary(), lowestPaidEmployeeFromDb.getSalary());
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_TEST_GET_HIGHEST_PAID_EMPLOYEE, lowestPaidEmployee, lowestPaidEmployeeFromDb),
+            lowestPaidEmployee,
+            Matchers.equalTo(lowestPaidEmployeeFromDb)
+        );
+        LOG.info("{} : {}", highestPaidEmployee.getSalary(), highestPaidEmployeeFromDb.getSalary());
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_TEST_GET_HIGHEST_PAID_EMPLOYEE, highestPaidEmployee, highestPaidEmployeeFromDb),
+            highestPaidEmployee,
+            Matchers.equalTo(highestPaidEmployeeFromDb)
         );
     }
 

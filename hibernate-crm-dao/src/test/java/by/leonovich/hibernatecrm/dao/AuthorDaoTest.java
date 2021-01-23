@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -213,6 +214,33 @@ class AuthorDaoTest implements BaseDaoTest<Author> {
             Matchers.nullValue()
         );
     }
+
+    @Test
+    @SneakyThrows
+    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
+    void testGetAuthorByNameCriteria() {
+        Author author = entities().randomEntity();
+        List<Author> sameNameAuthors = ((AuthorDao) dao()).getAuthorByNameCriteria(author.getName());
+        sameNameAuthors.forEach(a -> MatcherAssert.assertThat(
+            String.format(TestConstants.M_TEST_SELECT_BY_NAME, author.getName(), a.getName()),
+            a.getName(),
+            Matchers.equalTo(author.getName())
+        ));
+    }
+
+    @Test
+    @SneakyThrows
+    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
+    void testGetAuthorByNameHql() {
+        Author author = entities().randomEntity();
+        List<Author> sameNameAuthors = ((AuthorDao) dao()).getAuthorByNameHql(author.getName());
+        sameNameAuthors.forEach(a -> MatcherAssert.assertThat(
+            String.format(TestConstants.M_TEST_SELECT_BY_NAME, author.getName(), a.getName()),
+            a.getName(),
+            Matchers.equalTo(author.getName())
+        ));
+    }
+
 
     @Override
     public Dao<Author> dao() {

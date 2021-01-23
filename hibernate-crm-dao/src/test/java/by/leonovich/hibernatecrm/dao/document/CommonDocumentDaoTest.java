@@ -29,8 +29,8 @@ import static by.leonovich.hibernatecrm.TestConstants.MAIN_LIMIT;
  * @author alexanderleonovich
  * @version 1.0
  */
-public class CommonDocumentDaoTest {
-    private static final MagicList<Document> allDocuments = new MagicList<>();
+class CommonDocumentDaoTest {
+    protected static final MagicList<Document> allDocuments = new MagicList<>();
     protected static final MagicList<DrivingLicense> drivingLicenses = new MagicList<>();
     protected static final MagicList<Passport> passports = new MagicList<>();
 

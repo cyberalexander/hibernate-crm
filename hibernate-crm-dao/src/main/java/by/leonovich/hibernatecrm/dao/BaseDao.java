@@ -1,5 +1,6 @@
 package by.leonovich.hibernatecrm.dao;
 
+import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -152,7 +153,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     }
 
     @Override
-    public List<Serializable> getIds() throws DaoException {
+    public MagicList<Serializable> getIds() throws DaoException {
         try {
             Session session = HibernateUtil.getInstance().getSession();
             transaction = session.beginTransaction();
@@ -163,7 +164,7 @@ public abstract class BaseDao<T> implements Dao<T> {
             Root<Serializable> rootEntry = query.from(clazz);
             query.select(rootEntry.get("id"));
             Query<Serializable> allQuery = session.createQuery(query);
-            List<Serializable> result = allQuery.getResultList();
+            MagicList<Serializable> result = new MagicList<>(allQuery.getResultList());
             transaction.commit();
             return result;
         } catch (HibernateException e) {
@@ -191,7 +192,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     }
 
     @SuppressWarnings("unchecked")
-    private Class<T> getPersistentClass() {
+    protected Class<T> getPersistentClass() {
         return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 }

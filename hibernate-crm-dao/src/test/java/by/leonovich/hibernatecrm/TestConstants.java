@@ -31,4 +31,8 @@ public class TestConstants {
         public static final String M_GET_IDS = "%s does not exists in database.";
         public static final String M_MEETING_EXPIRED_TEST = "%s";
         public static final String M_TEST_INDEX = "Column INDEX expected to be equal to [%s]";
+        public static final String M_TEST_LAST_INDEX = "Max ID in %s expected to be %s but was %s";
+        public static final String M_TEST_SELECT_BY_NAME = "Expected to be selected object(s) with name equal to [%s] but received [%s]";
+        public static final String M_TEST_GET_EXPIRING_THIS_YEAR_DOCUMENTS = "Expected to be selected %s objects, but received %s";
+        public static final String M_TEST_GET_HIGHEST_PAID_EMPLOYEE = "Expected to be selected %s, but received %s";
 }

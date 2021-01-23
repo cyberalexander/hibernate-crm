@@ -10,6 +10,8 @@ import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
  * @version 1.0
  */
 public interface BaseDaoTest<T extends Automated> {
+    Logger LOG = LoggerFactory.getLogger(BaseDaoTest.class);
 
     @Test
     @SneakyThrows
@@ -169,6 +172,19 @@ public interface BaseDaoTest<T extends Automated> {
             String.format(TestConstants.M_GET_IDS, id),
             queried.contains(id),
             Matchers.is(Boolean.TRUE))
+        );
+    }
+
+    @Test
+    @SneakyThrows
+    default void testGetLastIndex() {
+        Serializable maxId = dao().getIds().lastElement();
+        Serializable queriedMaxId = dao().getLastIndex();
+        LOG.info("expected={}; actual={}", maxId, queriedMaxId);
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_TEST_LAST_INDEX, getEntityClass().getSimpleName(), queriedMaxId, maxId),
+            maxId,
+            Matchers.equalTo(queriedMaxId)
         );
     }
 

@@ -17,7 +17,6 @@ import by.leonovich.hibernatecrm.mappings.joinedtable.DrivingLicense;
 class DrivingLicenseDaoTest extends CommonDocumentDaoTest implements BaseDaoTest<DrivingLicense> {
     private static final Dao<DrivingLicense> drivingLicenseDao = new DrivingLicenseDao();
 
-
     @Override
     public Dao<DrivingLicense> dao() {
         return drivingLicenseDao;
