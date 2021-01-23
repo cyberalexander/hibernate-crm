@@ -7,13 +7,20 @@ import by.leonovich.hibernatecrm.common.model.converter.CategoryConverter;
 import by.leonovich.hibernatecrm.common.random.RandomNumber;
 import by.leonovich.hibernatecrm.common.random.RandomString;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created : 06/01/2021 09:47
@@ -50,8 +57,11 @@ public class Book implements Automated {
     @JoinColumn(name = "F_LIBRARY_ID")
     private Library library; /* MANY-TO-ONE */
 
-    //TODO implement relation(s)
-    //private List<Author> authors; /* MANY-TO-MANY */
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @ManyToMany(mappedBy = "books")
+    @Cascade(CascadeType.SAVE_UPDATE)
+    private Set<Author> authors = new HashSet<>(); /* MANY-TO-MANY */
 
     @Override
     public <T> T populate() {
@@ -66,6 +76,8 @@ public class Book implements Automated {
     public <T> T populateCascade() {
         populate();
         setLibrary(Library.init());
+        setAuthors(Stream.generate(Author::init).limit(2).collect(Collectors.toSet()));
+        getAuthors().forEach(a -> a.setBooks(Collections.singleton(this)));
         return (T) this;
     }
 
@@ -80,6 +92,7 @@ public class Book implements Automated {
     public <T> T modifyCascade() {
         modify();
         getLibrary().setName(newCascadeValue(getId(), RandomString.COMPANY));
+        getAuthors().forEach(author -> author.setName(newCascadeValue(this.getId(), RandomString.NAME)));
         return (T) this;
     }
 
@@ -92,7 +105,7 @@ public class Book implements Automated {
         return new Book().populate();
     }
 
-    public static Book initWithManyToOne() {
+    public static Book initCascade() {
         return new Book().populateCascade();
     }
 }

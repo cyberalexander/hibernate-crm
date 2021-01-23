@@ -5,13 +5,20 @@ import by.leonovich.hibernatecrm.common.model.Enums;
 import by.leonovich.hibernatecrm.common.model.Prefix;
 import by.leonovich.hibernatecrm.common.random.RandomString;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created : 06/01/2021 09:47
@@ -39,6 +46,7 @@ public class Author implements Automated {
     /**
      * {@link Prefix} will be used in code
      */
+    @EqualsAndHashCode.Exclude
     @Transient
     private Prefix prefix;
 
@@ -66,8 +74,16 @@ public class Author implements Automated {
     )
     private Typewriter typewriter; /* ONE-TO-ONE with a Join Table */
 
-    //TODO implement relation(s)
-    //private List<Book> books; /* MANY-TO-MANY */
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @ManyToMany
+    @Cascade(CascadeType.ALL)
+    @JoinTable(
+        name = "T_AUTHOR_BOOK",
+        joinColumns = {@JoinColumn(name = "F_AUTHOR_ID")},
+        inverseJoinColumns = {@JoinColumn(name = "F_BOOK_ID")}
+    )
+    private Set<Book> books = new HashSet<>(); /* MANY-TO-MANY */
 
     @PostLoad
     void fillTransient() {
@@ -96,6 +112,8 @@ public class Author implements Automated {
         populate();
         setPortfolio(Portfolio.init());
         setTypewriter(Typewriter.init());
+        setBooks(Stream.generate(Book::init).limit(2).collect(Collectors.toSet()));
+        getBooks().forEach(book -> book.setAuthors(Collections.singleton(this)));
         return (T) this;
     }
 
@@ -111,6 +129,7 @@ public class Author implements Automated {
         setName(newValue(getId(), RandomString.NAME));
         getPortfolio().setDescription(newCascadeValue(getId(), RandomString.DEFAULT));
         getTypewriter().setModel(newCascadeValue(getId(), RandomString.DEFAULT));
+        getBooks().forEach(book -> book.setName(newCascadeValue(this.getId(), RandomString.NAME)));
         return (T) this;
     }
 

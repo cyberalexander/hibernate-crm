@@ -1,6 +1,7 @@
 package by.leonovich.hibernatecrm.dao;
 
 import by.leonovich.hibernatecrm.TestConstants;
+import by.leonovich.hibernatecrm.annotation.Author;
 import by.leonovich.hibernatecrm.annotation.Book;
 import by.leonovich.hibernatecrm.annotation.Library;
 import by.leonovich.hibernatecrm.common.collection.MagicList;
@@ -14,7 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,8 +55,8 @@ class BookDaoTest implements BaseDaoTest<Book> {
 
     @Test
     @SneakyThrows
-    void testSaveCascade() {
-        Book book = Book.initWithManyToOne();
+    void testSaveCascade_Library() {
+        Book book = Book.initCascade();
         dao().save(book);
         LOG.debug("Relation saved as well? {}", Objects.nonNull(book.getLibrary().getId()));
         MatcherAssert.assertThat(
@@ -65,8 +68,21 @@ class BookDaoTest implements BaseDaoTest<Book> {
 
     @Test
     @SneakyThrows
-    void testSaveOrUpdate_SaveCascade() {
-        Book book = Book.initWithManyToOne();
+    void testSaveCascade_Authors() {
+        Book book = Book.initCascade();
+        dao().save(book);
+        LOG.debug("Relation saved as well? {}", Objects.nonNull(book.getAuthors().iterator().next().getId()));
+        MatcherAssert.assertThat(
+            TestConstants.M_SAVE_CASCADE,
+            dao().get(book.getId()).getAuthors().iterator().next().getId(),
+            Matchers.notNullValue()
+        );
+    }
+
+    @Test
+    @SneakyThrows
+    void testSaveOrUpdate_SaveCascade_Library() {
+        Book book = Book.initCascade();
         Library library = book.getLibrary();
         dao().saveOrUpdate(book);
         MatcherAssert.assertThat(
@@ -78,22 +94,49 @@ class BookDaoTest implements BaseDaoTest<Book> {
 
     @Test
     @SneakyThrows
-    void testSaveOrUpdate_UpdateCascade() {
-        Book book = Book.initWithManyToOne();
-        dao().save(book);
-        Library library = ((Book) book.modifyCascade()).getLibrary();
+    void testSaveOrUpdate_SaveCascade_Authors() {
+        Book book = Book.initCascade();
         dao().saveOrUpdate(book);
         MatcherAssert.assertThat(
-            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATED_CASCADE, library, book),
-            dao().get(book.getId()).getLibrary(),
-            Matchers.equalTo(library)
+            String.format(TestConstants.M_SAVE_OR_UPDATE_SAVE_CASCADE, book.getAuthors(), book),
+            dao().get(book.getId()).getAuthors().size(),
+            Matchers.is(2)
         );
     }
 
     @Test
     @SneakyThrows
-    void testDeleteCascade() {
-        Book book = Book.initWithManyToOne();
+    void testSaveOrUpdate_UpdateCascade_Library() {
+        Serializable bookId = dao().save(Book.initCascade());
+        Book newBook = dao().get(bookId);
+        dao().saveOrUpdate(newBook.modifyCascade());
+        Library updated = newBook.getLibrary();
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATED_CASCADE, updated, newBook),
+            dao().get(newBook.getId()).getLibrary(),
+            Matchers.equalTo(updated)
+        );
+    }
+
+    @Test
+    @SneakyThrows
+    void testSaveOrUpdate_UpdateCascade_Authors() {
+        Serializable bookId = dao().save(Book.initCascade());
+        Book newBook = dao().get(bookId);
+        dao().saveOrUpdate(newBook.modifyCascade());
+        Set<Author> updated = newBook.getAuthors();
+        MatcherAssert.assertThat(
+            String.format(TestConstants.M_SAVE_OR_UPDATE_UPDATED_CASCADE, updated, newBook),
+            dao().get(bookId).getAuthors(),
+            Matchers.equalTo(updated)
+        );
+    }
+
+    @Test
+    @SneakyThrows
+    void testDeleteCascade_Library() {
+        Book book = Book.initCascade();
+        book.setAuthors(null);
         dao().save(book);
         Library library = book.getLibrary();
 

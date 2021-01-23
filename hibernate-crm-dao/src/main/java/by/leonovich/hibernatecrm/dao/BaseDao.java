@@ -174,7 +174,20 @@ public abstract class BaseDao<T> implements Dao<T> {
 
     @Override
     public Serializable getLastIndex() throws DaoException {
-        throw new UnsupportedOperationException("Operation is not implemented yet!");
+        try {
+            String hql = "SELECT MAX(id) FROM " + getPersistentClass().getSimpleName();
+            Session session = HibernateUtil.getInstance().getSession();
+            transaction = session.beginTransaction();
+            Query query = session.createQuery(hql);
+            List<Serializable> list = query.list();
+
+            transaction.commit();
+            return list.get(0);
+
+        } catch (HibernateException e) {
+            transaction.rollback();
+            throw new DaoException(e);
+        }
     }
 
     @SuppressWarnings("unchecked")
