@@ -1,6 +1,8 @@
 package by.leonovich.hibernatecrm.dao;
 
 import by.leonovich.hibernatecrm.common.collection.MagicList;
+import by.leonovich.hibernatecrm.exception.DaoException;
+import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 
 import java.io.Serializable;
 import java.util.List;
@@ -37,4 +39,6 @@ public interface Dao<T> {
     MagicList<Serializable> getIds() throws DaoException;
 
     Serializable getLastIndex() throws DaoException;
+
+    HibernateUtil hibernate();
 }

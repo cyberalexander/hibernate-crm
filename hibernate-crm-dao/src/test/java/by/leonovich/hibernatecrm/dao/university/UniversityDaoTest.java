@@ -4,26 +4,23 @@ import by.leonovich.hibernatecrm.TestConstants;
 import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.dao.BaseDaoTest;
 import by.leonovich.hibernatecrm.dao.Dao;
-import by.leonovich.hibernatecrm.dao.PersonDao;
-import by.leonovich.hibernatecrm.dao.UniversityDao;
-import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import by.leonovich.hibernatecrm.mappings.singletable.Person;
 import by.leonovich.hibernatecrm.mappings.singletable.Student;
 import by.leonovich.hibernatecrm.mappings.singletable.University;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created : 13/12/2020 20:24
@@ -33,25 +30,16 @@ import java.util.stream.Stream;
  * @author alexanderleonovich
  * @version 1.0
  */
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations= "classpath:DaoContext.xml")
 class UniversityDaoTest implements BaseDaoTest<University> {
     protected static final Logger LOG = LoggerFactory.getLogger(UniversityDaoTest.class);
-    protected static final Dao<Person> personDao = new PersonDao();
-    protected static final Dao<University> universityDao = new UniversityDao();
-    protected static MagicList<University> universities = new MagicList<>();
+    private static final MagicList<University> universities = new MagicList<>();
 
-    @BeforeAll
-    static void beforeAll() {
-        universities.addAll(Stream.generate(University::initWithOneToMany).limit(TestConstants.LIMIT)
-            .map(UniversityDaoTest::persist)
-            .collect(Collectors.toList())
-        );
-        HibernateUtil.getInstance().closeSession();
-    }
-
-    @AfterEach
-    void tearDown() {
-        HibernateUtil.getInstance().closeSession();
-    }
+    @Autowired
+    private Dao<University> dao;
+    @Autowired
+    private Dao<Person> personDao;
 
     @Test
     @SneakyThrows
@@ -132,7 +120,7 @@ class UniversityDaoTest implements BaseDaoTest<University> {
 
     @Override
     public Dao<University> dao() {
-        return universityDao;
+        return dao;
     }
 
     @Override
@@ -140,10 +128,8 @@ class UniversityDaoTest implements BaseDaoTest<University> {
         return universities;
     }
 
-    @SneakyThrows
-    private static University persist(University university) {
-        universityDao.saveOrUpdate(university);
-        LOG.info("{}", university);
-        return university;
+    @Override
+    public University generate() {
+        return University.initWithOneToMany();
     }
 }

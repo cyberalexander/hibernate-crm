@@ -5,23 +5,20 @@ import by.leonovich.hibernatecrm.annotation.Author;
 import by.leonovich.hibernatecrm.annotation.Book;
 import by.leonovich.hibernatecrm.annotation.Library;
 import by.leonovich.hibernatecrm.common.collection.MagicList;
-import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static by.leonovich.hibernatecrm.TestConstants.LIMIT;
 
 /**
  * Created : 08/01/2021 21:05
@@ -31,27 +28,16 @@ import static by.leonovich.hibernatecrm.TestConstants.LIMIT;
  * @author alexanderleonovich
  * @version 1.0
  */
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations= "classpath:DaoContext.xml")
 class BookDaoTest implements BaseDaoTest<Book> {
     private static final Logger LOG = LoggerFactory.getLogger(BookDaoTest.class);
-    private static final Dao<Book> bookDao = new BookDao();
     private static final MagicList<Book> books = new MagicList<>();
 
-    @BeforeAll
-    static void beforeAll() {
-        books.addAll(
-            Stream.generate(Book::init)
-                .limit(LIMIT)
-                .map(BookDaoTest::persist)
-                .collect(Collectors.toList())
-        );
-        HibernateUtil.getInstance().closeSession();
-    }
-
-    @AfterEach
-    void tearDown() {
-        //Approach: Session opened in DAO method; session closed here after each @test method execution
-        HibernateUtil.getInstance().closeSession();
-    }
+    @Autowired
+    private Dao<Book> dao;
+    @Autowired
+    private LibraryDao libraryDao;
 
     @Test
     @SneakyThrows
@@ -142,19 +128,19 @@ class BookDaoTest implements BaseDaoTest<Book> {
 
         /* to avoid hibernate exception, need to brake relation before Portfolio deletion, as Portfolio has cascadeType=SAVE_UPDATE */
         library.setBooks(null);
-        new LibraryDao().saveOrUpdate(library);
+        libraryDao.saveOrUpdate(library);
 
         dao().delete(book);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_DELETE_CASCADE_AND_KEEP_RELATION, library, book),
-            new LibraryDao().get(library.getId()),
+            libraryDao.get(library.getId()),
             Matchers.notNullValue()
         );
     }
 
     @Override
     public Dao<Book> dao() {
-        return bookDao;
+        return dao;
     }
 
     @Override
@@ -162,10 +148,8 @@ class BookDaoTest implements BaseDaoTest<Book> {
         return books;
     }
 
-    @SneakyThrows
-    private static Book persist(Book book) {
-        bookDao.save(book);
-        LOG.info("{}", book);
-        return book;
+    @Override
+    public Book generate() {
+        return Book.init();
     }
 }

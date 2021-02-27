@@ -1,6 +1,7 @@
 package by.leonovich.hibernatecrm.dao;
 
 import by.leonovich.hibernatecrm.common.collection.MagicList;
+import by.leonovich.hibernatecrm.exception.DaoException;
 import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -29,14 +30,10 @@ public abstract class BaseDao<T> implements Dao<T> {
     protected Transaction transaction;
     protected HibernateUtil hibernate;
 
-    public BaseDao() {
-        hibernate = HibernateUtil.getInstance();
-    }
-
     @Override
     public void persist(T entity) throws DaoException {
         try {
-            Session session = HibernateUtil.getInstance().getSession();
+            Session session = hibernate.getSession();
             transaction = session.beginTransaction();
             LOG.debug("Before persist {}", entity);
             session.persist(entity);
@@ -54,7 +51,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     @Override
     public Serializable save(T entity) throws DaoException {
         try {
-            Session session = HibernateUtil.getInstance().getSession();
+            Session session = hibernate.getSession();
             transaction = session.beginTransaction();
             LOG.debug("Before save {}", entity);
             Serializable id = session.save(entity);
@@ -73,7 +70,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     @Override
     public void saveOrUpdate(T entity) throws DaoException {
         try {
-            Session session = HibernateUtil.getInstance().getSession();
+            Session session = hibernate.getSession();
             transaction = session.beginTransaction();
             LOG.debug("Before {}", entity);
             session.saveOrUpdate(entity);
@@ -91,7 +88,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     @Override
     public T get(Serializable id) throws DaoException {
         try {
-            Session session = HibernateUtil.getInstance().getSession();
+            Session session = hibernate.getSession();
             transaction = session.beginTransaction();
             T t = session.get(getPersistentClass(), id);
             transaction.commit();
@@ -106,7 +103,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     @Override
     public T load(Serializable id) throws DaoException {
         try {
-            Session session = HibernateUtil.getInstance().getSession();
+            Session session = hibernate.getSession();
             transaction = session.beginTransaction();
             T t = session.load(getPersistentClass(), id);
             LOG.debug("Session#isDirty={}; Request : {}; Result : {}", session.isDirty(), id, t);
@@ -121,7 +118,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     @Override
     public void delete(T entity) throws DaoException {
         try {
-            Session session = HibernateUtil.getInstance().getSession();
+            Session session = hibernate.getSession();
             transaction = session.beginTransaction();
             session.delete(entity);
             transaction.commit();
@@ -135,7 +132,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     @Override
     public List<T> getAll(Class<T> type) throws DaoException {
         try {
-            Session session = HibernateUtil.getInstance().getSession();
+            Session session = hibernate.getSession();
             transaction = session.beginTransaction();
 
             CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -155,7 +152,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     @Override
     public MagicList<Serializable> getIds() throws DaoException {
         try {
-            Session session = HibernateUtil.getInstance().getSession();
+            Session session = hibernate.getSession();
             transaction = session.beginTransaction();
 
             Class clazz = getPersistentClass();
@@ -177,7 +174,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     public Serializable getLastIndex() throws DaoException {
         try {
             String hql = "SELECT MAX(id) FROM " + getPersistentClass().getSimpleName();
-            Session session = HibernateUtil.getInstance().getSession();
+            Session session = hibernate.getSession();
             transaction = session.beginTransaction();
             Query query = session.createQuery(hql);
             List<Serializable> list = query.list();
@@ -194,5 +191,14 @@ public abstract class BaseDao<T> implements Dao<T> {
     @SuppressWarnings("unchecked")
     protected Class<T> getPersistentClass() {
         return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    }
+
+    @Override
+    public HibernateUtil hibernate() {
+        return hibernate;
+    }
+
+    public void setHibernate(HibernateUtil hibernate) {
+        this.hibernate = hibernate;
     }
 }

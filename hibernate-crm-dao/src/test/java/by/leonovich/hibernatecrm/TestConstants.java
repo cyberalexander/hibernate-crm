@@ -9,8 +9,8 @@ package by.leonovich.hibernatecrm;
  * @version 1.0
  */
 public class TestConstants {
-        public static final int MAIN_LIMIT = 16;
-        public static final int LIMIT = 8;
+        public static final int MAIN_LIMIT = 10;
+        public static final int LIMIT = 5;
 
         public static final String M_PERSIST = "Persisted entity should to be equal to : %s";
         public static final String M_SAVE = "Generated Id must not be null";

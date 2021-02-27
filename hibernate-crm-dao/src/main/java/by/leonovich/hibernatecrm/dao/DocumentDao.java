@@ -1,6 +1,6 @@
 package by.leonovich.hibernatecrm.dao;
 
-import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
+import by.leonovich.hibernatecrm.exception.DaoException;
 import by.leonovich.hibernatecrm.mappings.joinedtable.Document;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -25,7 +25,7 @@ public class DocumentDao extends BaseDao<Document> {
 
     public List<Document> getExpiringThisYearDocumentsCriteria() throws DaoException {
         try {
-            Session session = HibernateUtil.getInstance().getSession();
+            Session session = hibernate.getSession();
             transaction = session.beginTransaction();
 
             CriteriaBuilder cBuilder = session.getCriteriaBuilder();
@@ -51,7 +51,7 @@ public class DocumentDao extends BaseDao<Document> {
 
     public List<Document> getExpiringThisYearDocumentsHql() throws DaoException {
         try {
-            Session session = HibernateUtil.getInstance().getSession();
+            Session session = hibernate.getSession();
             transaction = session.beginTransaction();
             String hql = "FROM " + Document.class.getSimpleName() + " WHERE YEAR(expirationDate) <= :inputDate";
             Query<Document> query = session.createQuery(hql);

@@ -1,4 +1,4 @@
-package by.leonovich.hibernatecrm.dao;
+package by.leonovich.hibernatecrm.exception;
 
 import lombok.Getter;
 import lombok.Setter;

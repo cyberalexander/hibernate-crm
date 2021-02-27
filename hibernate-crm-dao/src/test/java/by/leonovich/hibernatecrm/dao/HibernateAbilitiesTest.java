@@ -1,21 +1,26 @@
 package by.leonovich.hibernatecrm.dao;
 
-import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
-import by.leonovich.hibernatecrm.mappings.singletable.Person;
 import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.common.random.RandomString;
+import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
+import by.leonovich.hibernatecrm.mappings.singletable.Person;
 import lombok.SneakyThrows;
+import org.apache.commons.collections4.CollectionUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.PersistenceException;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -31,24 +36,34 @@ import static by.leonovich.hibernatecrm.TestConstants.MAIN_LIMIT;
  * @author alexanderleonovich
  * @version 1.0
  */
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations= "classpath:DaoContext.xml")
 class HibernateAbilitiesTest {
     private static final Logger LOG = LoggerFactory.getLogger(HibernateAbilitiesTest.class);
-    private static final Dao<Person> dao = new PersonDao();
-    private static HibernateUtil hibernate;
     private static final MagicList<Person> all = new MagicList<>();
 
-    @BeforeAll
-    static void beforeAll() {
-        hibernate = HibernateUtil.getInstance();
-        all.addAll(
-            Stream.generate(Person::init).limit(MAIN_LIMIT).map(HibernateAbilitiesTest::persist).collect(Collectors.toList())
-        );
+    @Autowired
+    private Dao<Person> dao;
+    @Autowired
+    private HibernateUtil hibernate;
+
+    @PostConstruct
+    @SneakyThrows
+    public void postConstruct() {
+        if (CollectionUtils.isEmpty(all)) {
+            all.addAll(
+                Stream.generate(Person::init).limit(MAIN_LIMIT).collect(Collectors.toList())
+            );
+            for (Person p : all) {
+                dao.save(p);
+            }
+        }
     }
 
     @AfterEach
     void tearDown() {
         //Approach: Session opened in DAO method; session closed here after each @test method execution
-        HibernateUtil.getInstance().closeSession();
+        hibernate.closeSession();
     }
 
     @Test
@@ -210,14 +225,5 @@ class HibernateAbilitiesTest {
                 "detached entity passed to persist]!");
 
         t.commit();
-    }
-
-    @SneakyThrows
-    private static Person persist(Person person) {
-        dao.save(person);
-        if (LOG.isInfoEnabled()){
-            LOG.info("{}", person);
-        }
-        return person;
     }
 }

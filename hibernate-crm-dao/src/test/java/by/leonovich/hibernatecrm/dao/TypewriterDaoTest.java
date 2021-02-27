@@ -4,23 +4,20 @@ import by.leonovich.hibernatecrm.TestConstants;
 import by.leonovich.hibernatecrm.annotation.Author;
 import by.leonovich.hibernatecrm.annotation.Typewriter;
 import by.leonovich.hibernatecrm.common.collection.MagicList;
-import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.PersistenceException;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static by.leonovich.hibernatecrm.TestConstants.LIMIT;
 
 /**
  * Created : 13/01/2021 16:55
@@ -30,27 +27,14 @@ import static by.leonovich.hibernatecrm.TestConstants.LIMIT;
  * @author alexanderleonovich
  * @version 1.0
  */
-public class TypewriterDaoTest implements BaseDaoTest<Typewriter> {
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations= "classpath:DaoContext.xml")
+class TypewriterDaoTest implements BaseDaoTest<Typewriter> {
     private static final Logger LOG = LoggerFactory.getLogger(TypewriterDaoTest.class);
-    private static final Dao<Typewriter> typewriterDao = new TypewriterDao();
     private static final MagicList<Typewriter> typewriters = new MagicList<>();
 
-    @BeforeAll
-    static void beforeAll() {
-        typewriters.addAll(
-            Stream.generate(Typewriter::init)
-                .limit(LIMIT)
-                .map(TypewriterDaoTest::persist)
-                .collect(Collectors.toList())
-        );
-        HibernateUtil.getInstance().closeSession();
-    }
-
-    @AfterEach
-    void tearDown() {
-        //Approach: Session opened in DAO method; session closed here after each @test method execution
-        HibernateUtil.getInstance().closeSession();
-    }
+    @Autowired
+    private Dao<Typewriter> dao;
 
     @Test
     @SneakyThrows
@@ -107,7 +91,7 @@ public class TypewriterDaoTest implements BaseDaoTest<Typewriter> {
 
     @Override
     public Dao<Typewriter> dao() {
-        return typewriterDao;
+        return dao;
     }
 
     @Override
@@ -115,10 +99,8 @@ public class TypewriterDaoTest implements BaseDaoTest<Typewriter> {
         return typewriters;
     }
 
-    @SneakyThrows
-    private static Typewriter persist(Typewriter typewriter) {
-        typewriterDao.save(typewriter);
-        LOG.info("{}", typewriter);
-        return typewriter;
+    @Override
+    public Typewriter generate() {
+        return Typewriter.init();
     }
 }

@@ -1,7 +1,7 @@
 package by.leonovich.hibernatecrm.dao;
 
 import by.leonovich.hibernatecrm.annotation.Author;
-import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
+import by.leonovich.hibernatecrm.exception.DaoException;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -24,7 +24,7 @@ public class AuthorDao extends BaseDao<Author> {
 
     public List<Author> getAuthorByNameCriteria(String name) throws DaoException {
         try {
-            Session session = HibernateUtil.getInstance().getSession();
+            Session session = hibernate.getSession();
             transaction = session.beginTransaction();
 
             CriteriaBuilder cBuilder = session.getCriteriaBuilder();
@@ -46,7 +46,7 @@ public class AuthorDao extends BaseDao<Author> {
 
     public List<Author> getAuthorByNameHql(String name) throws DaoException {
         try {
-            Session session = HibernateUtil.getInstance().getSession();
+            Session session = hibernate.getSession();
             transaction = session.beginTransaction();
             String hql = "FROM " + Author.class.getSimpleName() + " WHERE name=:name";
             Query<Author> query = session.createQuery(hql);

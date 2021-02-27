@@ -5,7 +5,6 @@ import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.dao.BaseDaoTest;
 import by.leonovich.hibernatecrm.dao.Dao;
 import by.leonovich.hibernatecrm.dao.EmployeeDao;
-import by.leonovich.hibernatecrm.dao.MeetingDao;
 import by.leonovich.hibernatecrm.mappings.singletable.Employee;
 import by.leonovich.hibernatecrm.mappings.singletable.Meeting;
 import lombok.SneakyThrows;
@@ -13,8 +12,12 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -31,10 +34,16 @@ import java.util.stream.Collectors;
  * @author alexanderleonovich
  * @version 1.0
  */
-class EmployeeDaoTest extends CommonPersonDaoTest implements BaseDaoTest<Employee> {
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations= "classpath:DaoContext.xml")
+class EmployeeDaoTest implements BaseDaoTest<Employee> {
     private static final Logger LOG = LoggerFactory.getLogger(EmployeeDaoTest.class);
-    private static final Dao<Meeting> meetingDao = new MeetingDao();
-    private static final Dao<Employee> employeeDao = new EmployeeDao();
+    private static final MagicList<Employee> employees = new MagicList<>();
+
+    @Autowired
+    private Dao<Employee> dao;
+    @Autowired
+    private Dao<Meeting> meetingDao;
 
     @Test
     @SneakyThrows
@@ -153,11 +162,16 @@ class EmployeeDaoTest extends CommonPersonDaoTest implements BaseDaoTest<Employe
 
     @Override
     public Dao<Employee> dao() {
-        return employeeDao;
+        return dao;
     }
 
     @Override
     public MagicList<Employee> entities() {
         return employees;
+    }
+
+    @Override
+    public Employee generate() {
+        return Employee.initWithManyToMany();
     }
 }

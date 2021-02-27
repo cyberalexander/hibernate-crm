@@ -10,8 +10,12 @@ import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,9 +29,14 @@ import java.util.stream.Collectors;
  * @author alexanderleonovich
  * @version 1.0
  */
-class DocumentDaoTest extends CommonDocumentDaoTest implements BaseDaoTest<Document> {
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations= "classpath:DaoContext.xml")
+class DocumentDaoTest implements BaseDaoTest<Document> {
     private static final Logger LOG = LoggerFactory.getLogger(DocumentDaoTest.class);
-    private static final Dao<Document> documentDao = new DocumentDao();
+    private static final MagicList<Document> documents = new MagicList<>();
+
+    @Autowired
+    private Dao<Document> dao;
 
     @Test
     @SneakyThrows
@@ -63,11 +72,16 @@ class DocumentDaoTest extends CommonDocumentDaoTest implements BaseDaoTest<Docum
 
     @Override
     public Dao<Document> dao() {
-        return documentDao;
+        return dao;
     }
 
     @Override
     public MagicList<Document> entities() {
-        return allDocuments;
+        return documents;
+    }
+
+    @Override
+    public Document generate() {
+        return Document.init();
     }
 }

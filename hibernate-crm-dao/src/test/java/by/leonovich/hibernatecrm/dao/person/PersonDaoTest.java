@@ -12,8 +12,12 @@ import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Objects;
 
@@ -25,8 +29,16 @@ import java.util.Objects;
  * @author alexanderleonovich
  * @version 1.0
  */
-class PersonDaoTest extends CommonPersonDaoTest implements BaseDaoTest<Person> {
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations= "classpath:DaoContext.xml")
+class PersonDaoTest implements BaseDaoTest<Person> {
     private static final Logger LOG = LoggerFactory.getLogger(PersonDaoTest.class);
+    private static final MagicList<Person> persons = new MagicList<>();
+
+    @Autowired
+    private Dao<Person> dao;
+    @Autowired
+    private PhoneNumberDao phoneNumberDao;
 
     @Test
     @SneakyThrows
@@ -77,7 +89,7 @@ class PersonDaoTest extends CommonPersonDaoTest implements BaseDaoTest<Person> {
         dao().delete(p);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_DELETE_CASCADE, phoneNumber, p),
-            new PhoneNumberDao().get(p.getId()),
+            phoneNumberDao.get(p.getId()),
             Matchers.nullValue()
         );
     }
@@ -89,7 +101,7 @@ class PersonDaoTest extends CommonPersonDaoTest implements BaseDaoTest<Person> {
     @Test
     @SneakyThrows
     void testPersonAddressColumnIndex() {
-        Address address = dao().get(allPersons.randomEntity().getId()).getHomeAddress();
+        Address address = dao().get(persons.randomEntity().getId()).getHomeAddress();
         String expected = address.getCountryCode() + "_" + address.getCountry();
         MatcherAssert.assertThat(
             String.format(TestConstants.M_TEST_INDEX, expected),
@@ -100,11 +112,16 @@ class PersonDaoTest extends CommonPersonDaoTest implements BaseDaoTest<Person> {
 
     @Override
     public Dao<Person> dao() {
-        return personDao;
+        return dao;
     }
 
     @Override
     public MagicList<Person> entities() {
-        return allPersons;
+        return persons;
+    }
+
+    @Override
+    public Person generate() {
+        return Person.init();
     }
 }

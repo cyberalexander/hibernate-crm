@@ -4,21 +4,18 @@ import by.leonovich.hibernatecrm.TestConstants;
 import by.leonovich.hibernatecrm.annotation.Author;
 import by.leonovich.hibernatecrm.annotation.Portfolio;
 import by.leonovich.hibernatecrm.common.collection.MagicList;
-import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static by.leonovich.hibernatecrm.TestConstants.LIMIT;
 
 /**
  * Created : 08/01/2021 21:05
@@ -28,27 +25,16 @@ import static by.leonovich.hibernatecrm.TestConstants.LIMIT;
  * @author alexanderleonovich
  * @version 1.0
  */
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations= "classpath:DaoContext.xml")
 class PortfolioDaoTest implements BaseDaoTest<Portfolio> {
     private static final Logger LOG = LoggerFactory.getLogger(PortfolioDaoTest.class);
-    private static final Dao<Portfolio> portfolioDao = new PortfolioDao();
     private static final MagicList<Portfolio> portfolios = new MagicList<>();
 
-    @BeforeAll
-    static void beforeAll() {
-        portfolios.addAll(
-            Stream.generate(Portfolio::init)
-                .limit(LIMIT)
-                .map(PortfolioDaoTest::persist)
-                .collect(Collectors.toList())
-        );
-        HibernateUtil.getInstance().closeSession();
-    }
-
-    @AfterEach
-    void tearDown() {
-        //Approach: Session opened in DAO method; session closed here after each @test method execution
-        HibernateUtil.getInstance().closeSession();
-    }
+    @Autowired
+    private Dao<Portfolio> dao;
+    @Autowired
+    private AuthorDao authorDao;
 
     @Test
     @SneakyThrows
@@ -99,19 +85,19 @@ class PortfolioDaoTest implements BaseDaoTest<Portfolio> {
 
         /* to avoid hibernate exception, need to brake relation before Portfolio deletion, as Portfolio has cascadeType=SAVE_UPDATE */
         author.setPortfolio(null);
-        new AuthorDao().saveOrUpdate(author);
+        authorDao.saveOrUpdate(author);
 
         dao().delete(p);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_DELETE_CASCADE_AND_KEEP_RELATION, author, p),
-            new AuthorDao().get(author.getId()),
+            authorDao.get(author.getId()),
             Matchers.notNullValue()
         );
     }
 
     @Override
     public Dao<Portfolio> dao() {
-        return portfolioDao;
+        return dao;
     }
 
     @Override
@@ -119,10 +105,8 @@ class PortfolioDaoTest implements BaseDaoTest<Portfolio> {
         return portfolios;
     }
 
-    @SneakyThrows
-    private static Portfolio persist(Portfolio portfolio) {
-        portfolioDao.save(portfolio);
-        LOG.info("{}", portfolio);
-        return portfolio;
+    @Override
+    public Portfolio generate() {
+        return Portfolio.init();
     }
 }

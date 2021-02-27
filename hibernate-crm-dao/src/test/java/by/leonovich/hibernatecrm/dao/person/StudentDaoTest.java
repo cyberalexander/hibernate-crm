@@ -4,8 +4,6 @@ import by.leonovich.hibernatecrm.TestConstants;
 import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.dao.BaseDaoTest;
 import by.leonovich.hibernatecrm.dao.Dao;
-import by.leonovich.hibernatecrm.dao.StudentDao;
-import by.leonovich.hibernatecrm.dao.UniversityDao;
 import by.leonovich.hibernatecrm.mappings.singletable.Student;
 import by.leonovich.hibernatecrm.mappings.singletable.University;
 import lombok.SneakyThrows;
@@ -13,8 +11,12 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Objects;
 
@@ -26,10 +28,16 @@ import java.util.Objects;
  * @author alexanderleonovich
  * @version 1.0
  */
-class StudentDaoTest extends CommonPersonDaoTest implements BaseDaoTest<Student> {
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations= "classpath:DaoContext.xml")
+class StudentDaoTest implements BaseDaoTest<Student> {
     private static final Logger LOG = LoggerFactory.getLogger(StudentDaoTest.class);
-    private static final Dao<Student> studentDao = new StudentDao();
-    private static final Dao<University> universityDao = new UniversityDao();
+    private static final MagicList<Student> students = new MagicList<>();
+
+    @Autowired
+    private Dao<Student> dao;
+    @Autowired
+    private Dao<University> universityDao;
 
     @Test
     @SneakyThrows
@@ -77,11 +85,16 @@ class StudentDaoTest extends CommonPersonDaoTest implements BaseDaoTest<Student>
 
     @Override
     public Dao<Student> dao() {
-        return studentDao;
+        return dao;
     }
 
     @Override
     public MagicList<Student> entities() {
         return students;
+    }
+
+    @Override
+    public Student generate() {
+        return Student.initWithManyToOne();
     }
 }

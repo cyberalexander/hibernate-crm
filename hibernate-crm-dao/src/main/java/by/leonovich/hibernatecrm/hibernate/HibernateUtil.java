@@ -9,6 +9,7 @@ import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -21,7 +22,6 @@ import java.util.Optional;
  */
 public class HibernateUtil {
     private static final Logger LOG = LoggerFactory.getLogger(HibernateUtil.class);
-    private static final HibernateUtil instance = new HibernateUtil();
     private final SessionFactory factory;
     private final ThreadLocal<Session> session = new ThreadLocal<>();
 
@@ -51,15 +51,11 @@ public class HibernateUtil {
     }
 
     public void closeSession() {
-        if (this.session.get().isOpen()) {
-            this.session.get().close();
-            LOG.info("Session {} closed!", this.session.get());
+        if (Objects.nonNull(session) && session.get().isOpen()) {
+            session.get().close();
+            LOG.info("Session {} closed!", session.get());
         } else {
-            LOG.info("Session {} was already closed!", this.session.get());
+            LOG.info("Session {} was already closed!", session.get());
         }
-    }
-
-    public static synchronized HibernateUtil getInstance(){
-        return instance;
     }
 }

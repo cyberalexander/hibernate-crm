@@ -1,6 +1,6 @@
 package by.leonovich.hibernatecrm.dao;
 
-import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
+import by.leonovich.hibernatecrm.exception.DaoException;
 import by.leonovich.hibernatecrm.mappings.singletable.Employee;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -23,7 +23,7 @@ public class EmployeeDao extends BaseDao<Employee> {
 
     public Employee getHighestPaidEmployee() throws DaoException {
         try {
-            Session session = HibernateUtil.getInstance().getSession();
+            Session session = hibernate.getSession();
             transaction = session.beginTransaction();
 
             CriteriaBuilder cBuilder = session.getCriteriaBuilder();
@@ -45,7 +45,7 @@ public class EmployeeDao extends BaseDao<Employee> {
 
     public List<Employee> getEmployeesOrderedBySalary() throws DaoException {
         try {
-            Session session = HibernateUtil.getInstance().getSession();
+            Session session = hibernate.getSession();
             transaction = session.beginTransaction();
 
             CriteriaBuilder cBuilder = session.getCriteriaBuilder();

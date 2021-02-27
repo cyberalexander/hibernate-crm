@@ -4,19 +4,25 @@ import by.leonovich.hibernatecrm.TestConstants;
 import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.common.model.Automated;
 import lombok.SneakyThrows;
+import org.apache.commons.collections4.CollectionUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static by.leonovich.hibernatecrm.TestConstants.LIMIT;
 
 /**
  * Created : 02/01/2021 15:37
@@ -28,6 +34,26 @@ import java.util.stream.Collectors;
  */
 public interface BaseDaoTest<T extends Automated> {
     Logger LOG = LoggerFactory.getLogger(BaseDaoTest.class);
+
+    @PostConstruct
+    @SneakyThrows
+    default void postConstruct() {
+        if (CollectionUtils.isEmpty(entities())) {
+
+            entities().addAll(
+                Stream.generate(this::generate).limit(LIMIT).collect(Collectors.toList())
+            );
+
+            for (T obj : entities()) {
+                dao().save(obj);
+            }
+        }
+    }
+
+    @AfterEach
+    default void tearDown() {
+        dao().hibernate().closeSession();
+    }
 
     @Test
     @SneakyThrows
@@ -191,6 +217,8 @@ public interface BaseDaoTest<T extends Automated> {
     Dao<T> dao();
 
     MagicList<T> entities();
+
+    T generate();
 
     @SuppressWarnings("unchecked")
     default Class<T> getEntityClass() {

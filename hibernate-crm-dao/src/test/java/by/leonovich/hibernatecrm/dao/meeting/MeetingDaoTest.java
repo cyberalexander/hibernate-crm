@@ -4,28 +4,22 @@ import by.leonovich.hibernatecrm.TestConstants;
 import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.dao.BaseDaoTest;
 import by.leonovich.hibernatecrm.dao.Dao;
-import by.leonovich.hibernatecrm.dao.MeetingDao;
-import by.leonovich.hibernatecrm.dao.PersonDao;
-import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import by.leonovich.hibernatecrm.mappings.singletable.Employee;
 import by.leonovich.hibernatecrm.mappings.singletable.Meeting;
 import by.leonovich.hibernatecrm.mappings.singletable.Person;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static by.leonovich.hibernatecrm.TestConstants.LIMIT;
 
 /**
  * Created : 26/12/2020 12:58
@@ -35,28 +29,15 @@ import static by.leonovich.hibernatecrm.TestConstants.LIMIT;
  * @author alexanderleonovich
  * @version 1.0
  */
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations= "classpath:DaoContext.xml")
 class MeetingDaoTest implements BaseDaoTest<Meeting> {
-    private static final Logger LOG = LoggerFactory.getLogger(MeetingDaoTest.class);
-    private static final Dao<Person> personDao = new PersonDao();
-    private static final Dao<Meeting> meetingDao = new MeetingDao();
     private static final MagicList<Meeting> meetings = new MagicList<>();
 
-    @BeforeAll
-    static void beforeAll() {
-        meetings.addAll(
-            Stream.generate(Meeting::initWithManyToMany)
-                .limit(LIMIT)
-                .map(MeetingDaoTest::persist)
-                .collect(Collectors.toList())
-        );
-        HibernateUtil.getInstance().closeSession();
-    }
-
-    @AfterEach
-    void tearDown() {
-        //Approach: Session opened in DAO method; session closed here after each @test method execution
-        HibernateUtil.getInstance().closeSession();
-    }
+    @Autowired
+    private Dao<Person> personDao;
+    @Autowired
+    private Dao<Meeting> meetingDao;
 
     @Test
     @SneakyThrows
@@ -189,10 +170,8 @@ class MeetingDaoTest implements BaseDaoTest<Meeting> {
         return meetings;
     }
 
-    @SneakyThrows
-    private static Meeting persist(Meeting meeting) {
-        meetingDao.saveOrUpdate(meeting);
-        LOG.info("{}", meeting);
-        return meeting;
+    @Override
+    public Meeting generate() {
+        return Meeting.initWithManyToMany();
     }
 }

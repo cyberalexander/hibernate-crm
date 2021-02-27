@@ -6,23 +6,20 @@ import by.leonovich.hibernatecrm.annotation.Book;
 import by.leonovich.hibernatecrm.annotation.Portfolio;
 import by.leonovich.hibernatecrm.annotation.Typewriter;
 import by.leonovich.hibernatecrm.common.collection.MagicList;
-import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static by.leonovich.hibernatecrm.TestConstants.LIMIT;
 
 /**
  * Created : 08/01/2021 21:05
@@ -32,27 +29,20 @@ import static by.leonovich.hibernatecrm.TestConstants.LIMIT;
  * @author alexanderleonovich
  * @version 1.0
  */
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations= "classpath:DaoContext.xml")
 class AuthorDaoTest implements BaseDaoTest<Author> {
     private static final Logger LOG = LoggerFactory.getLogger(AuthorDaoTest.class);
-    private static final Dao<Author> authorDao = new AuthorDao();
     private static final MagicList<Author> authors = new MagicList<>();
 
-    @BeforeAll
-    static void beforeAll() {
-        authors.addAll(
-            Stream.generate(Author::initCascade)
-                .limit(LIMIT)
-                .map(AuthorDaoTest::persist)
-                .collect(Collectors.toList())
-        );
-        HibernateUtil.getInstance().closeSession();
-    }
-
-    @AfterEach
-    void tearDown() {
-        //Approach: Session opened in DAO method; session closed here after each @test method execution
-        HibernateUtil.getInstance().closeSession();
-    }
+    @Autowired
+    private Dao<Author> dao;
+    @Autowired
+    private TypewriterDao typewriterDao;
+    @Autowired
+    private PortfolioDao portfolioDao;
+    @Autowired
+    private BookDao bookDao;
 
     @Test
     @SneakyThrows
@@ -182,7 +172,7 @@ class AuthorDaoTest implements BaseDaoTest<Author> {
         dao().delete(a);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_DELETE_CASCADE, portfolio, a),
-            new PortfolioDao().get(portfolio.getId()),
+            portfolioDao.get(portfolio.getId()),
             Matchers.nullValue()
         );
     }
@@ -196,7 +186,7 @@ class AuthorDaoTest implements BaseDaoTest<Author> {
         dao().delete(a);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_DELETE_CASCADE, typewriter, a),
-            new TypewriterDao().get(typewriter.getId()),
+            typewriterDao.get(typewriter.getId()),
             Matchers.nullValue()
         );
     }
@@ -210,7 +200,7 @@ class AuthorDaoTest implements BaseDaoTest<Author> {
         dao().delete(a);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_DELETE_CASCADE, relatedBook, a),
-            new BookDao().get(relatedBook.getId()),
+            bookDao.get(relatedBook.getId()),
             Matchers.nullValue()
         );
     }
@@ -244,7 +234,7 @@ class AuthorDaoTest implements BaseDaoTest<Author> {
 
     @Override
     public Dao<Author> dao() {
-        return authorDao;
+        return dao;
     }
 
     @Override
@@ -252,10 +242,8 @@ class AuthorDaoTest implements BaseDaoTest<Author> {
         return authors;
     }
 
-    @SneakyThrows
-    private static Author persist(Author author) {
-        authorDao.save(author);
-        LOG.info("{}", author);
-        return author;
+    @Override
+    public Author generate() {
+        return Author.initCascade();
     }
 }
