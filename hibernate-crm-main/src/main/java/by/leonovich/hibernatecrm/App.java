@@ -1,30 +1,28 @@
 package by.leonovich.hibernatecrm;
 
-import by.leonovich.hibernatecrm.dao.Dao;
-import by.leonovich.hibernatecrm.exception.DaoException;
 import by.leonovich.hibernatecrm.mappings.singletable.Person;
+import by.leonovich.hibernatecrm.service.exception.ServiceException;
+import by.leonovich.hibernatecrm.service.person.PersonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.io.Serializable;
 import java.util.stream.Stream;
 
 public class App {
     protected static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     public static void main( String[] args ) throws Exception {
-        ApplicationContext context = new ClassPathXmlApplicationContext("DaoContext.xml");
-        Dao<Person> personDao = context.getBean("by.leonovich.hibernate.crm.PersonDao", Dao.class);
+        ApplicationContext context = new ClassPathXmlApplicationContext("ServiceContext.xml");
+        PersonService<Person> personService = context.getBean(PersonService.class);
         Stream.generate(Person::init).limit(3).forEach(p -> {
             try {
-                personDao.save(p);
-            } catch (DaoException e) {
+                personService.create(p);
+            } catch (ServiceException e) {
                 throw new RuntimeException(e);
             }
         });
-        Serializable lastIndex = personDao.getLastIndex();
-        LOGGER.info("INDEX : {}", lastIndex);
+        LOGGER.info("ALL PERSONS : {}", personService.read());
     }
 }

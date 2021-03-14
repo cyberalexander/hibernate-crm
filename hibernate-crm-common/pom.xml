@@ -14,7 +14,6 @@
     <packaging>jar</packaging>
 
     <name>hibernate-crm-common</name>
-    <url>http://maven.apache.org</url>
 
     <dependencies>
         <dependency>
