@@ -1,6 +1,6 @@
 package by.leonovich.hibernatecrm.dao;
 
-import by.leonovich.hibernatecrm.annotation.Book;
+import by.leonovich.hibernatecrm.mappings.annotation.Book;
 
 /**
  * Created : 07/01/2021 11:18

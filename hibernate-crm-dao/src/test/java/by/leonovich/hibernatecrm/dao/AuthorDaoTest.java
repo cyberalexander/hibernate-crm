@@ -1,10 +1,10 @@
 package by.leonovich.hibernatecrm.dao;
 
 import by.leonovich.hibernatecrm.TestConstants;
-import by.leonovich.hibernatecrm.annotation.Author;
-import by.leonovich.hibernatecrm.annotation.Book;
-import by.leonovich.hibernatecrm.annotation.Portfolio;
-import by.leonovich.hibernatecrm.annotation.Typewriter;
+import by.leonovich.hibernatecrm.mappings.annotation.Author;
+import by.leonovich.hibernatecrm.mappings.annotation.Book;
+import by.leonovich.hibernatecrm.mappings.annotation.Portfolio;
+import by.leonovich.hibernatecrm.mappings.annotation.Typewriter;
 import by.leonovich.hibernatecrm.common.collection.MagicList;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;

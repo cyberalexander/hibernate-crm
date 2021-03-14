@@ -21,11 +21,11 @@
         <mapping resource="University.hbm.xml"/>
         <mapping resource="Meeting.hbm.xml"/>
 
-        <mapping class="by.leonovich.hibernatecrm.annotation.Author"/>
-        <mapping class="by.leonovich.hibernatecrm.annotation.Book"/>
-        <mapping class="by.leonovich.hibernatecrm.annotation.Library"/>
-        <mapping class="by.leonovich.hibernatecrm.annotation.Portfolio"/>
-        <mapping class="by.leonovich.hibernatecrm.annotation.Typewriter"/>
+        <mapping class="by.leonovich.hibernatecrm.mappings.annotation.Author"/>
+        <mapping class="by.leonovich.hibernatecrm.mappings.annotation.Book"/>
+        <mapping class="by.leonovich.hibernatecrm.mappings.annotation.Library"/>
+        <mapping class="by.leonovich.hibernatecrm.mappings.annotation.Portfolio"/>
+        <mapping class="by.leonovich.hibernatecrm.mappings.annotation.Typewriter"/>
     </session-factory>
 </hibernate-configuration>
 

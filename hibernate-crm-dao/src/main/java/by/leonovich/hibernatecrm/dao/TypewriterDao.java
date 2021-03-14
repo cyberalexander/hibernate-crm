@@ -1,6 +1,6 @@
 package by.leonovich.hibernatecrm.dao;
 
-import by.leonovich.hibernatecrm.annotation.Typewriter;
+import by.leonovich.hibernatecrm.mappings.annotation.Typewriter;
 
 /**
  * Created : 13/01/2021 16:55

@@ -1,6 +1,6 @@
 package by.leonovich.hibernatecrm.dao;
 
-import by.leonovich.hibernatecrm.annotation.Author;
+import by.leonovich.hibernatecrm.mappings.annotation.Author;
 import by.leonovich.hibernatecrm.exception.DaoException;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;

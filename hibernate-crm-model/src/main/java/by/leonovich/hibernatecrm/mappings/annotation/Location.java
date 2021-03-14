@@ -1,4 +1,4 @@
-package by.leonovich.hibernatecrm.annotation;
+package by.leonovich.hibernatecrm.mappings.annotation;
 
 import by.leonovich.hibernatecrm.common.random.RandomCountry;
 import by.leonovich.hibernatecrm.common.random.RandomNumber;

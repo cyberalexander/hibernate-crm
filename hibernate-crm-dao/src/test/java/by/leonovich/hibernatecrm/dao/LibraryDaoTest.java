@@ -1,8 +1,8 @@
 package by.leonovich.hibernatecrm.dao;
 
 import by.leonovich.hibernatecrm.TestConstants;
-import by.leonovich.hibernatecrm.annotation.Book;
-import by.leonovich.hibernatecrm.annotation.Library;
+import by.leonovich.hibernatecrm.mappings.annotation.Book;
+import by.leonovich.hibernatecrm.mappings.annotation.Library;
 import by.leonovich.hibernatecrm.common.collection.MagicList;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
