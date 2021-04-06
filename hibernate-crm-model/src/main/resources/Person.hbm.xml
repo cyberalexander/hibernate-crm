@@ -43,7 +43,7 @@
         <subclass name="Student" discriminator-value="S">
             <property name="faculty" column="F_FACULTY"/>
             <property name="mark" column="F_MARK"/>
-            <many-to-one name="university" class="University" fetch="select" column="F_UNIVERSITY_ID" cascade="save-update"/>
+            <many-to-one name="university" class="University" lazy="false" fetch="select" column="F_UNIVERSITY_ID" cascade="save-update"/>
         </subclass>
     </class>
 </hibernate-mapping>

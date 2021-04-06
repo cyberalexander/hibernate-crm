@@ -1,10 +1,11 @@
 package by.leonovich.hibernatecrm.dao;
 
 import by.leonovich.hibernatecrm.TestConstants;
+import by.leonovich.hibernatecrm.TestDaoConfiguration;
+import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.mappings.annotation.Author;
 import by.leonovich.hibernatecrm.mappings.annotation.Book;
 import by.leonovich.hibernatecrm.mappings.annotation.Library;
-import by.leonovich.hibernatecrm.common.collection.MagicList;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -13,8 +14,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -29,7 +32,9 @@ import java.util.Set;
  * @version 1.0
  */
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations= "classpath:DaoContext.xml")
+@ContextConfiguration(classes = {TestDaoConfiguration.class})
+@Transactional
+@Commit
 class BookDaoTest implements BaseDaoTest<Book> {
     private static final Logger LOG = LoggerFactory.getLogger(BookDaoTest.class);
     private static final MagicList<Book> books = new MagicList<>();

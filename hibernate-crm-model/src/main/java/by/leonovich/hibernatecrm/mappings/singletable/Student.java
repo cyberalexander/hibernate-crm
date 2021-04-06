@@ -16,7 +16,7 @@ import lombok.ToString;
  */
 @Data
 @ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class Student extends Person {
     private University university; /* MANY-TO-ONE relation */
     private String faculty;

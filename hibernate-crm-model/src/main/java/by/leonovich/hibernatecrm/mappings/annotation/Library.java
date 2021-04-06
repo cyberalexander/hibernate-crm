@@ -5,17 +5,10 @@ import by.leonovich.hibernatecrm.common.random.RandomString;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,28 +22,33 @@ import java.util.stream.Stream;
  * @version 1.0
  */
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "T_LIBRARY")
 public class Library implements Automated {
     @Id
     @Column(name = "F_ID")
     @GeneratedValue
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "F_NAME", nullable = false)
+    @EqualsAndHashCode.Include
     private String name;
 
     @Embedded
     private Location location;
 
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    @Cascade(CascadeType.ALL)
-    @OneToMany(mappedBy = "library", orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "library", orphanRemoval = true, cascade = {CascadeType.ALL})
     private Set<Book> books; /* ONE-TO-MANY */
 
     public boolean writeOffBook(Book book) {
-        return books.remove(book);
+        Set<Book> books = new HashSet<>(getBooks());
+        boolean result = books.remove(book);
+        book.setLibrary(null);
+        setBooks(books);
+        return result;
     }
 
     @Override

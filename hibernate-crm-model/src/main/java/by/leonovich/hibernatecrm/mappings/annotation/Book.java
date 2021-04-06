@@ -31,15 +31,18 @@ import java.util.stream.Stream;
  * @version 1.0
  */
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "T_BOOK")
 public class Book implements Automated {
     @Id
     @Column(name = "F_ID")
     @GeneratedValue
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "F_NAME")
+    @EqualsAndHashCode.Include
     private String name;
 
     @Column(name = "F_YEAR")
@@ -52,16 +55,22 @@ public class Book implements Automated {
     @Convert(converter = CategoryConverter.class)
     private Category category;
 
-    @ManyToOne
+    @ManyToOne(targetEntity = Library.class)
     @Cascade(CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "F_LIBRARY_ID")
     private Library library; /* MANY-TO-ONE */
 
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     @ManyToMany(mappedBy = "books")
     @Cascade(CascadeType.SAVE_UPDATE)
     private Set<Author> authors = new HashSet<>(); /* MANY-TO-MANY */
+
+    /**
+     * TODO: remove this temp solution
+     */
+    public Set<Author> getAuthors() {
+        return new HashSet<>(authors);
+    }
 
     @Override
     public <T> T populate() {

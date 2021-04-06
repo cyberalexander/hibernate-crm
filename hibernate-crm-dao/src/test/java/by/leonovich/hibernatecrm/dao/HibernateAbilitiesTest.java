@@ -1,17 +1,18 @@
 package by.leonovich.hibernatecrm.dao;
 
+import by.leonovich.hibernatecrm.TestDaoConfiguration;
 import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.common.random.RandomString;
-import by.leonovich.hibernatecrm.hibernate.HibernateUtil;
 import by.leonovich.hibernatecrm.mappings.singletable.Person;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.PersistenceException;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -37,40 +37,35 @@ import static by.leonovich.hibernatecrm.TestConstants.MAIN_LIMIT;
  * @version 1.0
  */
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations= "classpath:DaoContext.xml")
+@ContextConfiguration(classes = {TestDaoConfiguration.class})
 class HibernateAbilitiesTest {
     private static final Logger LOG = LoggerFactory.getLogger(HibernateAbilitiesTest.class);
-    private static final MagicList<Person> all = new MagicList<>();
+    private static final MagicList<Person> testData = new MagicList<>();
 
     @Autowired
-    private Dao<Person> dao;
-    @Autowired
-    private HibernateUtil hibernate;
+    private SessionFactory hibernate;
 
-    @PostConstruct
+    @BeforeEach
     @SneakyThrows
     public void postConstruct() {
-        if (CollectionUtils.isEmpty(all)) {
-            all.addAll(
+        if (CollectionUtils.isEmpty(testData)) {
+            testData.addAll(
                 Stream.generate(Person::init).limit(MAIN_LIMIT).collect(Collectors.toList())
             );
-            for (Person p : all) {
-                dao.save(p);
+            Session session = hibernate.openSession();
+            Transaction t = session.beginTransaction();
+            for (Person p : testData) {
+                session.save(p);
             }
+            t.commit();
         }
-    }
-
-    @AfterEach
-    void tearDown() {
-        //Approach: Session opened in DAO method; session closed here after each @test method execution
-        hibernate.closeSession();
     }
 
     @Test
     @SneakyThrows
     void testContains() {
-        Session session = hibernate.getSession();
-        Person notInContext = all.randomEntity();
+        Session session = hibernate.openSession();
+        Person notInContext = testData.randomEntity();
 
         MatcherAssert.assertThat("Object should not be associated with session",
             session.contains(notInContext),
@@ -81,8 +76,8 @@ class HibernateAbilitiesTest {
     @Test
     @SneakyThrows
     void testEvict() {
-        Session session = hibernate.getSession();
-        Long id = all.randomEntity().getId();
+        Session session = hibernate.openSession();
+        Long id = testData.randomEntity().getId();
         Transaction t = session.beginTransaction();
         Person test = session.get(Person.class, id); //attached to context
         session.evict(test); //removed from context
@@ -101,8 +96,8 @@ class HibernateAbilitiesTest {
     @Test
     @SneakyThrows
     void testFlush() {
-        Person detached = all.randomEntity();
-        Session session = hibernate.getSession();
+        Person detached = testData.randomEntity();
+        Session session = hibernate.openSession();
         LOG.info("isDirty={}, in memory : {}", session.isDirty(), detached);
 
         Transaction t = session.beginTransaction();
@@ -134,8 +129,8 @@ class HibernateAbilitiesTest {
     @Test
     @SneakyThrows
     void testRefresh() {
-        Person detached = all.randomEntity();
-        Session session = hibernate.getSession();
+        Person detached = testData.randomEntity();
+        Session session = hibernate.openSession();
         LOG.info("isDirty={}, in memory : {}", session.isDirty(), detached);
 
         Transaction t = session.beginTransaction();
@@ -161,8 +156,8 @@ class HibernateAbilitiesTest {
     @Test
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testPersist() {
-        Person random = all.randomEntity();
-        Session session = hibernate.getSession();
+        Person random = testData.randomEntity();
+        Session session = hibernate.openSession();
         Transaction t = session.beginTransaction();
         LOG.info("isDirty={}, before modify : {}", session.isDirty(), random);
 
@@ -191,8 +186,8 @@ class HibernateAbilitiesTest {
     @Test
     @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testPersistThrowException() {
-        Person random = all.randomEntity();
-        Session session = hibernate.getSession();
+        Person random = testData.randomEntity();
+        Session session = hibernate.openSession();
 
         Transaction t = session.beginTransaction();
         LOG.info("isDirty={}, before modify : {}", session.isDirty(), random);
@@ -214,7 +209,7 @@ class HibernateAbilitiesTest {
         Person newPerson = new Person();
         newPerson.setId(new Random().nextLong());
 
-        Session session = hibernate.getSession();
+        Session session = hibernate.openSession();
         Transaction t = session.beginTransaction();
         LOG.info("isDirty={}, before persist : {}", session.isDirty(), newPerson);
 

@@ -29,12 +29,14 @@ import java.util.stream.Stream;
  * @version 1.0
  */
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "T_AUTHOR")
 @SequenceGenerator(name = "AUTHOR_PK", sequenceName = "T_AUTHOR_SEQ")
 public class Author implements Automated {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "AUTHOR_PK")
+    @EqualsAndHashCode.Include
     private Long id;
 
     /**
@@ -46,14 +48,15 @@ public class Author implements Automated {
     /**
      * {@link Prefix} will be used in code
      */
-    @EqualsAndHashCode.Exclude
     @Transient
     private Prefix prefix;
 
     @Column(name = "F_NAME")
+    @EqualsAndHashCode.Include
     private String name;
 
     @Column(name = "F_SURNAME")
+    @EqualsAndHashCode.Include
     private String surname;
 
     /**
@@ -75,7 +78,6 @@ public class Author implements Automated {
     private Typewriter typewriter; /* ONE-TO-ONE with a Join Table */
 
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     @ManyToMany
     @Cascade(CascadeType.ALL)
     @JoinTable(
@@ -84,6 +86,10 @@ public class Author implements Automated {
         inverseJoinColumns = {@JoinColumn(name = "F_BOOK_ID")}
     )
     private Set<Book> books = new HashSet<>(); /* MANY-TO-MANY */
+
+    public Set<Book> getBooks() {
+        return new HashSet<>(books);
+    }
 
     @PostLoad
     void fillTransient() {

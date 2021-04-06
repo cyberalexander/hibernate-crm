@@ -1,10 +1,11 @@
 package by.leonovich.hibernatecrm.dao;
 
-import by.leonovich.hibernatecrm.mappings.annotation.Author;
 import by.leonovich.hibernatecrm.exception.DaoException;
+import by.leonovich.hibernatecrm.mappings.annotation.Author;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -20,12 +21,12 @@ import java.util.List;
  * @author alexanderleonovich
  * @version 1.0
  */
+@Repository
 public class AuthorDao extends BaseDao<Author> {
 
     public List<Author> getAuthorByNameCriteria(String name) throws DaoException {
         try {
-            Session session = hibernate.getSession();
-            transaction = session.beginTransaction();
+            Session session = session();
 
             CriteriaBuilder cBuilder = session.getCriteriaBuilder();
             CriteriaQuery<Author> cQuery = cBuilder.createQuery(Author.class);
@@ -35,27 +36,19 @@ public class AuthorDao extends BaseDao<Author> {
 
             cQuery.select(rootEntry);
             Query<Author> query = session.createQuery(cQuery);
-            List<Author> authors = query.getResultList();
-            transaction.commit();
-            return authors;
+            return query.getResultList();
         } catch (HibernateException e) {
-            transaction.rollback();
             throw new DaoException(e);
         }
     }
 
     public List<Author> getAuthorByNameHql(String name) throws DaoException {
         try {
-            Session session = hibernate.getSession();
-            transaction = session.beginTransaction();
             String hql = "FROM " + Author.class.getSimpleName() + " WHERE name=:name";
-            Query<Author> query = session.createQuery(hql);
+            Query<Author> query = session().createQuery(hql);
             query.setParameter("name", name);
-            List<Author> authors = query.list();
-            transaction.commit();
-            return authors;
+            return query.list();
         } catch (HibernateException e) {
-            transaction.rollback();
             throw new DaoException(e);
         }
     }

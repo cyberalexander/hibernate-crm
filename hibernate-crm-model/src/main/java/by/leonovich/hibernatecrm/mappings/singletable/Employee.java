@@ -23,12 +23,12 @@ import java.util.stream.Stream;
  */
 @Data
 @ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class Employee extends Person implements Automated {
+    @EqualsAndHashCode.Include
     private String company;
     private BigDecimal salary;
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Set<Meeting> meetings = new HashSet<>(); /* MANY-TO-MANY relation */
 
     @Override

@@ -1,6 +1,7 @@
 package by.leonovich.hibernatecrm.dao;
 
 import by.leonovich.hibernatecrm.TestConstants;
+import by.leonovich.hibernatecrm.TestDaoConfiguration;
 import by.leonovich.hibernatecrm.mappings.annotation.Author;
 import by.leonovich.hibernatecrm.mappings.annotation.Portfolio;
 import by.leonovich.hibernatecrm.common.collection.MagicList;
@@ -12,8 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
@@ -26,7 +29,9 @@ import java.util.Objects;
  * @version 1.0
  */
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations= "classpath:DaoContext.xml")
+@ContextConfiguration(classes = {TestDaoConfiguration.class})
+@Transactional
+@Commit
 class PortfolioDaoTest implements BaseDaoTest<Portfolio> {
     private static final Logger LOG = LoggerFactory.getLogger(PortfolioDaoTest.class);
     private static final MagicList<Portfolio> portfolios = new MagicList<>();

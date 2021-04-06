@@ -25,14 +25,16 @@ import java.util.stream.Stream;
  * @version 1.0
  */
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Meeting implements Serializable, Automated {
+    @EqualsAndHashCode.Include
     private Long id;
+    @EqualsAndHashCode.Include
     private String subject;
+    @EqualsAndHashCode.Include
     private LocalDateTime meetingDate;
-    @EqualsAndHashCode.Exclude
     private Boolean expired;
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Set<Employee> employees = new HashSet<>(); /* MANY-TO-MANY relation */
 
     @Override

@@ -21,16 +21,24 @@ import java.util.stream.Stream;
  * @version 1.0
  */
 @Data
+@ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class University implements Serializable, Automated {
+    @EqualsAndHashCode.Include
     private Long id;
     private String name;
-
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Set<Student> students = new HashSet<>(); /* ONE-TO-MANY relation */
 
+    /**
+     * TODO: rewrite it, avoid temp collection
+     */
     public boolean expelStudent(Student student) {
-        return students.remove(student);
+        Set<Student> temp = new HashSet<>(students);
+        boolean result = temp.remove(student);
+        student.setUniversity(null);
+        setStudents(temp);
+        return result;
     }
 
     @Override

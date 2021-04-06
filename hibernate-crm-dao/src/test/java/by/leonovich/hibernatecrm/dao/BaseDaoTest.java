@@ -9,13 +9,14 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.test.annotation.Commit;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
@@ -32,10 +33,12 @@ import static by.leonovich.hibernatecrm.TestConstants.LIMIT;
  * @author alexanderleonovich
  * @version 1.0
  */
+@Transactional
+@Commit
 public interface BaseDaoTest<T extends Automated> {
     Logger LOG = LoggerFactory.getLogger(BaseDaoTest.class);
 
-    @PostConstruct
+    @BeforeEach
     @SneakyThrows
     default void postConstruct() {
         if (CollectionUtils.isEmpty(entities())) {
@@ -48,11 +51,6 @@ public interface BaseDaoTest<T extends Automated> {
                 dao().save(obj);
             }
         }
-    }
-
-    @AfterEach
-    default void tearDown() {
-        dao().hibernate().closeSession();
     }
 
     @Test

@@ -19,7 +19,9 @@ import java.util.Optional;
  *
  * @author alexanderleonovich
  * @version 1.0
+ * @deprecated Replaced by Spring JPA
  */
+@Deprecated
 public class HibernateUtil {
     private static final Logger LOG = LoggerFactory.getLogger(HibernateUtil.class);
     private final SessionFactory factory;

@@ -1,6 +1,7 @@
 package by.leonovich.hibernatecrm.dao.document;
 
 import by.leonovich.hibernatecrm.TestConstants;
+import by.leonovich.hibernatecrm.TestDaoConfiguration;
 import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.dao.BaseDaoTest;
 import by.leonovich.hibernatecrm.dao.Dao;
@@ -14,8 +15,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,7 +33,9 @@ import java.util.stream.Collectors;
  * @version 1.0
  */
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations= "classpath:DaoContext.xml")
+@ContextConfiguration(classes = {TestDaoConfiguration.class})
+@Transactional
+@Commit
 class DocumentDaoTest implements BaseDaoTest<Document> {
     private static final Logger LOG = LoggerFactory.getLogger(DocumentDaoTest.class);
     private static final MagicList<Document> documents = new MagicList<>();

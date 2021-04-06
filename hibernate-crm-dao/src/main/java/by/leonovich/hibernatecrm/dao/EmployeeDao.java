@@ -5,6 +5,7 @@ import by.leonovich.hibernatecrm.mappings.singletable.Employee;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -19,12 +20,12 @@ import java.util.List;
  * @author alexanderleonovich
  * @version 1.0
  */
+@Repository
 public class EmployeeDao extends BaseDao<Employee> {
 
     public Employee getHighestPaidEmployee() throws DaoException {
         try {
-            Session session = hibernate.getSession();
-            transaction = session.beginTransaction();
+            Session session = session();
 
             CriteriaBuilder cBuilder = session.getCriteriaBuilder();
             CriteriaQuery<Employee> cQuery = cBuilder.createQuery(Employee.class);
@@ -34,19 +35,15 @@ public class EmployeeDao extends BaseDao<Employee> {
             cQuery.select(rootEntry);
             Query<Employee> query = session.createQuery(cQuery);
             query.setMaxResults(1);
-            Employee result = query.getSingleResult();
-            transaction.commit();
-            return result;
+            return query.getSingleResult();
         } catch (HibernateException e) {
-            transaction.rollback();
             throw new DaoException(e);
         }
     }
 
     public List<Employee> getEmployeesOrderedBySalary() throws DaoException {
         try {
-            Session session = hibernate.getSession();
-            transaction = session.beginTransaction();
+            Session session = session();
 
             CriteriaBuilder cBuilder = session.getCriteriaBuilder();
             CriteriaQuery<Employee> cQuery = cBuilder.createQuery(Employee.class);
@@ -55,11 +52,8 @@ public class EmployeeDao extends BaseDao<Employee> {
 
             cQuery.select(rootEntry);
             Query<Employee> query = session.createQuery(cQuery);
-            List<Employee> result = query.getResultList();
-            transaction.commit();
-            return result;
+            return query.getResultList();
         } catch (HibernateException e) {
-            transaction.rollback();
             throw new DaoException(e);
         }
     }
