@@ -100,11 +100,5 @@
 
     <build>
         <finalName>hibernate-crm-service</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-            </plugin>
-        </plugins>
     </build>
 </project>

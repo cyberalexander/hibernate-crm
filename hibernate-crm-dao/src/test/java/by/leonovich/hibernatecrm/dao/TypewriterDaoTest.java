@@ -83,7 +83,6 @@ class TypewriterDaoTest implements BaseDaoTest<Typewriter> {
 
     //@Test TODO fix this test
     @SneakyThrows
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testDeleteCascade() {
         Typewriter typewriter = Typewriter.initWithOneToOne();
         dao().save(typewriter);

@@ -65,7 +65,6 @@ class EmployeeDaoTest implements BaseDaoTest<Employee> {
 
     @Test
     @SneakyThrows
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testSaveOrUpdate_SaveCascade() {
         Employee emp = Employee.initWithManyToMany();
         Set<Meeting> newMeetings = emp.getMeetings();

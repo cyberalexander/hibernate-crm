@@ -212,7 +212,6 @@ class AuthorDaoTest implements BaseDaoTest<Author> {
 
     @Test
     @SneakyThrows
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testGetAuthorByNameCriteria() {
         Author author = entities().randomEntity();
         List<Author> sameNameAuthors = ((AuthorDao) dao()).getAuthorByNameCriteria(author.getName());
@@ -225,7 +224,6 @@ class AuthorDaoTest implements BaseDaoTest<Author> {
 
     @Test
     @SneakyThrows
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testGetAuthorByNameHql() {
         Author author = entities().randomEntity();
         List<Author> sameNameAuthors = ((AuthorDao) dao()).getAuthorByNameHql(author.getName());

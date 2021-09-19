@@ -73,7 +73,6 @@ class StudentDaoTest implements BaseDaoTest<Student> {
 
     @Test
     @SneakyThrows
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testDeleteCascade() {
         Student toDelete = Student.initWithManyToOne();
         dao().saveOrUpdate(toDelete);

@@ -22,7 +22,7 @@
     <properties>
         <!-- ========= Project properties ========= -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jdk.version>15</jdk.version>
+        <java.version>15</java.version>
 
         <!-- ========= Plugins versions ========= -->
         <surefire.plugin.version>2.22.2</surefire.plugin.version>
@@ -52,6 +52,7 @@
         <mockito.core.version>2.21.0</mockito.core.version>
         <mockito.version>2.0.2-beta</mockito.version>
         <mockito.junit.jupiter.version>2.23.0</mockito.junit.jupiter.version>
+        <maven.compiler.target>15</maven.compiler.target>
     </properties>
 
     <dependencyManagement>
@@ -259,8 +260,8 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${compiler-plugin.version}</version>
                     <configuration>
-                        <source>${jdk.version}</source>
-                        <target>${jdk.version}</target>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -332,14 +333,9 @@
                     <version>${pmd.plugin.verion}</version>
                     <configuration>
                         <rulesets>
-                            <!-- A rule set, that comes bundled with PMD -->
-                            <ruleset>/category/java/bestpractices.xml</ruleset>
-                            <ruleset>/rulesets/java/maven-pmd-plugin-default.xml</ruleset>
+                            <ruleset>${settings.localRepository}/pmd-ruleset.xml</ruleset>
                         </rulesets>
-                        <!--<excludes>
-                            <exclude>/</exclude>
-                        </excludes>-->
-                        <targetJdk>${jdk.version}</targetJdk>
+                        <targetJdk>${java.version}</targetJdk>
                         <includeTests>true</includeTests>
                         <outputEncoding>${project.build.sourceEncoding}</outputEncoding>
                         <linkXRef>false</linkXRef>

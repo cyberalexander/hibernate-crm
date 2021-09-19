@@ -154,7 +154,6 @@ class HibernateAbilitiesTest {
     }
 
     @Test
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testPersist() {
         Person random = testData.randomEntity();
         Session session = hibernate.openSession();
@@ -184,7 +183,6 @@ class HibernateAbilitiesTest {
      * and populating it's id with some value (like it was already stored in database)
      */
     @Test
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testPersistThrowException() {
         Person random = testData.randomEntity();
         Session session = hibernate.openSession();
@@ -204,7 +202,6 @@ class HibernateAbilitiesTest {
     }
 
     @Test
-    @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
     void testPersistThrowException2() {
         Person newPerson = new Person();
         newPerson.setId(new Random().nextLong());
