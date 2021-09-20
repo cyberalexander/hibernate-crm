@@ -17,8 +17,16 @@ public record TestConstants () {
         public static final String M_SAVE_CASCADE = "Related entity(ies) should be persisted is database as well.";
         public static final String M_SAVE_OR_UPDATE_SAVE = "Saved entity should be equal to : %s";
         public static final String M_SAVE_OR_UPDATE_UPDATE = "Updated entity should be equal to : %s";
-        public static final String M_SAVE_OR_UPDATE_SAVE_CASCADE = "Related Entity(ies) %s expected to be persisted in database along with current entity %s";
-        public static final String M_SAVE_OR_UPDATE_UPDATED_CASCADE = "Related Entity(ies) %s expected to be updated in database after %s update operation execution.";
+        public static final String M_SAVE_OR_UPDATE_SAVE_CASCADE =
+        """
+        Related Entity(ies) %s expected to be persisted
+         in database along with current entity %s
+        """;
+        public static final String M_SAVE_OR_UPDATE_UPDATED_CASCADE =
+        """
+        Related Entity(ies) %s expected to be updated
+         in database after %s update operation execution.
+        """;
         public static final String M_GET = "Cannot GET %s by Id : %s";
         public static final String M_GET_NOT_EXISTS = "There should not be any record in database for Id : %s";
         public static final String M_LOAD = "Cannot LOAD %s by Id : %s";
