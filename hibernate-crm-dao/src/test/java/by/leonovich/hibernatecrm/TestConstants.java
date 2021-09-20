@@ -8,7 +8,7 @@ package by.leonovich.hibernatecrm;
  * @author alexanderleonovich
  * @version 1.0
  */
-public class TestConstants {
+public record TestConstants () {
         public static final int MAIN_LIMIT = 10;
         public static final int LIMIT = 5;
 

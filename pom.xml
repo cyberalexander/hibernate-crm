@@ -23,12 +23,13 @@
         <!-- ========= Project properties ========= -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>15</java.version>
+        <maven.compiler.target>15</maven.compiler.target>
 
         <!-- ========= Plugins versions ========= -->
         <surefire.plugin.version>2.22.2</surefire.plugin.version>
         <failsafe.plugin.version>2.22.2</failsafe.plugin.version>
         <compiler-plugin.version>3.8.0</compiler-plugin.version>
-        <pmd.plugin.verion>3.14.0</pmd.plugin.verion>
+        <pmd.plugin.verion>3.15.0</pmd.plugin.verion>
 
         <!-- ========= Dependencies versions ========= -->
         <javax.persistence.version>2.2</javax.persistence.version>
@@ -52,7 +53,6 @@
         <mockito.core.version>2.21.0</mockito.core.version>
         <mockito.version>2.0.2-beta</mockito.version>
         <mockito.junit.jupiter.version>2.23.0</mockito.junit.jupiter.version>
-        <maven.compiler.target>15</maven.compiler.target>
     </properties>
 
     <dependencyManagement>
@@ -262,6 +262,11 @@
                     <configuration>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
+                        <compilerArgs>--enable-preview</compilerArgs>
+                        <fork>true</fork>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <showDeprecation>true</showDeprecation>
+                        <showWarnings>true</showWarnings>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -275,6 +280,9 @@
                             <version>${junit.version}</version>
                         </dependency>
                     </dependencies>
+                    <configuration>
+                        <argLine>--enable-preview</argLine>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
