@@ -27,9 +27,18 @@
         <java.version>16</java.version>
 
         <!-- ========= Plugins versions ========= -->
+        <clean.plugin.version>3.1.0</clean.plugin.version>
+        <resource.plugin.version>3.1.0</resource.plugin.version>
+        <jar.plugin.version>3.2.0</jar.plugin.version>
+        <install.plugin.version>2.5.2</install.plugin.version>
+        <deploy.plugin.version>2.8.2</deploy.plugin.version>
+        <site.plugin.version>3.7.1</site.plugin.version>
+        <project.info.reports.plugin.version>3.1.0</project.info.reports.plugin.version>
+        <dependency.plugin.version>3.1.2</dependency.plugin.version>
         <surefire.plugin.version>2.22.2</surefire.plugin.version>
         <failsafe.plugin.version>2.22.2</failsafe.plugin.version>
         <compiler-plugin.version>3.8.0</compiler-plugin.version>
+        <checkstyle.plugin.version>3.1.2</checkstyle.plugin.version>
         <pmd.plugin.verion>3.15.0</pmd.plugin.verion>
 
         <!-- ========= Dependencies versions ========= -->
@@ -54,6 +63,7 @@
         <mockito.core.version>2.21.0</mockito.core.version>
         <mockito.version>2.0.2-beta</mockito.version>
         <mockito.junit.jupiter.version>2.23.0</mockito.junit.jupiter.version>
+        <checkstyle.version>9.0</checkstyle.version>
     </properties>
 
     <dependencyManagement>
@@ -240,21 +250,39 @@
                 <version>${mockito.junit.jupiter.version}</version>
                 <scope>test</scope>
             </dependency>
+            <!-- https://mvnrepository.com/artifact/com.puppycrawl.tools/checkstyle -->
+            <dependency>
+                <groupId>com.puppycrawl.tools</groupId>
+                <artifactId>checkstyle</artifactId>
+                <version>${checkstyle.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <profiles>
+        <profile>
+            <id>dev-build</id>
+            <properties>
+                <checkstyle.skip>true</checkstyle.skip>
+                <pmd.skip>true</pmd.skip>
+            </properties>
+        </profile>
+    </profiles>
 
     <build>
         <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
             <plugins>
                 <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>${clean.plugin.version}</version>
                 </plugin>
                 <!-- default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>${resource.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -319,8 +347,9 @@
                     <version>${failsafe.plugin.version}</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>${jar.plugin.version}</version>
                     <configuration>
                         <archive>
                             <manifest>
@@ -328,30 +357,37 @@
                                 <addClasspath>true</addClasspath>
                                 <classpathPrefix>lib/</classpathPrefix>
                             </manifest>
+                            <manifestEntries>
+                                <Built-By>Apache Maven</Built-By>
+                            </manifestEntries>
                         </archive>
                     </configuration>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>2.5.2</version>
+                    <version>${install.plugin.version}</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
+                    <version>${deploy.plugin.version}</version>
                 </plugin>
                 <!-- site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.7.1</version>
+                    <version>${site.plugin.version}</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>${project.info.reports.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>2.10</version>
+                    <version>${dependency.plugin.version}</version>
                     <executions>
                         <execution>
                             <phase>install</phase>
@@ -366,16 +402,42 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${checkstyle.plugin.version}</version>
+                    <configuration>
+                        <configLocation>src/main/resources/checkstyle.xml</configLocation>
+                        <consoleOutput>true</consoleOutput>
+                        <includeTests>true</includeTests>
+                        <linkXRef>false</linkXRef>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>${checkstyle.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <id>validate</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
                     <version>${pmd.plugin.verion}</version>
                     <configuration>
-                        <rulesets>
-                            <ruleset>${settings.localRepository}/pmd-ruleset.xml</ruleset>
-                        </rulesets>
+                        <rulesetsTargetDirectory>src/main/resources/**</rulesetsTargetDirectory>
                         <targetJdk>${java.version}</targetJdk>
                         <includeTests>true</includeTests>
                         <outputEncoding>${project.build.sourceEncoding}</outputEncoding>
                         <linkXRef>false</linkXRef>
+                        <printFailingErrors>true</printFailingErrors>
                     </configuration>
                     <executions>
                         <execution>
