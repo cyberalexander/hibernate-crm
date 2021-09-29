@@ -22,7 +22,10 @@ public interface Automated {
     <T> T populate();
 
     /**
-     * Default realization throws an exception cause not every entity might have relations (one-to-one, one-to-many etc.)
+     * Default realization throws an exception cause not every entity
+     * might have relations (one-to-one, one-to-many etc.)
+     * @param <T> Any object
+     * @return The reference to the same object, who called method
      */
     default <T> T populateCascade() {
         throw new UnsupportedOperationException();
@@ -31,7 +34,10 @@ public interface Automated {
     <T> T modify();
 
     /**
-     * Default realization throws an exception cause not every entity might have relations (one-to-one, one-to-many etc.)
+     * Default realization throws an exception cause not every entity
+     * might have relations (one-to-one, one-to-many etc.)
+     * @param <T> Any object
+     * @return the reference to the same object, who called method
      */
     default <T> T modifyCascade() {
         throw new UnsupportedOperationException();
@@ -40,6 +46,7 @@ public interface Automated {
     /**
      * Method created for unit-tests to simplify entity id increment operation, to test
      * cases of loading/getting entity by id, which is not exists in database yet.
+     * @return Incremented by any number value
      */
     Serializable incrementIdAndGet();
 

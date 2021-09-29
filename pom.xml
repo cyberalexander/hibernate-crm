@@ -405,7 +405,6 @@
                     <artifactId>maven-checkstyle-plugin</artifactId>
                     <version>${checkstyle.plugin.version}</version>
                     <configuration>
-                        <configLocation>src/main/resources/checkstyle.xml</configLocation>
                         <consoleOutput>true</consoleOutput>
                         <includeTests>true</includeTests>
                         <linkXRef>false</linkXRef>
@@ -419,11 +418,26 @@
                     </dependencies>
                     <executions>
                         <execution>
-                            <id>validate</id>
+                            <id>oob-checks</id>
                             <phase>validate</phase>
                             <goals>
                                 <goal>check</goal>
                             </goals>
+                            <configuration>
+                                <failOnViolation>true</failOnViolation>
+                                <suppressionsLocation>src/main/resources/checkstyle_suppressions.xml</suppressionsLocation>
+                                <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>check-custom-checks</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                            <configuration>
+                                <configLocation>src/main/resources/custom_checkstyle.xml</configLocation>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>

@@ -10,13 +10,19 @@ import java.util.Random;
  * @author alexanderleonovich
  * @version 1.0
  */
-public class Enums {
+public final class Enums {
+
+    /**
+     * CheckStyle.HideUtilityClassConstructor: Utility classes should not have a public or default constructor.
+     */
+    private Enums() {
+    }
 
     public static <T extends Enum<T>> T random(Class<T> enumClass) {
         return random(enumClass.getEnumConstants());
     }
 
-    public static <T> T random(T ... values) {
+    public static <T> T random(T... values) {
         return values[new Random().nextInt(values.length)];
     }
 }
