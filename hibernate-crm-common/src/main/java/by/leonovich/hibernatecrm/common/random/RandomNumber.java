@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
 import static by.leonovich.hibernatecrm.common.Constants.ONE_HUNDRED;
+import static by.leonovich.hibernatecrm.common.Constants.TEN_MILLION;
 
 /**
  * Created : 09/12/2020 22:28
@@ -19,7 +20,7 @@ import static by.leonovich.hibernatecrm.common.Constants.ONE_HUNDRED;
  */
 public enum RandomNumber {
     DEFAULT_I(() -> new Random().nextInt(ONE_HUNDRED - 1) + 1),
-    DEFAULT_L(() -> ThreadLocalRandom.current().nextLong(10000000L, 1000000000L)),
+    DEFAULT_L(() -> ThreadLocalRandom.current().nextLong(TEN_MILLION, 1000000000L)),
     DAYS(() -> ThreadLocalRandom.current().nextLong(10, 1000)),
     MARK(() -> Double.valueOf(String.format("%.1f", 1 + (101 - 1) * new Random().nextDouble()))),
     SALARY(() ->

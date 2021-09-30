@@ -13,4 +13,5 @@ public record Constants () {
     public static final String UPDATE_CASCADE_PREFIX = "_UPD_CASCADE_";
 
     public static final int ONE_HUNDRED = 100;
+    public static final long TEN_MILLION = 10000000L;
 }
