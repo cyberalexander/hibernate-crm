@@ -11,4 +11,6 @@ package by.leonovich.hibernatecrm.common;
 public record Constants () {
     public static final String UPDATE_PREFIX = "_UPD_";
     public static final String UPDATE_CASCADE_PREFIX = "_UPD_CASCADE_";
+
+    public static final int ONE_HUNDRED = 100;
 }
