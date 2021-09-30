@@ -85,8 +85,8 @@ public class Book implements Automated {
     public <T> T populateCascade() {
         populate();
         setLibrary(Library.init());
-        setAuthors(Stream.generate(Author::init).limit(2).collect(Collectors.toSet()));
-        getAuthors().forEach(a -> a.setBooks(Collections.singleton(this)));
+        setAuthors(Set.of(Author.init(), Author.init(), Author.init()));
+        getAuthors().forEach(a -> a.setBooks(Set.of(this)));
         return (T) this;
     }
 

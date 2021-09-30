@@ -9,7 +9,6 @@ import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -53,11 +52,14 @@ public class HibernateUtil {
     }
 
     public void closeSession() {
-        if (Objects.nonNull(session) && session.get().isOpen()) {
-            session.get().close();
-            LOG.info("Session {} closed!", session.get());
-        } else {
-            LOG.info("Session {} was already closed!", session.get());
-        }
+        Optional.ofNullable(session.get()).ifPresentOrElse(
+            s -> {
+                if (s.isOpen()) {
+                    s.close();
+                    LOG.info("Session {} closed!", s);
+                }
+            },
+            () -> LOG.info("Session {} was already closed!", session.get())
+        );
     }
 }

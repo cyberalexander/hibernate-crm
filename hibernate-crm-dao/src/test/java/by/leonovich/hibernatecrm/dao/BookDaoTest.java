@@ -91,7 +91,7 @@ class BookDaoTest implements BaseDaoTest<Book> {
         MatcherAssert.assertThat(
             String.format(TestConstants.M_SAVE_OR_UPDATE_SAVE_CASCADE, book.getAuthors(), book),
             dao().get(book.getId()).getAuthors().size(),
-            Matchers.is(2)
+            Matchers.is(3)
         );
     }
 

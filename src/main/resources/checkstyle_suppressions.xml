@@ -3,7 +3,7 @@
         "-//Checkstyle//DTD SuppressionFilter Configuration 1.0//EN"
         "https://checkstyle.org/dtds/suppressions_1_0.dtd">
 <suppressions>
-    <!-- LineLength overridden and customized in custom_checkstyle.xml -->
+    <!-- LineLength overridden from google_checks.xml and suppressed in custom_checkstyle.xml -->
     <suppress files="." checks="LineLength"/>
 
     <suppress files="." checks="JavadocVariable"/>
