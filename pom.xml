@@ -406,7 +406,6 @@
                     <version>${checkstyle.plugin.version}</version>
                     <configuration>
                         <consoleOutput>true</consoleOutput>
-                        <includeTests>true</includeTests>
                         <linkXRef>false</linkXRef>
                     </configuration>
                     <dependencies>
@@ -446,7 +445,7 @@
                     <artifactId>maven-pmd-plugin</artifactId>
                     <version>${pmd.plugin.verion}</version>
                     <configuration>
-                        <rulesetsTargetDirectory>src/main/resources/**</rulesetsTargetDirectory>
+                        <rulesetsTargetDirectory>src/main/resources/</rulesetsTargetDirectory>
                         <targetJdk>${java.version}</targetJdk>
                         <includeTests>true</includeTests>
                         <outputEncoding>${project.build.sourceEncoding}</outputEncoding>
