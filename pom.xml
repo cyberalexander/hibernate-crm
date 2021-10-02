@@ -17,7 +17,14 @@
     <name>hibernate-crm</name>
     <packaging>pom</packaging>
 
-    <url>http://maven.apache.org</url>
+    <url>https://github.com/cyberalexander/hibernate-crm</url>
+    <licenses>
+        <license>
+            <name>${project.licence}</name>
+            <url>${project.licence.url}</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <properties>
         <!-- ========= Project properties ========= -->
@@ -25,6 +32,8 @@
         <maven.compiler.source>16</maven.compiler.source>
         <maven.compiler.target>16</maven.compiler.target>
         <java.version>16</java.version>
+        <license>MIT License</license>
+        <license.url>https://github.com/cyberalexander/hibernate-crm/blob/master/license.txt</license.url>
 
         <!-- ========= Plugins versions ========= -->
         <clean.plugin.version>3.1.0</clean.plugin.version>
