@@ -3,6 +3,9 @@ package by.leonovich.hibernatecrm.common.random;
 import java.util.Random;
 import java.util.function.Supplier;
 
+import static by.leonovich.hibernatecrm.common.Constants.Numbers;
+
+
 /**
  * Created : 09/12/2020 22:02
  * Project : hibernate-crm
@@ -12,31 +15,31 @@ import java.util.function.Supplier;
  * @version 1.0
  */
 public enum RandomString {
-    DEFAULT(() -> generate(new Random().nextInt(8 - 2) + 2)),
+    DEFAULT(() -> generate(new Random().nextInt(Numbers.EIGHT - 2) + 2)),
     NAME(() -> {
-        int nameLength = new Random().nextInt(6 - 2) + 2;
+        int nameLength = new Random().nextInt(Numbers.SIX - 2) + 2;
         return generate(nameLength);
     }),
     SURNAME(() -> {
-        int nameLength = new Random().nextInt(8 - 3) + 3;
+        int nameLength = new Random().nextInt(Numbers.EIGHT - Numbers.THREE) + Numbers.THREE;
         return generate(nameLength);
     }),
     COMPANY(() -> {
-        int nameLength = new Random().nextInt(12-3) + 3;
+        int nameLength = new Random().nextInt(Numbers.TWELVE - Numbers.THREE) + Numbers.THREE;
         return generate(nameLength);
     }),
     FACULTY(() -> {
-        int nameLength = new Random().nextInt(10-3) + 3;
+        int nameLength = new Random().nextInt(Numbers.TEN - Numbers.THREE) + Numbers.THREE;
         return generate(nameLength);
     }),
-    DOCUMENT_NUMBER(() -> generateDocNumber(10)),
-    PASSPORT_NUMBER(() -> generateDocNumber(6)),
+    DOCUMENT_NUMBER(() -> generateDocNumber(Numbers.TEN)),
+    PASSPORT_NUMBER(() -> generateDocNumber(Numbers.SIX)),
     ISSUED_BY(() -> {
-        int issuedByLength = new Random().nextInt(15-4) + 4;
+        int issuedByLength = new Random().nextInt(Numbers.FIFTEEN - Numbers.FOUR) + Numbers.FOUR;
         return generate(issuedByLength);
     }),
     MANUFACTURER(() -> {
-        int manufacturerLength = new Random().nextInt(10-2) + 2;
+        int manufacturerLength = new Random().nextInt(Numbers.TEN - 2) + 2;
         return generate(manufacturerLength);
     });
 

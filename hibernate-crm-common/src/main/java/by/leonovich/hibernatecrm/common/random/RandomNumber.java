@@ -7,8 +7,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
-import static by.leonovich.hibernatecrm.common.Constants.ONE_HUNDRED;
-import static by.leonovich.hibernatecrm.common.Constants.TEN_MILLION;
+import static by.leonovich.hibernatecrm.common.Constants.Numbers;
 
 /**
  * Created : 09/12/2020 22:28
@@ -19,16 +18,18 @@ import static by.leonovich.hibernatecrm.common.Constants.TEN_MILLION;
  * @version 1.0
  */
 public enum RandomNumber {
-    DEFAULT_I(() -> new Random().nextInt(ONE_HUNDRED - 1) + 1),
-    DEFAULT_L(() -> ThreadLocalRandom.current().nextLong(TEN_MILLION, 1000000000L)),
-    DAYS(() -> ThreadLocalRandom.current().nextLong(10, 1000)),
-    MARK(() -> Double.valueOf(String.format("%.1f", 1 + (101 - 1) * new Random().nextDouble()))),
+    DEFAULT_I(() -> new Random().nextInt(Numbers.ONE_HUNDRED - 1) + 1),
+    DEFAULT_L(() -> ThreadLocalRandom.current().nextLong(Numbers.TEN_MILLION, Numbers.ONE_BILLION)),
+    DAYS(() -> ThreadLocalRandom.current().nextLong(Numbers.TEN, Numbers.ONE_THOUSAND)),
+    MARK(() -> Double.valueOf(String.format("%.1f", 1 + (Numbers.ONE_HUNDRED_ONE - 1) * new Random().nextDouble()))),
     SALARY(() ->
-        BigDecimal.valueOf(100 + (100000 - 100) * new Random().nextDouble()).setScale(4, RoundingMode.CEILING)
+        BigDecimal.valueOf(
+            Numbers.ONE_HUNDRED + (Numbers.ONE_HUNDRED_THOUSAND - Numbers.ONE_HUNDRED) * new Random().nextDouble()
+        ).setScale(Numbers.FOUR, RoundingMode.CEILING)
     ),
-    ENGINE_VOLUME(() -> ThreadLocalRandom.current().nextDouble(10) * 5),
-    BATTERY_CAPACITY(() -> ThreadLocalRandom.current().nextInt(10) * 5),
-    PASSENGERS_COUNT(() -> new Random().nextInt(8 - 2) + 2);
+    ENGINE_VOLUME(() -> ThreadLocalRandom.current().nextDouble(Numbers.TEN) * Numbers.FIVE),
+    BATTERY_CAPACITY(() -> ThreadLocalRandom.current().nextInt(Numbers.TEN) * Numbers.FIVE),
+    PASSENGERS_COUNT(() -> new Random().nextInt(Numbers.EIGHT - 2) + 2);
 
     private final Supplier<? extends Serializable> supplier;
 

@@ -18,5 +18,4 @@
     <suppress files="." checks="HiddenField"/>
     <suppress files="." checks="ConstantName"/>
     <suppress files="." checks="WhitespaceAround"/>
-    <suppress files="." checks="MagicNumber"/>
 </suppressions>
