@@ -1,4 +1,4 @@
-package by.leonovich.hibernatecrm.demo;
+package by.leonovich.hibernatecrm.sandbox;
 
 import lombok.extern.slf4j.Slf4j;
 
