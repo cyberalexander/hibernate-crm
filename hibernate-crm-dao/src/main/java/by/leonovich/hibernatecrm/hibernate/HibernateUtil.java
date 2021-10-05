@@ -29,7 +29,6 @@ public class HibernateUtil {
     private HibernateUtil() {
         try {
             Configuration config = new Configuration().configure();
-            config.setPhysicalNamingStrategy(new CustomPhysicalNamingStrategy());
             factory = config.buildSessionFactory();
             LOG.trace("SessionFactory initialized : {}", factory);
         } catch (Exception e) {
