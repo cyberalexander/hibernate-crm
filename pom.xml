@@ -87,8 +87,8 @@
         <aspectj.version>1.9.6</aspectj.version>
         <mysql.connector.version>8.0.17</mysql.connector.version>
         <h2.database.version>1.4.200</h2.database.version>
-        <log4j.version>1.2.17</log4j.version>
-        <slf4j.version>1.7.30</slf4j.version>
+        <log4j.version>2.14.1</log4j.version>
+        <slf4j.version>2.0.0-alpha1</slf4j.version>
         <guava.version>29.0-jre</guava.version>
         <reflections.version>0.9.12</reflections.version>
         <apache.commons.version>4.4</apache.commons.version>
@@ -121,6 +121,7 @@
                 <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
+
             <!-- https://mvnrepository.com/artifact/org.hamcrest/hamcrest-all -->
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -128,6 +129,7 @@
                 <version>${matchers.version}</version>
                 <scope>test</scope>
             </dependency>
+
             <!-- https://mvnrepository.com/artifact/org.llorllale/cactoos-matchers -->
             <dependency>
                 <groupId>org.llorllale</groupId>
@@ -135,38 +137,32 @@
                 <version>${cactoos.version}</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>log4j</groupId>
+
+            <dependency> <!--Log4j implementation for slf4j-->
+                <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>${log4j.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.sun.jdmk</groupId>
-                        <artifactId>jmxtools</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.sun.jmx</groupId>
-                        <artifactId>jmxri</artifactId>
-                    </exclusion>
-                </exclusions>
+                <type>pom</type>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12 -->
-            <dependency>
+            <dependency> <!--Facade for logging systems-->
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
+
             <!-- https://mvnrepository.com/artifact/javax.persistence/javax.persistence-api -->
             <dependency>
                 <groupId>javax.persistence</groupId>
                 <artifactId>javax.persistence-api</artifactId>
                 <version>${javax.persistence.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
                 <version>${hibernate.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-entitymanager</artifactId>
