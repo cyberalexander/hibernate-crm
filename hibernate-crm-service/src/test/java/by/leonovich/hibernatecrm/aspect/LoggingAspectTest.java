@@ -5,8 +5,6 @@ import by.leonovich.hibernatecrm.mappings.singletable.Person;
 import by.leonovich.hibernatecrm.service.person.PersonService;
 import lombok.SneakyThrows;
 import nl.altindag.log.LogCaptor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -26,7 +24,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {ServiceConfiguration.class})
 class LoggingAspectTest {
-    private static final Logger LOG = LogManager.getLogger(LoggingAspectTest.class);
 
     @Autowired
     private PersonService<Person> personService;
@@ -35,12 +32,12 @@ class LoggingAspectTest {
     @SneakyThrows
     void testAroundAspect() {
         LogCaptor captor = LogCaptor.forClass(LoggingAspect.class);
-        Person person = Person.init();
-        personService.create(person);
-        LOG.info("s : {}", captor);
+
+        personService.create(Person.init());
+
         MatcherAssert.assertThat(
-            "",
-            captor.getWarnLogs().stream().anyMatch(log -> log.startsWith("Exec time : ")),
+            "Test that 'LoggingAspect' was invoked and written information to logs",
+            captor.getWarnLogs().stream().anyMatch(log -> log.startsWith("PersonServiceImpl#create exec time : ")),
             Matchers.is(Boolean.TRUE)
         );
     }
