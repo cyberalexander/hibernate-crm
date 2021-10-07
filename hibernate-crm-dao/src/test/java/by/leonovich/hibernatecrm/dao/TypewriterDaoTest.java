@@ -2,17 +2,15 @@ package by.leonovich.hibernatecrm.dao;
 
 import by.leonovich.hibernatecrm.TestConstants;
 import by.leonovich.hibernatecrm.TestDaoConfiguration;
+import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.mappings.annotation.Author;
 import by.leonovich.hibernatecrm.mappings.annotation.Typewriter;
-import by.leonovich.hibernatecrm.common.collection.MagicList;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
@@ -35,7 +33,6 @@ import java.util.Objects;
 @Transactional
 @Commit
 class TypewriterDaoTest implements BaseDaoTest<Typewriter> {
-    private static final Logger LOG = LoggerFactory.getLogger(TypewriterDaoTest.class);
     private static final MagicList<Typewriter> typewriters = new MagicList<>();
 
     @Autowired
@@ -46,7 +43,7 @@ class TypewriterDaoTest implements BaseDaoTest<Typewriter> {
     void testSaveCascade() {
         Typewriter typewriter = Typewriter.initWithOneToOne();
         dao().save(typewriter);
-        LOG.debug("Relation saved as well? {}", Objects.nonNull(typewriter.getAuthor().getId()));
+        log.debug("Relation saved as well? {}", Objects.nonNull(typewriter.getAuthor().getId()));
         MatcherAssert.assertThat(
             TestConstants.M_SAVE_CASCADE,
             dao().get(typewriter.getId()).getAuthor().getId(),

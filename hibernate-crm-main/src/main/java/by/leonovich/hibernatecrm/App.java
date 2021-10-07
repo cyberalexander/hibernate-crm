@@ -4,14 +4,14 @@ import by.leonovich.hibernatecrm.exception.HibernateCrmApplicationException;
 import by.leonovich.hibernatecrm.mappings.singletable.Person;
 import by.leonovich.hibernatecrm.service.exception.ServiceException;
 import by.leonovich.hibernatecrm.service.person.PersonServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.stream.Stream;
 
 public class App {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+    protected static final Logger log = LogManager.getLogger(App.class);
 
     public static void main( String[] args ) throws Exception {
         var context = new AnnotationConfigApplicationContext(ServiceConfiguration.class);
@@ -24,6 +24,6 @@ public class App {
             }
         });
 
-        personService.read().forEach(p -> LOGGER.info("{}", p));
+        personService.read().forEach(p -> log.info("{}", p));
     }
 }

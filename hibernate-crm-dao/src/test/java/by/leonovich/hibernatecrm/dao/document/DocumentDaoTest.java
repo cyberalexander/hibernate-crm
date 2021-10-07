@@ -12,8 +12,6 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
@@ -37,7 +35,6 @@ import java.util.stream.Collectors;
 @Transactional
 @Commit
 class DocumentDaoTest implements BaseDaoTest<Document> {
-    private static final Logger LOG = LoggerFactory.getLogger(DocumentDaoTest.class);
     private static final MagicList<Document> documents = new MagicList<>();
 
     @Autowired
@@ -49,9 +46,9 @@ class DocumentDaoTest implements BaseDaoTest<Document> {
         List<Document> expiresThisYear = dao().getAll(Document.class).stream()
             .filter(doc -> doc.getExpirationDate().getYear() == LocalDate.now().getYear())
             .collect(Collectors.toList());
-        LOG.info("Expected : {} : {}", expiresThisYear.size(), expiresThisYear);
+        log.info("Expected : {} : {}", expiresThisYear.size(), expiresThisYear);
         List<Document> queried = ((DocumentDao) dao()).getExpiringThisYearDocumentsCriteria();
-        LOG.info("Actual : {} : {}", queried.size(), queried);
+        log.info("Actual : {} : {}", queried.size(), queried);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_TEST_GET_EXPIRING_THIS_YEAR_DOCUMENTS, expiresThisYear.size(), queried.size()),
             queried,
@@ -65,9 +62,9 @@ class DocumentDaoTest implements BaseDaoTest<Document> {
         List<Document> expiresThisYear = dao().getAll(Document.class).stream()
             .filter(doc -> doc.getExpirationDate().getYear() == LocalDate.now().getYear())
             .collect(Collectors.toList());
-        LOG.info("Expected : {} : {}", expiresThisYear.size(), expiresThisYear);
+        log.info("Expected : {} : {}", expiresThisYear.size(), expiresThisYear);
         List<Document> queried = ((DocumentDao) dao()).getExpiringThisYearDocumentsHql();
-        LOG.info("Actual : {} : {}", queried.size(), queried);
+        log.info("Actual : {} : {}", queried.size(), queried);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_TEST_GET_EXPIRING_THIS_YEAR_DOCUMENTS, expiresThisYear.size(), queried.size()),
             queried,

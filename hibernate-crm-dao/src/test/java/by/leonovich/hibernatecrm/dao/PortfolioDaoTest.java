@@ -2,16 +2,14 @@ package by.leonovich.hibernatecrm.dao;
 
 import by.leonovich.hibernatecrm.TestConstants;
 import by.leonovich.hibernatecrm.TestDaoConfiguration;
+import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.mappings.annotation.Author;
 import by.leonovich.hibernatecrm.mappings.annotation.Portfolio;
-import by.leonovich.hibernatecrm.common.collection.MagicList;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
@@ -33,7 +31,6 @@ import java.util.Objects;
 @Transactional
 @Commit
 class PortfolioDaoTest implements BaseDaoTest<Portfolio> {
-    private static final Logger LOG = LoggerFactory.getLogger(PortfolioDaoTest.class);
     private static final MagicList<Portfolio> portfolios = new MagicList<>();
 
     @Autowired
@@ -46,7 +43,7 @@ class PortfolioDaoTest implements BaseDaoTest<Portfolio> {
     void testSaveCascade() {
         Portfolio p = Portfolio.initWithOneToOne();
         dao().save(p);
-        LOG.debug("Relation saved as well? {}", Objects.nonNull(p.getAuthor().getId()));
+        log.debug("Relation saved as well? {}", Objects.nonNull(p.getAuthor().getId()));
         MatcherAssert.assertThat(
             TestConstants.M_SAVE_CASCADE,
             dao().get(p.getId()).getAuthor().getId(),

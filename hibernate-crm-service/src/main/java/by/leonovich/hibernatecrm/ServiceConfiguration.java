@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @ComponentScan("by.leonovich.hibernatecrm")
-@EnableAspectJAutoProxy(proxyTargetClass = true)
+@EnableAspectJAutoProxy
 @Import(DaoConfiguration.class)
 public class ServiceConfiguration {
 }

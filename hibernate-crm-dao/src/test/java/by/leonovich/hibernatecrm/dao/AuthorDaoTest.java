@@ -12,8 +12,6 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
@@ -37,7 +35,6 @@ import java.util.Set;
 @Transactional
 @Commit
 class AuthorDaoTest implements BaseDaoTest<Author> {
-    private static final Logger LOG = LoggerFactory.getLogger(AuthorDaoTest.class);
     private static final MagicList<Author> authors = new MagicList<>();
 
     @Autowired
@@ -54,7 +51,7 @@ class AuthorDaoTest implements BaseDaoTest<Author> {
     void testSaveCascade_PortFolio() {
         Author a = Author.initCascade();
         dao().save(a);
-        LOG.debug("Relation saved as well? {}", Objects.nonNull(a.getPortfolio().getId()));
+        log.debug("Relation saved as well? {}", Objects.nonNull(a.getPortfolio().getId()));
         MatcherAssert.assertThat(
             TestConstants.M_SAVE_CASCADE,
             dao().get(a.getId()).getPortfolio().getId(),
@@ -67,7 +64,7 @@ class AuthorDaoTest implements BaseDaoTest<Author> {
     void testSaveCascade_TypeWriter() {
         Author a = Author.initCascade();
         dao().save(a);
-        LOG.debug("Relation saved as well? {}", Objects.nonNull(a.getTypewriter().getId()));
+        log.debug("Relation saved as well? {}", Objects.nonNull(a.getTypewriter().getId()));
         MatcherAssert.assertThat(
             TestConstants.M_SAVE_CASCADE,
             dao().get(a.getId()).getTypewriter().getId(),
@@ -80,7 +77,7 @@ class AuthorDaoTest implements BaseDaoTest<Author> {
     void testSaveCascade_Books() {
         Author a = Author.initCascade();
         dao().save(a);
-        LOG.debug("Relation saved as well? {}", Objects.nonNull(a.getBooks().iterator().next().getId()));
+        log.debug("Relation saved as well? {}", Objects.nonNull(a.getBooks().iterator().next().getId()));
         MatcherAssert.assertThat(
             TestConstants.M_SAVE_CASCADE,
             dao().get(a.getId()).getBooks().iterator().next().getId(),

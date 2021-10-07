@@ -11,8 +11,6 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
@@ -36,7 +34,6 @@ import java.util.Set;
 @Transactional
 @Commit
 class BookDaoTest implements BaseDaoTest<Book> {
-    private static final Logger LOG = LoggerFactory.getLogger(BookDaoTest.class);
     private static final MagicList<Book> books = new MagicList<>();
 
     @Autowired
@@ -49,7 +46,7 @@ class BookDaoTest implements BaseDaoTest<Book> {
     void testSaveCascade_Library() {
         Book book = Book.initCascade();
         dao().save(book);
-        LOG.debug("Relation saved as well? {}", Objects.nonNull(book.getLibrary().getId()));
+        log.debug("Relation saved as well? {}", Objects.nonNull(book.getLibrary().getId()));
         MatcherAssert.assertThat(
             TestConstants.M_SAVE_CASCADE,
             dao().get(book.getId()).getLibrary().getId(),
@@ -62,7 +59,7 @@ class BookDaoTest implements BaseDaoTest<Book> {
     void testSaveCascade_Authors() {
         Book book = Book.initCascade();
         dao().save(book);
-        LOG.debug("Relation saved as well? {}", Objects.nonNull(book.getAuthors().iterator().next().getId()));
+        log.debug("Relation saved as well? {}", Objects.nonNull(book.getAuthors().iterator().next().getId()));
         MatcherAssert.assertThat(
             TestConstants.M_SAVE_CASCADE,
             dao().get(book.getId()).getAuthors().iterator().next().getId(),

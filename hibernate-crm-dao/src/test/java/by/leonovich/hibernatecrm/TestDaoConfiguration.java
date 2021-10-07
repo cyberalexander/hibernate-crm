@@ -1,8 +1,8 @@
 package by.leonovich.hibernatecrm;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.h2.jdbcx.JdbcDataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +22,7 @@ import javax.sql.DataSource;
 @Configuration
 @Import(DaoConfiguration.class)
 public class TestDaoConfiguration {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(TestDaoConfiguration.class);
+    protected static final Logger log = LogManager.getLogger(TestDaoConfiguration.class);
 
     @Value("${test_database_driver_classname}")
     private String testDriverClassName;
@@ -35,7 +35,7 @@ public class TestDaoConfiguration {
 
     @Bean
     public DataSource dataSource() {
-        LOGGER.info("DRIVER : {}; URL : {}; USER : {}; PASSWORD : {}", testDriverClassName, testUrl, testUsername, testPassword);
+        log.info("DRIVER : {}; URL : {}; USER : {}; PASSWORD : {}", testDriverClassName, testUrl, testUsername, testPassword);
         JdbcDataSource dataSource = new JdbcDataSource();
         dataSource.setUrl(testUrl);
         dataSource.setUser(testUsername);

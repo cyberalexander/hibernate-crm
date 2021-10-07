@@ -14,8 +14,6 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
@@ -38,7 +36,6 @@ import java.util.Set;
 @Transactional
 @Commit
 class UniversityDaoTest implements BaseDaoTest<University> {
-    protected static final Logger LOG = LoggerFactory.getLogger(UniversityDaoTest.class);
     private static final MagicList<University> universities = new MagicList<>();
 
     @Autowired
@@ -51,7 +48,7 @@ class UniversityDaoTest implements BaseDaoTest<University> {
     void testSaveCascade() {
         University u = University.initWithOneToMany();
         dao().save(u);
-        LOG.debug("Relation saved as well? {}", Objects.nonNull(u.getStudents().iterator().next().getId()));
+        log.debug("Relation saved as well? {}", Objects.nonNull(u.getStudents().iterator().next().getId()));
         MatcherAssert.assertThat(
             TestConstants.M_SAVE_CASCADE,
             dao().get(u.getId()).getStudents().iterator().next().getId(),
@@ -114,7 +111,7 @@ class UniversityDaoTest implements BaseDaoTest<University> {
 
         Student orphan = u.getStudents().iterator().next();
         boolean removed = u.expelStudent(orphan);
-        LOG.debug("Student {} expelled from University {}? {}",orphan.getId(), u.getId(),  removed);
+        log.debug("Student {} expelled from University {}? {}",orphan.getId(), u.getId(),  removed);
         dao().saveOrUpdate(u);
 
         MatcherAssert.assertThat(String.format(TestConstants.M_DELETE_ORPHAN, orphan, u),

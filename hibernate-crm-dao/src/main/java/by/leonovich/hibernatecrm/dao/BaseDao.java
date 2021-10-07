@@ -2,12 +2,12 @@ package by.leonovich.hibernatecrm.dao;
 
 import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.exception.DaoException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -26,15 +26,15 @@ import java.util.List;
  * @version 1.0
  */
 public abstract class BaseDao<T> implements Dao<T> {
-    protected static final Logger LOG = LoggerFactory.getLogger(BaseDao.class);
+    protected static final Logger log = LogManager.getLogger(BaseDao.class);
     private SessionFactory hibernate;
 
     @Override
     public void persist(T entity) throws DaoException {
         try {
-            LOG.debug("Before persist {}", entity);
+            log.debug("Before persist {}", entity);
             session().persist(entity);
-            LOG.debug("After persist {}", entity);
+            log.debug("After persist {}", entity);
         } catch (HibernateException e) {
             throw new DaoException(e);
         }
@@ -43,9 +43,9 @@ public abstract class BaseDao<T> implements Dao<T> {
     @Override
     public Serializable save(T entity) throws DaoException {
         try {
-            LOG.debug("Before save {}", entity);
+            log.debug("Before save {}", entity);
             Serializable id = session().save(entity);
-            LOG.debug("After save {}", entity);
+            log.debug("After save {}", entity);
             return id;
         } catch (HibernateException e) {
             throw new DaoException(e);
@@ -55,9 +55,9 @@ public abstract class BaseDao<T> implements Dao<T> {
     @Override
     public void saveOrUpdate(T entity) throws DaoException {
         try {
-            LOG.debug("Before {}", entity);
+            log.debug("Before {}", entity);
             session().saveOrUpdate(entity);
-            LOG.debug("After {}", entity);
+            log.debug("After {}", entity);
         } catch (HibernateException e) {
             throw new DaoException(e);
         }
@@ -85,7 +85,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     public void delete(T entity) throws DaoException {
         try {
             session().delete(entity);
-            LOG.debug("Deleted : {}", entity);
+            log.debug("Deleted : {}", entity);
         } catch (HibernateException e) {
             throw new DaoException(e);
         }

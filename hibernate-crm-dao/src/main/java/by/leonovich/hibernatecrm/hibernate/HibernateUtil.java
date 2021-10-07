@@ -1,13 +1,13 @@
 package by.leonovich.hibernatecrm.hibernate;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.SharedSessionContract;
 import org.hibernate.cfg.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
@@ -22,7 +22,7 @@ import java.util.Optional;
  */
 @Deprecated
 public class HibernateUtil {
-    private static final Logger LOG = LoggerFactory.getLogger(HibernateUtil.class);
+    private static final Logger log = LogManager.getLogger(HibernateUtil.class);
     private final SessionFactory factory;
     private final ThreadLocal<Session> session = new ThreadLocal<>();
 
@@ -30,7 +30,7 @@ public class HibernateUtil {
         try {
             Configuration config = new Configuration().configure();
             factory = config.buildSessionFactory();
-            LOG.trace("SessionFactory initialized : {}", factory);
+            log.trace("SessionFactory initialized : {}", factory);
         } catch (Exception e) {
             throw new HibernateException("Hibernate Session Factory creation failed.", e);
             /*System.exit(0);*/
@@ -42,7 +42,7 @@ public class HibernateUtil {
             .filter(SharedSessionContract::isOpen)
             .orElseGet(() -> {
                 Session newSession = factory.openSession();
-                LOG.info("Session {} opened!", newSession);
+                log.info("Session {} opened!", newSession);
                 return newSession;
             });
         this.session.set(s);
@@ -55,10 +55,10 @@ public class HibernateUtil {
             s -> {
                 if (s.isOpen()) {
                     s.close();
-                    LOG.info("Session {} closed!", s);
+                    log.info("Session {} closed!", s);
                 }
             },
-            () -> LOG.info("Session {} was already closed!", session.get())
+            () -> log.info("Session {} was already closed!", session.get())
         );
     }
 }

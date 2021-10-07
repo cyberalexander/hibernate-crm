@@ -1,8 +1,8 @@
 package by.leonovich.hibernatecrm;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -30,7 +30,7 @@ import javax.sql.DataSource;
 @ComponentScan(basePackages = "by.leonovich.hibernatecrm.dao")
 @PropertySource(value={"classpath:application.properties"})
 public class DaoConfiguration {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(DaoConfiguration.class);
+    protected static final Logger log = LogManager.getLogger(DaoConfiguration.class);
 
     @Value("${driver_classname}")
     private String driverClassName;
@@ -48,7 +48,7 @@ public class DaoConfiguration {
 
     @Bean
     public DataSource dataSource() {
-        LOGGER.info("DRIVER : {}; URL : {}; USER : {}; PASSWORD : {}", driverClassName, url, username, password);
+        log.info("DRIVER : {}; URL : {}; USER : {}; PASSWORD : {}", driverClassName, url, username, password);
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName(driverClassName);
         dataSource.setUrl(url);

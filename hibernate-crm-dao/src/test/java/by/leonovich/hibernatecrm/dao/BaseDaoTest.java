@@ -5,6 +5,8 @@ import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.common.model.Automated;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.hibernate.ObjectNotFoundException;
@@ -12,8 +14,6 @@ import org.hibernate.Session;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +36,7 @@ import static by.leonovich.hibernatecrm.TestConstants.LIMIT;
 @Transactional
 @Commit
 public interface BaseDaoTest<T extends Automated> {
-    Logger LOG = LoggerFactory.getLogger(BaseDaoTest.class);
+    Logger log = LogManager.getLogger(BaseDaoTest.class);
 
     @BeforeEach
     @SneakyThrows
@@ -204,7 +204,7 @@ public interface BaseDaoTest<T extends Automated> {
     default void testGetLastIndex() {
         Serializable maxId = dao().getIds().lastElement();
         Serializable queriedMaxId = dao().getLastIndex();
-        LOG.info("expected={}; actual={}", maxId, queriedMaxId);
+        log.info("expected={}; actual={}", maxId, queriedMaxId);
         MatcherAssert.assertThat(
             String.format(TestConstants.M_TEST_LAST_INDEX, getEntityClass().getSimpleName(), queriedMaxId, maxId),
             maxId,

@@ -14,8 +14,6 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
@@ -37,7 +35,6 @@ import java.util.Objects;
 @Transactional
 @Commit
 class PersonDaoTest implements BaseDaoTest<Person> {
-    private static final Logger LOG = LoggerFactory.getLogger(PersonDaoTest.class);
     private static final MagicList<Person> persons = new MagicList<>();
 
     @Autowired
@@ -50,7 +47,7 @@ class PersonDaoTest implements BaseDaoTest<Person> {
     void testSaveCascade() {
         Person p = Person.init();
         dao().save(p);
-        LOG.debug("Relation saved as well? {}", Objects.nonNull(p.getPhoneNumber().getPersonId()));
+        log.debug("Relation saved as well? {}", Objects.nonNull(p.getPhoneNumber().getPersonId()));
         MatcherAssert.assertThat(
             TestConstants.M_SAVE_CASCADE,
             dao().get(p.getId()).getPhoneNumber().getPersonId(),

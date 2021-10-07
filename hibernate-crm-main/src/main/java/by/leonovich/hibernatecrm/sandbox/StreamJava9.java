@@ -1,6 +1,7 @@
 package by.leonovich.hibernatecrm.sandbox;
 
-import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -13,8 +14,8 @@ import java.util.stream.Stream;
  * @author alexanderleonovich
  * @version 1.0
  */
-@Slf4j
 public class StreamJava9 {
+    private static final Logger log = LogManager.getLogger(StreamJava9.class);
 
     public static void main(String[] args) {
         takeWhileDemo();

@@ -13,8 +13,6 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
@@ -36,7 +34,6 @@ import java.util.Objects;
 @Transactional
 @Commit
 class StudentDaoTest implements BaseDaoTest<Student> {
-    private static final Logger LOG = LoggerFactory.getLogger(StudentDaoTest.class);
     private static final MagicList<Student> students = new MagicList<>();
 
     @Autowired
@@ -50,7 +47,7 @@ class StudentDaoTest implements BaseDaoTest<Student> {
         Student student = Student.initWithManyToOne();
         University university = student.getUniversity();
         dao().save(student);
-        LOG.debug("Relation saved as well? {}", Objects.nonNull(student.getUniversity().getId()));
+        log.debug("Relation saved as well? {}", Objects.nonNull(student.getUniversity().getId()));
         MatcherAssert.assertThat(
             TestConstants.M_SAVE_CASCADE,
             university.getId(),
@@ -79,7 +76,7 @@ class StudentDaoTest implements BaseDaoTest<Student> {
         Assertions.assertNotNull(toDelete.getId(), TestConstants.M_SAVE);
         University university = toDelete.getUniversity();
         boolean removed = university.expelStudent(toDelete);
-        LOG.debug("Student {} expelled from University {}? {}", toDelete.getId(), university.getId(),  removed);
+        log.debug("Student {} expelled from University {}? {}", toDelete.getId(), university.getId(),  removed);
 
         dao().delete(toDelete);
         Assertions.assertNull(dao().get(toDelete.getId()), String.format(TestConstants.M_DELETE, toDelete));

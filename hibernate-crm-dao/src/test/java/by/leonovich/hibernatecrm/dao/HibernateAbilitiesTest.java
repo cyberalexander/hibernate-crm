@@ -6,6 +6,8 @@ import by.leonovich.hibernatecrm.common.random.RandomString;
 import by.leonovich.hibernatecrm.mappings.singletable.Person;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.hibernate.Session;
@@ -15,8 +17,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -39,7 +39,7 @@ import static by.leonovich.hibernatecrm.TestConstants.MAIN_LIMIT;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestDaoConfiguration.class})
 class HibernateAbilitiesTest {
-    private static final Logger LOG = LoggerFactory.getLogger(HibernateAbilitiesTest.class);
+    private static final Logger log = LogManager.getLogger(HibernateAbilitiesTest.class);
     private static final MagicList<Person> testData = new MagicList<>();
 
     @Autowired
@@ -98,14 +98,14 @@ class HibernateAbilitiesTest {
     void testFlush() {
         Person detached = testData.randomEntity();
         Session session = hibernate.openSession();
-        LOG.info("isDirty={}, in memory : {}", session.isDirty(), detached);
+        log.info("isDirty={}, in memory : {}", session.isDirty(), detached);
 
         Transaction t = session.beginTransaction();
         Person flushed = session.get(Person.class, detached.getId());
-        LOG.info("isDirty={}, from session : {}", session.isDirty(), flushed);
+        log.info("isDirty={}, from session : {}", session.isDirty(), flushed);
         flushed.setName("TEST_FLUSH_NAME");
         flushed.setSurname("TEST_FLUSH_SURNAME");
-        LOG.info("isDirty={}, modified in context : {}", session.isDirty(), flushed);
+        log.info("isDirty={}, modified in context : {}", session.isDirty(), flushed);
         session.flush();
         t.commit();
 
@@ -131,17 +131,17 @@ class HibernateAbilitiesTest {
     void testRefresh() {
         Person detached = testData.randomEntity();
         Session session = hibernate.openSession();
-        LOG.info("isDirty={}, in memory : {}", session.isDirty(), detached);
+        log.info("isDirty={}, in memory : {}", session.isDirty(), detached);
 
         Transaction t = session.beginTransaction();
         Person refreshed = session.get(Person.class, detached.getId());
-        LOG.info("isDirty={}, from session : {}", session.isDirty(), refreshed);
+        log.info("isDirty={}, from session : {}", session.isDirty(), refreshed);
         refreshed.setName("TEST_REFRESH_NAME");
         refreshed.setSurname("TEST_REFRESH_SURNAME");
-        LOG.info("isDirty={}, modified in context : {}", session.isDirty(), refreshed);
+        log.info("isDirty={}, modified in context : {}", session.isDirty(), refreshed);
         session.refresh(refreshed);
         t.commit();
-        LOG.info("isDirty={}, after refresh : {}", session.isDirty(), refreshed);
+        log.info("isDirty={}, after refresh : {}", session.isDirty(), refreshed);
 
         t = session.beginTransaction();
         Person queried = session.load(Person.class, detached.getId());
@@ -158,11 +158,11 @@ class HibernateAbilitiesTest {
         Person random = testData.randomEntity();
         Session session = hibernate.openSession();
         Transaction t = session.beginTransaction();
-        LOG.info("isDirty={}, before modify : {}", session.isDirty(), random);
+        log.info("isDirty={}, before modify : {}", session.isDirty(), random);
 
         random = session.get(Person.class, random.getId());
         random.setName("MODIFIED_" + RandomString.NAME.get());
-        LOG.info("isDirty={}, after modify : {}", session.isDirty(), random);
+        log.info("isDirty={}, after modify : {}", session.isDirty(), random);
         session.persist(random);
         t.commit();
 
@@ -170,7 +170,7 @@ class HibernateAbilitiesTest {
         Person persisted = session.get(Person.class, random.getId());
         t.commit();
 
-        LOG.info("isDirty={}, persisted : {}", session.isDirty(), persisted);
+        log.info("isDirty={}, persisted : {}", session.isDirty(), persisted);
         Assertions.assertEquals(random.getName(), persisted.getName());
     }
 
@@ -188,9 +188,9 @@ class HibernateAbilitiesTest {
         Session session = hibernate.openSession();
 
         Transaction t = session.beginTransaction();
-        LOG.info("isDirty={}, before modify : {}", session.isDirty(), random);
+        log.info("isDirty={}, before modify : {}", session.isDirty(), random);
         random.setName("MODIFIED_" + RandomString.NAME.get());
-        LOG.info("isDirty={}, after modify : {}", session.isDirty(), random);
+        log.info("isDirty={}, after modify : {}", session.isDirty(), random);
 
         Assertions.assertThrows(
             PersistenceException.class,
@@ -208,7 +208,7 @@ class HibernateAbilitiesTest {
 
         Session session = hibernate.openSession();
         Transaction t = session.beginTransaction();
-        LOG.info("isDirty={}, before persist : {}", session.isDirty(), newPerson);
+        log.info("isDirty={}, before persist : {}", session.isDirty(), newPerson);
 
         Assertions.assertThrows(
             PersistenceException.class,

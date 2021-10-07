@@ -11,8 +11,6 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
@@ -36,7 +34,6 @@ import java.util.Set;
 @Transactional
 @Commit
 class LibraryDaoTest implements BaseDaoTest<Library> {
-    private static final Logger LOG = LoggerFactory.getLogger(LibraryDaoTest.class);
     private static final MagicList<Library> libraries = new MagicList<>();
 
     @Autowired
@@ -49,7 +46,7 @@ class LibraryDaoTest implements BaseDaoTest<Library> {
     void testSaveCascade() {
         Library library = Library.initWitOneToMany();
         dao().save(library);
-        LOG.debug("Relation saved as well? {}", Objects.nonNull(library.getBooks().iterator().next().getId()));
+        log.debug("Relation saved as well? {}", Objects.nonNull(library.getBooks().iterator().next().getId()));
         MatcherAssert.assertThat(
             TestConstants.M_SAVE_CASCADE,
             dao().get(library.getId()).getBooks().iterator().next().getId(),
@@ -109,7 +106,7 @@ class LibraryDaoTest implements BaseDaoTest<Library> {
 
         Book orphan = library.getBooks().iterator().next();
         boolean removed = library.writeOffBook(orphan);
-        LOG.debug("Book {} removed from Library {}? {}",orphan.getId(), library.getId(),  removed);
+        log.debug("Book {} removed from Library {}? {}",orphan.getId(), library.getId(),  removed);
         dao().saveOrUpdate(library);
 
         MatcherAssert.assertThat(String.format(TestConstants.M_DELETE_ORPHAN, orphan, library),
