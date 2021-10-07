@@ -31,7 +31,12 @@ public class LoggingAspect {
         stopWatch.start();
         Object result = joinPoint.proceed();
         stopWatch.stop();
-        log.warn("Exec time : {}", stopWatch.getTime(TimeUnit.MILLISECONDS));//TODO log class & method name
+        log.info(
+            "{}#{} exec time : {}ms",
+            joinPoint.getSignature().getDeclaringType().getSimpleName(),
+            joinPoint.getSignature().getName(),
+            stopWatch.getTime(TimeUnit.MILLISECONDS)
+        );
         return result;
     }
 }
