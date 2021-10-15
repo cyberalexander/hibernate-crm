@@ -37,7 +37,7 @@ class LoggingAspectTest {
 
         MatcherAssert.assertThat(
             "Test that 'LoggingAspect' was invoked and written information to logs",
-            captor.getWarnLogs().stream().anyMatch(log -> log.startsWith("PersonServiceImpl#create exec time : ")),
+            captor.getInfoLogs().stream().anyMatch(log -> log.startsWith("PersonServiceImpl#create exec time : ")),
             Matchers.is(Boolean.TRUE)
         );
     }
