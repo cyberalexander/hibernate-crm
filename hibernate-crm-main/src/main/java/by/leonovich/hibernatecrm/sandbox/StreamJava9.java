@@ -14,8 +14,11 @@ import java.util.stream.Stream;
  * @author alexanderleonovich
  * @version 1.0
  */
-public class StreamJava9 {
+public final class StreamJava9 {
     private static final Logger log = LogManager.getLogger(StreamJava9.class);
+
+    private StreamJava9() {
+    }
 
     public static void main(String[] args) {
         takeWhileDemo();

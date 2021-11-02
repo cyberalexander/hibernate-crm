@@ -10,10 +10,13 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.stream.Stream;
 
-public class App {
-    protected static final Logger log = LogManager.getLogger(App.class);
+public final class App {
+    private static final Logger log = LogManager.getLogger(App.class);
 
-    public static void main( String[] args ) throws Exception {
+    private App() {
+    }
+
+    public static void main(String[] args) throws Exception {
         var context = new AnnotationConfigApplicationContext(ServiceConfiguration.class);
         var personService = context.getBean("personServiceImpl", PersonServiceImpl.class);
         Stream.generate(Person::init).limit(3).forEach(p -> {
