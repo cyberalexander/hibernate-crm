@@ -19,5 +19,5 @@
     <suppress files="." checks="ConstantName"/>
     <suppress files="." checks="WhitespaceAround"/>
 
-    <suppress files="StreamJava9.java|App.java" checks="MagicNumber"/>
+    <suppress files="App.java" checks="MagicNumber"/>
 </suppressions>
