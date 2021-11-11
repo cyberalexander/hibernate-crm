@@ -13,7 +13,7 @@ import java.util.Random;
  * @version 1.0
  */
 public class MagicList<E> extends ArrayList<E> {
-    protected static final Random r = new Random();
+    protected static final Random RANDOM = new Random();
 
     public MagicList() {
         super();
@@ -28,7 +28,7 @@ public class MagicList<E> extends ArrayList<E> {
     }
 
     public int randIndex() {
-        return r.nextInt(super.size() - 1);
+        return RANDOM.nextInt(super.size() - 1);
     }
 
     public E lastElement() {

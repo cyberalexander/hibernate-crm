@@ -33,8 +33,8 @@ public enum RandomNumber {
 
     private final Supplier<? extends Serializable> supplier;
 
-    RandomNumber(Supplier<? extends Serializable> supplier) {
-        this.supplier = supplier;
+    RandomNumber(Supplier<? extends Serializable> s) {
+        this.supplier = s;
     }
 
     public <T extends Serializable> T get() {

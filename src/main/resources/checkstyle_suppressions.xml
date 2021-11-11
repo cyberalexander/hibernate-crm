@@ -15,9 +15,6 @@
     <suppress files="." checks="MethodParamPad"/>
     <suppress files="." checks="FinalParameters"/>
     <suppress files="." checks="DesignForExtension"/>
-    <suppress files="." checks="HiddenField"/>
-    <suppress files="." checks="ConstantName"/>
-    <suppress files="." checks="WhitespaceAround"/>
 
     <suppress files="App.java" checks="MagicNumber"/>
 </suppressions>

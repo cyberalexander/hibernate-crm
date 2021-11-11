@@ -4,14 +4,13 @@ import by.leonovich.hibernatecrm.exception.HibernateCrmApplicationException;
 import by.leonovich.hibernatecrm.mappings.singletable.Person;
 import by.leonovich.hibernatecrm.service.exception.ServiceException;
 import by.leonovich.hibernatecrm.service.person.PersonServiceImpl;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.stream.Stream;
 
+@Log4j2
 public final class App {
-    private static final Logger log = LogManager.getLogger(App.class);
 
     private App() {
     }

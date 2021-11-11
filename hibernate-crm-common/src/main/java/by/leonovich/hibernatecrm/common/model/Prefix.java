@@ -25,9 +25,9 @@ public enum Prefix {
     PROF("Prof", "Professor"),
     SISTER("Sister", "Sister");
 
-    Prefix(String shortPrefix, String fullPrefix) {
-        this.shortPrefix = shortPrefix;
-        this.fullPrefix = fullPrefix;
+    Prefix(String sPrefix, String fPrefix) {
+        this.shortPrefix = sPrefix;
+        this.fullPrefix = fPrefix;
     }
 
     private final String shortPrefix;
