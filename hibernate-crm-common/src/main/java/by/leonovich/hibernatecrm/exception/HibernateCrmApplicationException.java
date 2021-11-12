@@ -10,7 +10,7 @@ package by.leonovich.hibernatecrm.exception;
  */
 public class HibernateCrmApplicationException extends RuntimeException {
 
-    public HibernateCrmApplicationException(Exception e) {
+    public HibernateCrmApplicationException(final Exception e) {
         super(e);
     }
 }

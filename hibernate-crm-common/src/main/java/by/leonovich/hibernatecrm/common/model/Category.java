@@ -21,7 +21,7 @@ public enum Category {
 
     private final String categoryCode;
 
-    Category(String code) {
+    Category(final String code) {
         this.categoryCode = code;
     }
 

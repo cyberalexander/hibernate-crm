@@ -19,7 +19,7 @@ public class MagicList<E> extends ArrayList<E> {
         super();
     }
 
-    public MagicList(List<E> elements) {
+    public MagicList(final List<E> elements) {
         super(elements);
     }
 

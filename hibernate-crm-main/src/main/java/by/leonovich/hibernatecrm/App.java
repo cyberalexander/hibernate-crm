@@ -15,7 +15,7 @@ public final class App {
     private App() {
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
         var context = new AnnotationConfigApplicationContext(ServiceConfiguration.class);
         var personService = context.getBean("personServiceImpl", PersonServiceImpl.class);
         Stream.generate(Person::init).limit(3).forEach(p -> {

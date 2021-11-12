@@ -33,7 +33,7 @@ public enum RandomNumber {
 
     private final Supplier<? extends Serializable> supplier;
 
-    RandomNumber(Supplier<? extends Serializable> s) {
+    RandomNumber(final Supplier<? extends Serializable> s) {
         this.supplier = s;
     }
 

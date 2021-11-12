@@ -19,12 +19,12 @@ import java.util.Objects;
 @Converter(autoApply = true)
 public class CategoryConverter implements AttributeConverter<Category, String> {
     @Override
-    public String convertToDatabaseColumn(Category category) {
+    public String convertToDatabaseColumn(final Category category) {
         return Objects.nonNull(category) ? category.getCategoryCode() : null;
     }
 
     @Override
-    public Category convertToEntityAttribute(String code) {
+    public Category convertToEntityAttribute(final String code) {
         if (StringUtils.isEmpty(code)) {
             return null;
         }

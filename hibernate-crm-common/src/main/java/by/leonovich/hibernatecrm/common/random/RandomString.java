@@ -50,7 +50,7 @@ public enum RandomString {
     private static final char[] VOWELS = "aeiou".toCharArray();
     private static final char[] NUMS = "1234567890".toCharArray();
 
-    RandomString(Supplier<String> s) {
+    RandomString(final Supplier<String> s) {
         this.supplier = s;
     }
 
@@ -58,7 +58,7 @@ public enum RandomString {
         return supplier.get();
     }
 
-    private static String generate(int length) {
+    private static String generate(final int length) {
         StringBuilder sb = new StringBuilder();
         sb.append(CAPITALS[RANDOM.nextInt(CAPITALS.length)]);
         for (int i = 0; i < length; i++) {
@@ -68,7 +68,7 @@ public enum RandomString {
         return sb.toString();
     }
 
-    private static String generateDocNumber(int length) {
+    private static String generateDocNumber(final int length) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < length; i++) {
             sb.append(CAPITALS[RANDOM.nextInt(CAPITALS.length)]);

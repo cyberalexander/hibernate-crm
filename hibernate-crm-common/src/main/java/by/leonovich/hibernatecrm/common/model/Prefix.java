@@ -25,7 +25,7 @@ public enum Prefix {
     PROF("Prof", "Professor"),
     SISTER("Sister", "Sister");
 
-    Prefix(String sPrefix, String fPrefix) {
+    Prefix(final String sPrefix, final String fPrefix) {
         this.shortPrefix = sPrefix;
         this.fullPrefix = fPrefix;
     }
@@ -41,7 +41,7 @@ public enum Prefix {
         return fullPrefix;
     }
 
-    public static Prefix of(String prefixValue) {
+    public static Prefix of(final String prefixValue) {
         return Arrays.stream(Prefix.values())
             .filter(p -> prefixValue.equals(p.getShortPrefix()))
             .findFirst()

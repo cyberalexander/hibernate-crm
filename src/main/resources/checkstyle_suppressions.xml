@@ -13,7 +13,6 @@
     <suppress files="." checks="JavadocType"/>
     <suppress files="." checks="MissingJavadocMethod"/>
     <suppress files="." checks="MethodParamPad"/>
-    <suppress files="." checks="FinalParameters"/>
     <suppress files="." checks="DesignForExtension"/>
 
     <suppress files="App.java" checks="MagicNumber"/>

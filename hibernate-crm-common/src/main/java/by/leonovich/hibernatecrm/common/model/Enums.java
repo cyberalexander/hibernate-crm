@@ -18,11 +18,11 @@ public final class Enums {
     private Enums() {
     }
 
-    public static <T extends Enum<T>> T random(Class<T> enumClass) {
+    public static <T extends Enum<T>> T random(final Class<T> enumClass) {
         return random(enumClass.getEnumConstants());
     }
 
-    public static <T> T random(T... values) {
+    public static <T> T random(final T... values) {
         return values[new Random().nextInt(values.length)];
     }
 }
