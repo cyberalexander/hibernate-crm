@@ -1,5 +1,6 @@
 package by.leonovich.hibernatecrm.common.collection;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -12,8 +13,10 @@ import java.util.Random;
  * @author alexanderleonovich
  * @version 1.0
  */
-public class MagicList<E> extends ArrayList<E> {
-    protected static final Random RANDOM = new Random();
+public final class MagicList<E> extends ArrayList<E> {
+    @Serial
+    private static final long serialVersionUID = -6382952508051769260L;
+    private static final Random RANDOM = new Random();
 
     public MagicList() {
         super();

@@ -37,6 +37,7 @@ public enum RandomNumber {
         this.supplier = s;
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Serializable> T get() {
         return (T) supplier.get();
     }
