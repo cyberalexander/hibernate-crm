@@ -1,7 +1,7 @@
 package by.leonovich.hibernatecrm.service.exception;
 
 import lombok.Getter;
-import lombok.Setter;
+import java.io.Serial;
 
 /**
  * Created : 26/11/2020 21:59
@@ -12,10 +12,11 @@ import lombok.Setter;
  * @version 1.0
  */
 public class ServiceException extends Exception {
+    @Serial
+    private static final long serialVersionUID = 9126351143499635053L;
 
     @Getter
-    @Setter
-    private Exception exception;
+    private final Exception exception;
 
     public ServiceException(Exception exception) {
         super(exception);

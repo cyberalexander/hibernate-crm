@@ -6,6 +6,7 @@ import by.leonovich.hibernatecrm.common.random.RandomString;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -19,6 +20,8 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Person implements Serializable, Automated {
+    @Serial
+    private static final long serialVersionUID = 6759377216033508698L;
     @EqualsAndHashCode.Include
     private Long id;
     @EqualsAndHashCode.Include
@@ -30,6 +33,7 @@ public class Person implements Serializable, Automated {
     private PhoneNumber phoneNumber; /* ONE-TO-ONE relation */
 
     @Override
+    @SuppressWarnings("unchecked")
     public Person populate() {
         this.setName(RandomString.NAME.get());
         this.setSurname(RandomString.SURNAME.get());
@@ -40,11 +44,13 @@ public class Person implements Serializable, Automated {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Person populateCascade() {
         return this.populate();
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Person modify() {
         this.setName(newValue(this.getId(), RandomString.NAME));
         this.getPhoneNumber().setNumber(RandomNumber.DEFAULT_L.get());
@@ -52,6 +58,7 @@ public class Person implements Serializable, Automated {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Person modifyCascade() {
         return this.modify();
     }

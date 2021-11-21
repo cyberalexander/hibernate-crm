@@ -52,6 +52,7 @@ public class Library implements Automated {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T populate() {
         setName(RandomString.COMPANY.get());
         setLocation(Location.init());
@@ -59,6 +60,7 @@ public class Library implements Automated {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T populateCascade() {
         populate();
         setBooks(Stream.generate(Book::init).limit(2).collect(Collectors.toSet()));
@@ -67,6 +69,7 @@ public class Library implements Automated {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T modify() {
         setName(newValue(getId(), RandomString.COMPANY));
         getLocation().setCity(newCascadeValue(getId(), RandomString.DEFAULT));
@@ -74,6 +77,7 @@ public class Library implements Automated {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T modifyCascade() {
         modify();
         getBooks().forEach(book -> book.setName(newCascadeValue(getId(), RandomString.NAME)));

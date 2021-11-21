@@ -70,6 +70,7 @@ public class Book implements Automated {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T populate() {
         this.setName(RandomString.NAME.get());
         this.setYear(LocalDate.now().minusYears(RandomNumber.DAYS.get()).getYear());
@@ -79,6 +80,7 @@ public class Book implements Automated {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T populateCascade() {
         populate();
         setLibrary(Library.init());
@@ -88,6 +90,7 @@ public class Book implements Automated {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T modify() {
         this.setName(newValue(this.getId(), RandomString.NAME));
         this.setYear(LocalDate.now().minusYears(RandomNumber.DAYS.get()).getYear());
@@ -95,6 +98,7 @@ public class Book implements Automated {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T modifyCascade() {
         modify();
         getLibrary().setName(newCascadeValue(getId(), RandomString.COMPANY));

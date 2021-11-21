@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -18,6 +19,8 @@ import java.io.Serializable;
  */
 @Data
 public class PhoneNumber implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -3977415971088554604L;
     private Long personId; /* ONE-TO-ONE relation */
     private PhoneNumberType type;
     private Long number;
