@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>by.leonovich.hibernatecrm</groupId>
     <artifactId>hibernate-crm</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>${project.revision}</version>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
     <description>Hibernate framework sandbox demo project</description>
@@ -49,6 +49,7 @@
         </developer>
     </developers>
     <modules>
+        <module>build-tools</module>
         <module>hibernate-crm-common</module>
         <module>hibernate-crm-model</module>
         <module>hibernate-crm-dao</module>
@@ -56,6 +57,7 @@
         <module>hibernate-crm-main</module>
     </modules>
     <properties>
+        <project.revision>2021.0.1</project.revision>
         <!-- ========= Project properties ========= -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>16</maven.compiler.source>
@@ -462,8 +464,17 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
                     <version>${pmd.plugin.verion}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>by.leonovich.hibernatecrm</groupId>
+                            <artifactId>build-tools</artifactId>
+                            <version>${project.revision}</version>
+                        </dependency>
+                    </dependencies>
                     <configuration>
-                        <rulesetsTargetDirectory>src/main/resources/</rulesetsTargetDirectory>
+                        <rulesets>
+                            <ruleset>/quality/pmd-ruleset.xml</ruleset>
+                        </rulesets>
                         <targetJdk>${java.version}</targetJdk>
                         <includeTests>true</includeTests>
                         <outputEncoding>${project.build.sourceEncoding}</outputEncoding>

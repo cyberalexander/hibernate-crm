@@ -27,11 +27,10 @@
     <parent>
         <artifactId>hibernate-crm</artifactId>
         <groupId>by.leonovich.hibernatecrm</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>2021.0.1</version>
     </parent>
 
     <artifactId>hibernate-crm-service</artifactId>
-    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>hibernate-crm-service</name>
@@ -48,12 +47,12 @@
         <dependency>
             <groupId>by.leonovich.hibernatecrm</groupId>
             <artifactId>hibernate-crm-model</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.revision}</version>
         </dependency>
         <dependency>
             <groupId>by.leonovich.hibernatecrm</groupId>
             <artifactId>hibernate-crm-dao</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.revision}</version>
         </dependency>
 
         <!-- 3-party dependencies -->

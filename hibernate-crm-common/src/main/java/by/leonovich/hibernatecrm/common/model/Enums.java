@@ -22,7 +22,7 @@ public final class Enums {
         return random(enumClass.getEnumConstants());
     }
 
-    public static <T> T random(final T[] values) {
+    public static <T> T random(final T... values) {
         return values[new Random().nextInt(values.length)];
     }
 }
