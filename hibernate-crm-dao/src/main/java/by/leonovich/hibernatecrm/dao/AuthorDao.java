@@ -24,7 +24,7 @@ import java.util.List;
 @Repository
 public class AuthorDao extends BaseDao<Author> {
 
-    public List<Author> getAuthorByNameCriteria(String name) throws DaoException {
+    public List<Author> getAuthorByNameCriteria(final String name) throws DaoException {
         try {
             Session session = session();
 
@@ -42,7 +42,7 @@ public class AuthorDao extends BaseDao<Author> {
         }
     }
 
-    public List<Author> getAuthorByNameHql(String name) throws DaoException {
+    public List<Author> getAuthorByNameHql(final String name) throws DaoException {
         try {
             String hql = "FROM " + Author.class.getSimpleName() + " WHERE name=:name";
             Query<Author> query = session().createQuery(hql);

@@ -1,8 +1,7 @@
 package by.leonovich.hibernatecrm;
 
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -28,9 +27,9 @@ import javax.sql.DataSource;
 @Configuration
 @EnableTransactionManagement(proxyTargetClass = true)
 @ComponentScan(basePackages = "by.leonovich.hibernatecrm.dao")
-@PropertySource(value={"classpath:application.properties"})
+@PropertySource(value = {"classpath:application.properties"})
+@Log4j2
 public class DaoConfiguration {
-    protected static final Logger log = LogManager.getLogger(DaoConfiguration.class);
 
     @Value("${driver_classname}")
     private String driverClassName;

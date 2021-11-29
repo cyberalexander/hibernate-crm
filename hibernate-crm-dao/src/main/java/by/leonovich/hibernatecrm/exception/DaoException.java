@@ -1,7 +1,6 @@
 package by.leonovich.hibernatecrm.exception;
 
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Created : 26/11/2020 21:59
@@ -14,11 +13,10 @@ import lombok.Setter;
 public class DaoException extends Exception {
 
     @Getter
-    @Setter
-    private Exception exception;
+    private final Exception exception;
 
-    public DaoException(Exception exception) {
-        super(exception);
-        this.exception = exception;
+    public DaoException(final Exception e) {
+        super(e);
+        this.exception = e;
     }
 }

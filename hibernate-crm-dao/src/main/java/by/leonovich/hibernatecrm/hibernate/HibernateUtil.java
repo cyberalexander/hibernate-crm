@@ -21,8 +21,8 @@ import java.util.Optional;
  * @deprecated Replaced by Spring JPA
  */
 @Deprecated
-public class HibernateUtil {
-    private static final Logger log = LogManager.getLogger(HibernateUtil.class);
+public final class HibernateUtil {
+    private static final Logger LOG = LogManager.getLogger(HibernateUtil.class);
     private final SessionFactory factory;
     private final ThreadLocal<Session> session = new ThreadLocal<>();
 
@@ -30,7 +30,7 @@ public class HibernateUtil {
         try {
             Configuration config = new Configuration().configure();
             factory = config.buildSessionFactory();
-            log.trace("SessionFactory initialized : {}", factory);
+            LOG.trace("SessionFactory initialized : {}", factory);
         } catch (Exception e) {
             throw new HibernateException("Hibernate Session Factory creation failed.", e);
             /*System.exit(0);*/
@@ -42,7 +42,7 @@ public class HibernateUtil {
             .filter(SharedSessionContract::isOpen)
             .orElseGet(() -> {
                 Session newSession = factory.openSession();
-                log.info("Session {} opened!", newSession);
+                LOG.info("Session {} opened!", newSession);
                 return newSession;
             });
         this.session.set(s);
@@ -55,10 +55,10 @@ public class HibernateUtil {
             s -> {
                 if (s.isOpen()) {
                     s.close();
-                    log.info("Session {} closed!", s);
+                    LOG.info("Session {} closed!", s);
                 }
             },
-            () -> log.info("Session {} was already closed!", session.get())
+            () -> LOG.info("Session {} was already closed!", session.get())
         );
     }
 }

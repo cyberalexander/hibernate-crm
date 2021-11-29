@@ -2,8 +2,7 @@ package by.leonovich.hibernatecrm.dao;
 
 import by.leonovich.hibernatecrm.common.collection.MagicList;
 import by.leonovich.hibernatecrm.exception.DaoException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -25,12 +24,12 @@ import java.util.List;
  * @author alexanderleonovich
  * @version 1.0
  */
+@Log4j2
 public abstract class BaseDao<T> implements Dao<T> {
-    protected static final Logger log = LogManager.getLogger(BaseDao.class);
     private SessionFactory hibernate;
 
     @Override
-    public void persist(T entity) throws DaoException {
+    public void persist(final T entity) throws DaoException {
         try {
             log.debug("Before persist {}", entity);
             session().persist(entity);
@@ -41,7 +40,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     }
 
     @Override
-    public Serializable save(T entity) throws DaoException {
+    public Serializable save(final T entity) throws DaoException {
         try {
             log.debug("Before save {}", entity);
             Serializable id = session().save(entity);
@@ -53,7 +52,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     }
 
     @Override
-    public void saveOrUpdate(T entity) throws DaoException {
+    public void saveOrUpdate(final T entity) throws DaoException {
         try {
             log.debug("Before {}", entity);
             session().saveOrUpdate(entity);
@@ -64,7 +63,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     }
 
     @Override
-    public T get(Serializable id) throws DaoException {
+    public T get(final Serializable id) throws DaoException {
         try {
             return session().get(getPersistentClass(), id);
         } catch (HibernateException e) {
@@ -73,7 +72,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     }
 
     @Override
-    public T load(Serializable id) throws DaoException {
+    public T load(final Serializable id) throws DaoException {
         try {
             return session().load(getPersistentClass(), id);
         } catch (HibernateException e) {
@@ -82,7 +81,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     }
 
     @Override
-    public void delete(T entity) throws DaoException {
+    public void delete(final T entity) throws DaoException {
         try {
             session().delete(entity);
             log.debug("Deleted : {}", entity);
@@ -92,7 +91,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     }
 
     @Override
-    public List<T> getAll(Class<T> type) throws DaoException {
+    public List<T> getAll(final Class<T> type) throws DaoException {
         try {
             Session session = session();
 
@@ -143,7 +142,7 @@ public abstract class BaseDao<T> implements Dao<T> {
     }
 
     @Autowired
-    public void setHibernate(SessionFactory hibernate) {
-        this.hibernate = hibernate;
+    public void setHibernate(final SessionFactory sessionFactory) {
+        this.hibernate = sessionFactory;
     }
 }
