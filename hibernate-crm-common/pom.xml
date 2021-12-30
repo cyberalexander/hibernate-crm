@@ -38,6 +38,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>by.leonovich.hibernatecrm</groupId>
+            <artifactId>build-tools</artifactId>
+            <version>${project.revision}</version>
+        </dependency>
+        <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>javax.persistence-api</artifactId>
         </dependency>

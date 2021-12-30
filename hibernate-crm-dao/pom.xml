@@ -40,6 +40,11 @@
         <!-- Internal dependencies -->
         <dependency>
             <groupId>by.leonovich.hibernatecrm</groupId>
+            <artifactId>build-tools</artifactId>
+            <version>${project.revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>by.leonovich.hibernatecrm</groupId>
             <artifactId>hibernate-crm-model</artifactId>
             <version>${project.revision}</version>
         </dependency>
