@@ -27,7 +27,7 @@
     <parent>
         <groupId>by.leonovich.hibernatecrm</groupId>
         <artifactId>hibernate-crm</artifactId>
-        <version>2021.0.1</version>
+        <version>2021.0.2</version>
     </parent>
 
     <artifactId>hibernate-crm-model</artifactId>

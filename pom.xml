@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>by.leonovich.hibernatecrm</groupId>
     <artifactId>hibernate-crm</artifactId>
-    <version>${project.revision}</version>
+    <version>2021.0.2</version>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
     <description>Hibernate framework sandbox demo project</description>
@@ -57,7 +57,7 @@
         <module>hibernate-crm-main</module>
     </modules>
     <properties>
-        <project.revision>2021.0.1</project.revision>
+        <project.revision>2021.0.2</project.revision>
         <!-- ========= Project properties ========= -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>16</maven.compiler.source>
