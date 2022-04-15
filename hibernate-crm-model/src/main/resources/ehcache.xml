@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="true"
+         monitoring="autodetect" dynamicConfig="true">
+    <!-- By default, Ehcache stored the cached files in temp folder. -->
+     <diskStore path="java.io.tmpdir"/>
+
+    <defaultCache
+        maxElementsInMemory="2000"
+        eternal="false"
+        timeToIdleSeconds="200"
+        timeToLiveSeconds="200"
+        overflowToDisk="true"
+        diskPersistent="false"
+        diskExpiryThreadIntervalSeconds="300"
+        memoryStoreEvictionPolicy="LRU"/>
+
+    <cache name="BodyTypeCache"
+           maxElementsInMemory="1000"
+           eternal="false"
+           timeToIdleSeconds="100"
+           timeToLiveSeconds="100"
+           overflowToDisk="false"/>
+</ehcache>
+<!--
+diskStore: EhCache stores data into memory but when it starts overflowing, it start writing data into file system.
+We use “path” property to define the location where EhCache will write the overflown data.
+-->
