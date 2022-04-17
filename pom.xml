@@ -86,10 +86,10 @@
         <hibernate.version>5.4.23.Final</hibernate.version>
         <spring.version>5.3.3</spring.version>
         <aspectj.version>1.9.6</aspectj.version>
-        <mysql.connector.version>8.0.17</mysql.connector.version>
+        <mysql.connector.version>8.0.27</mysql.connector.version>
         <h2.database.version>1.4.200</h2.database.version>
         <log4j.version>2.14.1</log4j.version>
-        <guava.version>29.0-jre</guava.version>
+        <guava.version>30.0-android</guava.version>
         <reflections.version>0.9.12</reflections.version>
         <apache.commons.version>4.4</apache.commons.version>
         <apache.commons.lang.version>3.10</apache.commons.lang.version>
